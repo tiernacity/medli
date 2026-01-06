@@ -1,2 +1,15 @@
 # Deciduous database (local)
 .deciduous/
+
+# Dependencies
+node_modules
+
+# Build outputs
+dist
+*.tsbuildinfo
+
+# Test coverage
+coverage
+
+# OS
+.DS_Store

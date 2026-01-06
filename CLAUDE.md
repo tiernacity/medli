@@ -164,3 +164,53 @@ deciduous diff apply --dry-run .deciduous/patches/teammate.json
 ```
 
 PR workflow: Export patch → commit patch file → PR → teammates apply.
+
+---
+
+## Code Quality Standards
+
+### Success Criteria for Edits
+
+Before considering any code edit complete, verify:
+
+1. **Type Safety**: Code compiles with `npm run typecheck` (no TypeScript errors)
+2. **Tests Pass**: All tests pass with `npm run test`
+3. **Linting Clean**: No lint errors with `npm run lint`
+4. **Formatting Consistent**: Code is formatted with `npm run format`
+5. **Dependencies Resolve**: Cross-package imports work correctly
+
+### Acceptance Criteria Before Committing
+
+**All checks must pass before committing:**
+
+```bash
+npm install        # Ensure dependencies are installed
+npm run typecheck  # TypeScript compilation succeeds
+npm run lint       # No ESLint errors
+npm run format:check  # Code follows formatting standards
+npm run test       # All tests pass
+```
+
+**Commit Checklist:**
+
+- [ ] `npm run typecheck` passes
+- [ ] `npm run lint` passes (or `npm run lint:fix` applied)
+- [ ] `npm run format:check` passes (or `npm run format` applied)
+- [ ] `npm run test` passes
+- [ ] New code has appropriate test coverage
+- [ ] Decision graph updated with relevant nodes
+
+### Package Structure
+
+```
+packages/
+├── spec/                    # Core types and interfaces
+├── generators/
+│   ├── procedural/          # Procedural shape generation
+│   └── object/              # Object-based shape generation
+└── renderers/
+    ├── svg/                 # SVG rendering
+    └── canvas/              # Canvas rendering
+```
+
+All generator and renderer packages depend on `@medli/spec`.
