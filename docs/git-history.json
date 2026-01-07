@@ -1,5 +1,21 @@
 [
   {
+    "hash": "7d24fb50b2cb03ac582ca03f1dba91ff75596507",
+    "short_hash": "7d24fb5",
+    "author": "Chris Tierney",
+    "date": "2026-01-07T16:16:38Z",
+    "message": "feat: consistent background(color) function API for both generators\n\n- Object generator now exports background() function matching procedural API\n- Fixed SVGSVGElement cast errors using querySelector with type parameter\n- Added typecheck and stub scripts to test-app package.json\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 3
+  },
+  {
+    "hash": "dd27045bbb3e7523239e32f0f71c20d34d77bbbf",
+    "short_hash": "dd27045",
+    "author": "Chris Tierney",
+    "date": "2026-01-07T15:54:40Z",
+    "message": "feat: reorganize test app layout to group renderers by generator type\n\nRenderers now displayed in two columns (Procedural | Object) instead of\nby renderer type (SVG | Canvas), with color-coded column headers.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 2
+  },
+  {
     "hash": "d9b79db59e672e5356b7ddb4d3b583d6700b0167",
     "short_hash": "d9b79db",
     "author": "Chris Tierney",
