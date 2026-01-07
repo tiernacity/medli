@@ -1,5 +1,13 @@
 [
   {
+    "hash": "d6f8dcd281eb8d47f6eaff1dc2b9f7d10e738fda",
+    "short_hash": "d6f8dcd",
+    "author": "Chris Tierney",
+    "date": "2026-01-07T13:08:55Z",
+    "message": "chore: add Claude Code permissions settings\n\nAuto-approve common dev actions:\n- npm/pnpm commands\n- git operations (except force push/hard reset)\n- deciduous graph commands\n- file edits within repo\n- Playwright and Context7 MCP tools\n- localhost curl/fetch\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 1
+  },
+  {
     "hash": "fb0155b3fa354c04c9e991523e7e4c6f0f4b12c8",
     "short_hash": "fb0155b",
     "author": "Chris Tierney",
