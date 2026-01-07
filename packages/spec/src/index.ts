@@ -2,16 +2,29 @@
  * Core specification types for medli
  */
 
-export interface Shape {
-  type: string;
-  x: number;
-  y: number;
+/**
+ * A frame represents the current state to render.
+ * All properties are optional - renderers provide defaults.
+ */
+export type Frame = {
+  backgroundColor?: string;
+};
+
+/**
+ * Generator produces frames based on time.
+ */
+export interface Generator {
+  frame(time: number): Frame;
 }
 
-export interface Generator<T extends Shape = Shape> {
-  generate(): T[];
-}
-
-export interface Renderer<T extends Shape = Shape> {
-  render(shapes: T[]): void;
+/**
+ * Renderer displays frames to the screen.
+ * Renders a 100x100 square of the background color.
+ * Constructors accept HTML elements of the relevant type.
+ * Expects requestAnimationFrame support.
+ */
+export interface Renderer {
+  render(time: number): void;
+  loop(): void;
+  stop(): void;
 }

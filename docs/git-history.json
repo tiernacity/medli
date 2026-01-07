@@ -1,0 +1,66 @@
+[
+  {
+    "hash": "7d24fb50b2cb03ac582ca03f1dba91ff75596507",
+    "short_hash": "7d24fb5",
+    "author": "Chris Tierney",
+    "date": "2026-01-07T16:16:38Z",
+    "message": "feat: consistent background(color) function API for both generators\n\n- Object generator now exports background() function matching procedural API\n- Fixed SVGSVGElement cast errors using querySelector with type parameter\n- Added typecheck and stub scripts to test-app package.json\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 3
+  },
+  {
+    "hash": "dd27045bbb3e7523239e32f0f71c20d34d77bbbf",
+    "short_hash": "dd27045",
+    "author": "Chris Tierney",
+    "date": "2026-01-07T15:54:40Z",
+    "message": "feat: reorganize test app layout to group renderers by generator type\n\nRenderers now displayed in two columns (Procedural | Object) instead of\nby renderer type (SVG | Canvas), with color-coded column headers.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 2
+  },
+  {
+    "hash": "d9b79db59e672e5356b7ddb4d3b583d6700b0167",
+    "short_hash": "d9b79db",
+    "author": "Chris Tierney",
+    "date": "2026-01-07T15:21:38Z",
+    "message": "feat: major architecture improvements across generators and renderers\n\nTest App:\n- Refactor to 2 generators + 4 harnesses with code display\n- Remove old apps/ directory, add generators/ and harnesses/\n- Show generator code and harness code separately\n\nRenderers:\n- Add @medli/renderer-common with BaseRenderer abstract class\n- SVG and Canvas renderers extend BaseRenderer (shared loop/stop)\n- Default to white background when backgroundColor undefined\n\nObject Generator:\n- Remove ObjectGenerator class - Scene IS the generator\n- Scene implements Generator, pass directly to renderers\n- Add SceneObject interface for extensible scene tree\n- Background is optional via setBackground()/add()/remove()\n\nProcedural Generator:\n- Redesign with p5.js-style sketch pattern\n- Pass draw function: new ProceduralGenerator((p) => p.background(color))\n- Sketch context provides background() and time\n\nSpec:\n- Frame.backgroundColor is now optional\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 30
+  },
+  {
+    "hash": "fd888fb91e7790f7c68716a87f8a5e3e96f2fac3",
+    "short_hash": "fd888fb",
+    "author": "Chris Tierney",
+    "date": "2026-01-07T14:37:32Z",
+    "message": "feat: refactor test app with separate app files and code display\n\n- Create 4 separate app files demonstrating API styles:\n  - proc-svg.ts, proc-canvas.ts (p5.js-style procedural)\n  - obj-svg.ts, obj-canvas.ts (three.js-style object-oriented)\n- Each app uses animation loop instead of recreating on change\n- Add \"Show Code\" buttons with live source via Vite ?raw imports\n- Add npm run dev script at root level\n- Update Claude Code permissions for deciduous commands\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 10
+  },
+  {
+    "hash": "d6f8dcd281eb8d47f6eaff1dc2b9f7d10e738fda",
+    "short_hash": "d6f8dcd",
+    "author": "Chris Tierney",
+    "date": "2026-01-07T13:08:55Z",
+    "message": "chore: add Claude Code permissions settings\n\nAuto-approve common dev actions:\n- npm/pnpm commands\n- git operations (except force push/hard reset)\n- deciduous graph commands\n- file edits within repo\n- Playwright and Context7 MCP tools\n- localhost curl/fetch\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 1
+  },
+  {
+    "hash": "fb0155b3fa354c04c9e991523e7e4c6f0f4b12c8",
+    "short_hash": "fb0155b",
+    "author": "Chris Tierney",
+    "date": "2026-01-07T13:01:08Z",
+    "message": "feat: add visual test app for renderer verification\n\n- Add @medli/test-app package with Vite dev server\n- 2x2 matrix testing all generator/renderer combinations\n- Interactive color picker for live verification\n- Configured for Playwright MCP visual testing workflow\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 10
+  },
+  {
+    "hash": "08cded78e34592bcc0f293c372099cd5b36ba005",
+    "short_hash": "08cded7",
+    "author": "Chris Tierney",
+    "date": "2026-01-07T12:14:35Z",
+    "message": "feat: simplify spec to Frame type with background color\n\nReplace the generic Shape-based spec with a simpler Frame-based approach:\n- Frame type contains only backgroundColor\n- Generator.frame(time) returns a Frame\n- Renderer has render(time), loop(), and stop() methods\n- Renderers accept HTML elements and render 100x100 squares\n- Added DOM lib support for renderer packages\n- Added jest-environment-jsdom for renderer tests\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 14
+  },
+  {
+    "hash": "bfecf05fe3ba212eb31216faaf87e0d2941d62f9",
+    "short_hash": "bfecf05",
+    "author": "Chris Tierney",
+    "date": "2026-01-06T13:21:30Z",
+    "message": "feat: bootstrap TypeScript monorepo with npm workspaces\n\nSet up a monorepo structure with five packages:\n- @medli/spec: Core types and interfaces\n- @medli/generator-procedural: Procedural shape generation\n- @medli/generator-object: Object-based shape generation\n- @medli/renderer-svg: SVG rendering\n- @medli/renderer-canvas: Canvas rendering\n\nConfigured tooling:\n- TypeScript with project references\n- Jest with ts-jest for testing\n- ESLint with flat config\n- Prettier for formatting\n\nUpdated CLAUDE.md with success criteria for edits and\nacceptance criteria before committing.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 30
+  }
+]

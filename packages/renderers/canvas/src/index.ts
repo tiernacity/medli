@@ -1,24 +1,28 @@
-import type { Renderer, Shape } from "@medli/spec";
+import type { Generator } from "@medli/spec";
+import { BaseRenderer } from "@medli/renderer-common";
 
-export interface CanvasContext {
-  fillRect(x: number, y: number, width: number, height: number): void;
-}
+export class CanvasRenderer extends BaseRenderer {
+  private element: HTMLCanvasElement;
+  private context: CanvasRenderingContext2D;
 
-export interface CanvasRendererConfig {
-  context: CanvasContext;
-}
+  constructor(element: HTMLCanvasElement, generator: Generator) {
+    super(generator);
+    this.element = element;
 
-export class CanvasRenderer implements Renderer {
-  private config: CanvasRendererConfig;
+    // Set up 100x100 canvas
+    this.element.width = 100;
+    this.element.height = 100;
 
-  constructor(config: CanvasRendererConfig) {
-    this.config = config;
+    const ctx = this.element.getContext("2d");
+    if (!ctx) {
+      throw new Error("Could not get 2d context from canvas");
+    }
+    this.context = ctx;
   }
 
-  render(shapes: Shape[]): void {
-    const { context } = this.config;
-    for (const shape of shapes) {
-      context.fillRect(shape.x, shape.y, 1, 1);
-    }
+  render(time: number = 0): void {
+    const frame = this.generator.frame(time);
+    this.context.fillStyle = frame.backgroundColor ?? "#ffffff";
+    this.context.fillRect(0, 0, 100, 100);
   }
 }

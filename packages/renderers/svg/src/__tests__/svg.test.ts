@@ -1,32 +1,73 @@
+/**
+ * @jest-environment jsdom
+ */
 import { SvgRenderer } from "../index";
+import type { Generator } from "@medli/spec";
 
 describe("SvgRenderer", () => {
-  it("should render shapes to console", () => {
-    const consoleSpy = jest.spyOn(console, "log").mockImplementation();
-    const renderer = new SvgRenderer({ width: 100, height: 100 });
+  let mockElement: SVGSVGElement;
+  let mockGenerator: Generator;
+  let mockRect: SVGRectElement;
 
-    renderer.render([{ type: "point", x: 10, y: 20 }]);
+  beforeEach(() => {
+    mockRect = {
+      setAttribute: jest.fn(),
+    } as unknown as SVGRectElement;
 
-    expect(consoleSpy).toHaveBeenCalledWith('<svg width="100" height="100">');
-    expect(consoleSpy).toHaveBeenCalledWith(
-      '  <circle cx="10" cy="20" r="1" />'
-    );
-    expect(consoleSpy).toHaveBeenCalledWith("</svg>");
+    mockElement = {
+      setAttribute: jest.fn(),
+      appendChild: jest.fn(),
+    } as unknown as SVGSVGElement;
 
-    consoleSpy.mockRestore();
+    // Mock document.createElementNS
+    jest.spyOn(document, "createElementNS").mockReturnValue(mockRect);
+
+    mockGenerator = {
+      frame: jest.fn().mockReturnValue({ backgroundColor: "#ff0000" }),
+    };
   });
 
-  it("should render multiple shapes", () => {
-    const consoleSpy = jest.spyOn(console, "log").mockImplementation();
-    const renderer = new SvgRenderer({ width: 200, height: 200 });
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
 
-    renderer.render([
-      { type: "point", x: 10, y: 20 },
-      { type: "point", x: 30, y: 40 },
-    ]);
+  it("should set up 100x100 viewport on construction", () => {
+    new SvgRenderer(mockElement, mockGenerator);
 
-    expect(consoleSpy).toHaveBeenCalledTimes(4); // opening, 2 circles, closing
+    expect(mockElement.setAttribute).toHaveBeenCalledWith("width", "100");
+    expect(mockElement.setAttribute).toHaveBeenCalledWith("height", "100");
+    expect(mockElement.setAttribute).toHaveBeenCalledWith(
+      "viewBox",
+      "0 0 100 100"
+    );
+  });
 
-    consoleSpy.mockRestore();
+  it("should create a rect element on construction", () => {
+    new SvgRenderer(mockElement, mockGenerator);
+
+    expect(document.createElementNS).toHaveBeenCalledWith(
+      "http://www.w3.org/2000/svg",
+      "rect"
+    );
+    expect(mockRect.setAttribute).toHaveBeenCalledWith("width", "100");
+    expect(mockRect.setAttribute).toHaveBeenCalledWith("height", "100");
+    expect(mockElement.appendChild).toHaveBeenCalledWith(mockRect);
+  });
+
+  it("should render the background color from the generator", () => {
+    const renderer = new SvgRenderer(mockElement, mockGenerator);
+
+    renderer.render(0);
+
+    expect(mockGenerator.frame).toHaveBeenCalledWith(0);
+    expect(mockRect.setAttribute).toHaveBeenCalledWith("fill", "#ff0000");
+  });
+
+  it("should default time to zero", () => {
+    const renderer = new SvgRenderer(mockElement, mockGenerator);
+
+    renderer.render();
+
+    expect(mockGenerator.frame).toHaveBeenCalledWith(0);
   });
 });

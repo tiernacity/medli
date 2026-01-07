@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medli Test App</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, sans-serif;
+      padding: 20px;
+      margin: 0;
+      background: #f5f5f5;
+    }
+    h1, h2 { margin-top: 0; }
+    h2 { margin-bottom: 15px; color: #333; }
+
+    .controls {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .controls label {
+      font-weight: bold;
+      margin-right: 10px;
+    }
+
+    section {
+      margin-bottom: 30px;
+    }
+
+    .generators-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .generator-card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .generator-header {
+      padding: 12px 15px;
+      background: #2563eb;
+      color: white;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .generator-header button {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .generator-header button:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    .generator-code {
+      display: none;
+      max-height: 250px;
+      overflow: auto;
+      background: #1e1e1e;
+    }
+    .generator-code.visible { display: block; }
+
+    .renderers-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .renderer-column {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .renderer-column-header {
+      font-weight: bold;
+      font-size: 14px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      text-align: center;
+    }
+    .renderer-column-header.procedural { background: #9333ea; color: white; }
+    .renderer-column-header.object { background: #059669; color: white; }
+
+    .renderer-card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .renderer-header {
+      padding: 12px 15px;
+      background: #333;
+      color: white;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .renderer-header .tag {
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      margin-left: 8px;
+    }
+    .renderer-header .tag.procedural { background: #9333ea; }
+    .renderer-header .tag.object { background: #059669; }
+    .renderer-header button {
+      background: #555;
+      color: white;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .renderer-header button:hover { background: #666; }
+
+    .renderer-output {
+      padding: 15px;
+      display: flex;
+      justify-content: center;
+      background: #fafafa;
+      border-bottom: 1px solid #eee;
+    }
+    svg, canvas { border: 1px solid #ccc; }
+
+    .renderer-code {
+      display: none;
+      max-height: 200px;
+      overflow: auto;
+      background: #1e1e1e;
+    }
+    .renderer-code.visible { display: block; }
+
+    pre {
+      margin: 0;
+      padding: 15px;
+      color: #d4d4d4;
+      font-size: 12px;
+      line-height: 1.4;
+      white-space: pre;
+      font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    }
+  </style>
+</head>
+<body>
+  <h1>Medli Renderer Test</h1>
+
+  <div class="controls">
+    <label for="bg-color">Background Color:</label>
+    <input type="color" id="bg-color" value="#3366ff">
+    <span id="color-value">#3366ff</span>
+  </div>
+
+  <section>
+    <h2>Generators</h2>
+    <div class="generators-grid">
+      <div class="generator-card">
+        <div class="generator-header">
+          <span>Procedural Generator</span>
+          <button data-toggle="gen-procedural-code">Show Code</button>
+        </div>
+        <div id="gen-procedural-code" class="generator-code">
+          <pre></pre>
+        </div>
+      </div>
+      <div class="generator-card">
+        <div class="generator-header">
+          <span>Object Generator</span>
+          <button data-toggle="gen-object-code">Show Code</button>
+        </div>
+        <div id="gen-object-code" class="generator-code">
+          <pre></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Renderers</h2>
+    <div class="renderers-grid">
+      <div class="renderer-column">
+        <div class="renderer-column-header procedural">Procedural Generator</div>
+        <div class="renderer-card">
+          <div class="renderer-header">
+            <span>SVG</span>
+            <button data-toggle="harness-proc-svg">Show Harness</button>
+          </div>
+          <div class="renderer-output">
+            <svg id="proc-svg" data-testid="proc-svg"></svg>
+          </div>
+          <div id="harness-proc-svg" class="renderer-code">
+            <pre></pre>
+          </div>
+        </div>
+        <div class="renderer-card">
+          <div class="renderer-header">
+            <span>Canvas</span>
+            <button data-toggle="harness-proc-canvas">Show Harness</button>
+          </div>
+          <div class="renderer-output">
+            <canvas id="proc-canvas" data-testid="proc-canvas"></canvas>
+          </div>
+          <div id="harness-proc-canvas" class="renderer-code">
+            <pre></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="renderer-column">
+        <div class="renderer-column-header object">Object Generator</div>
+        <div class="renderer-card">
+          <div class="renderer-header">
+            <span>SVG</span>
+            <button data-toggle="harness-obj-svg">Show Harness</button>
+          </div>
+          <div class="renderer-output">
+            <svg id="obj-svg" data-testid="obj-svg"></svg>
+          </div>
+          <div id="harness-obj-svg" class="renderer-code">
+            <pre></pre>
+          </div>
+        </div>
+        <div class="renderer-card">
+          <div class="renderer-header">
+            <span>Canvas</span>
+            <button data-toggle="harness-obj-canvas">Show Harness</button>
+          </div>
+          <div class="renderer-output">
+            <canvas id="obj-canvas" data-testid="obj-canvas"></canvas>
+          </div>
+          <div id="harness-obj-canvas" class="renderer-code">
+            <pre></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

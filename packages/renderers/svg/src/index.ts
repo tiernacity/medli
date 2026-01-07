@@ -1,23 +1,28 @@
-import type { Renderer, Shape } from "@medli/spec";
+import type { Generator } from "@medli/spec";
+import { BaseRenderer } from "@medli/renderer-common";
 
-export interface SvgRendererConfig {
-  width: number;
-  height: number;
-}
+export class SvgRenderer extends BaseRenderer {
+  private element: SVGSVGElement;
+  private rect: SVGRectElement;
 
-export class SvgRenderer implements Renderer {
-  private config: SvgRendererConfig;
+  constructor(element: SVGSVGElement, generator: Generator) {
+    super(generator);
+    this.element = element;
 
-  constructor(config: SvgRendererConfig) {
-    this.config = config;
+    // Set up 100x100 viewport
+    this.element.setAttribute("width", "100");
+    this.element.setAttribute("height", "100");
+    this.element.setAttribute("viewBox", "0 0 100 100");
+
+    // Create the background rect
+    this.rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    this.rect.setAttribute("width", "100");
+    this.rect.setAttribute("height", "100");
+    this.element.appendChild(this.rect);
   }
 
-  render(shapes: Shape[]): void {
-    const { width, height } = this.config;
-    console.log(`<svg width="${width}" height="${height}">`);
-    for (const shape of shapes) {
-      console.log(`  <circle cx="${shape.x}" cy="${shape.y}" r="1" />`);
-    }
-    console.log("</svg>");
+  render(time: number = 0): void {
+    const frame = this.generator.frame(time);
+    this.rect.setAttribute("fill", frame.backgroundColor ?? "#ffffff");
   }
 }
