@@ -230,6 +230,105 @@
       "created_at": "2026-01-07T13:09:05.322463+00:00",
       "updated_at": "2026-01-07T13:09:05.322463+00:00",
       "metadata_json": "{\"branch\":\"feat/background-color\",\"commit\":\"d6f8dcd\",\"confidence\":95}"
+    },
+    {
+      "id": 22,
+      "change_id": "6588d0b6-bcc7-48ba-bfac-cd90866b06b1",
+      "node_type": "goal",
+      "title": "Refactor test app: separate files per app, fix architecture, research p5.js/three.js patterns",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T13:16:32.287379+00:00",
+      "updated_at": "2026-01-07T13:18:40.849325+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":85,\"prompt\":\"Update the test app so that I can inspect the code for each of the four apps. Each one uses a generator/renderer pair. Make sure that this will stay up to date, automatically, as we modify the test app. Perhaps each app will live in its own file. The test app is also wrong. Each app should have a single renderer and generator, and update the background color accordingly. Do some research, think about how we would create these apps in the style of p5.js or three.js. One has a procedural-style API, the other is more object oriented.\"}"
+    },
+    {
+      "id": 23,
+      "change_id": "e86c61e1-a03d-4c0d-bd4e-2756448eeb10",
+      "node_type": "decision",
+      "title": "Choose test app architecture for separate apps with viewable code",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T13:19:04.143846+00:00",
+      "updated_at": "2026-01-07T13:19:04.143846+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":80}"
+    },
+    {
+      "id": 24,
+      "change_id": "28172ac9-1189-4e99-95e7-da7b4104a666",
+      "node_type": "option",
+      "title": "Separate app files with Vite raw imports for code display",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T13:19:09.123324+00:00",
+      "updated_at": "2026-01-07T13:19:09.123324+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":85}"
+    },
+    {
+      "id": 25,
+      "change_id": "7315a93f-a596-4f34-9619-6e5deede2168",
+      "node_type": "option",
+      "title": "Fetch source at runtime via fetch() API",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T13:19:13.804449+00:00",
+      "updated_at": "2026-01-07T13:19:13.804449+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":60}"
+    },
+    {
+      "id": 26,
+      "change_id": "867731ed-0d98-48ee-abd9-9088b06eff3b",
+      "node_type": "observation",
+      "title": "p5.js uses setup()/draw() procedural pattern; three.js uses scene/renderer objects with setAnimationLoop()",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T13:19:19.028636+00:00",
+      "updated_at": "2026-01-07T13:19:19.028636+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":95}"
+    },
+    {
+      "id": 27,
+      "change_id": "cea1a58f-1c65-4595-bcb8-0d88a68db3e4",
+      "node_type": "observation",
+      "title": "Frame spec is data exchange format. Generator API style (procedural/OOP) is separate from what's generated. Validation at gen-time, trust at render-time.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T13:21:51.086385+00:00",
+      "updated_at": "2026-01-07T13:21:51.086385+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":95}"
+    },
+    {
+      "id": 28,
+      "change_id": "598137ff-ebea-4eea-8e44-57182c60148b",
+      "node_type": "outcome",
+      "title": "Selected: Separate app files with Vite raw imports",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T13:21:58.116360+00:00",
+      "updated_at": "2026-01-07T13:21:58.116360+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":90}"
+    },
+    {
+      "id": 29,
+      "change_id": "5ae3f395-a2ae-4251-85e1-9cf2703acc11",
+      "node_type": "action",
+      "title": "Implementing 4 separate app files with viewable source",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T13:22:32.192177+00:00",
+      "updated_at": "2026-01-07T13:22:32.192177+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":85}"
+    },
+    {
+      "id": 30,
+      "change_id": "d02c83a5-631d-4346-a669-d19b2ad0123a",
+      "node_type": "outcome",
+      "title": "Test app refactored: 4 separate app files, code display, all checks pass",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T13:24:48.605302+00:00",
+      "updated_at": "2026-01-07T13:24:48.605302+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -419,6 +518,94 @@
       "weight": 1.0,
       "rationale": "Commit successful",
       "created_at": "2026-01-07T13:09:05.342315+00:00"
+    },
+    {
+      "id": 18,
+      "from_node_id": 22,
+      "to_node_id": 23,
+      "from_change_id": "6588d0b6-bcc7-48ba-bfac-cd90866b06b1",
+      "to_change_id": "e86c61e1-a03d-4c0d-bd4e-2756448eeb10",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Need to decide how to structure the 4 apps with viewable source",
+      "created_at": "2026-01-07T13:19:09.054699+00:00"
+    },
+    {
+      "id": 19,
+      "from_node_id": 23,
+      "to_node_id": 24,
+      "from_change_id": "e86c61e1-a03d-4c0d-bd4e-2756448eeb10",
+      "to_change_id": "28172ac9-1189-4e99-95e7-da7b4104a666",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Best option: Vite ?raw imports auto-update with HMR",
+      "created_at": "2026-01-07T13:19:13.863518+00:00"
+    },
+    {
+      "id": 20,
+      "from_node_id": 23,
+      "to_node_id": 25,
+      "from_change_id": "e86c61e1-a03d-4c0d-bd4e-2756448eeb10",
+      "to_change_id": "7315a93f-a596-4f34-9619-6e5deede2168",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Alternative but requires dev server for source access",
+      "created_at": "2026-01-07T13:19:18.967014+00:00"
+    },
+    {
+      "id": 21,
+      "from_node_id": 22,
+      "to_node_id": 26,
+      "from_change_id": "6588d0b6-bcc7-48ba-bfac-cd90866b06b1",
+      "to_change_id": "867731ed-0d98-48ee-abd9-9088b06eff3b",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Research findings inform design",
+      "created_at": "2026-01-07T13:19:25.260439+00:00"
+    },
+    {
+      "id": 22,
+      "from_node_id": 22,
+      "to_node_id": 27,
+      "from_change_id": "6588d0b6-bcc7-48ba-bfac-cd90866b06b1",
+      "to_change_id": "cea1a58f-1c65-4595-bcb8-0d88a68db3e4",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Context from original design discussion",
+      "created_at": "2026-01-07T13:21:58.059178+00:00"
+    },
+    {
+      "id": 23,
+      "from_node_id": 24,
+      "to_node_id": 28,
+      "from_change_id": "28172ac9-1189-4e99-95e7-da7b4104a666",
+      "to_change_id": "598137ff-ebea-4eea-8e44-57182c60148b",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "This option best supports auto-updating code display",
+      "created_at": "2026-01-07T13:22:22.318963+00:00"
+    },
+    {
+      "id": 24,
+      "from_node_id": 28,
+      "to_node_id": 29,
+      "from_change_id": "598137ff-ebea-4eea-8e44-57182c60148b",
+      "to_change_id": "5ae3f395-a2ae-4251-85e1-9cf2703acc11",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementing the selected approach",
+      "created_at": "2026-01-07T13:22:36.990545+00:00"
+    },
+    {
+      "id": 25,
+      "from_node_id": 29,
+      "to_node_id": 30,
+      "from_change_id": "5ae3f395-a2ae-4251-85e1-9cf2703acc11",
+      "to_change_id": "d02c83a5-631d-4346-a669-d19b2ad0123a",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation complete, all checks pass",
+      "created_at": "2026-01-07T13:24:54.414670+00:00"
     }
   ]
 }

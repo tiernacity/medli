@@ -5,35 +5,88 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Medli Test App</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
       font-family: system-ui, sans-serif;
       padding: 20px;
-      max-width: 600px;
-      margin: 0 auto;
+      margin: 0;
+      background: #f5f5f5;
+    }
+    h1 {
+      margin-top: 0;
     }
     .controls {
       margin-bottom: 20px;
+      padding: 15px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
     .controls label {
       font-weight: bold;
       margin-right: 10px;
     }
-    table {
-      border-collapse: collapse;
-      width: 100%;
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
     }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 10px;
-      text-align: center;
+    .app-card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      overflow: hidden;
     }
-    th {
-      background: #f5f5f5;
+    .app-header {
+      padding: 12px 15px;
+      background: #333;
+      color: white;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .app-header button {
+      background: #555;
+      color: white;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .app-header button:hover {
+      background: #666;
+    }
+    .app-render {
+      padding: 15px;
+      display: flex;
+      justify-content: center;
+      background: #fafafa;
+      border-bottom: 1px solid #eee;
     }
     svg, canvas {
+      border: 1px solid #ccc;
+    }
+    .app-code {
+      display: none;
+      max-height: 300px;
+      overflow: auto;
+      background: #1e1e1e;
+    }
+    .app-code.visible {
       display: block;
-      margin: 0 auto;
-      border: 1px solid #999;
+    }
+    .app-code pre {
+      margin: 0;
+      padding: 15px;
+      color: #d4d4d4;
+      font-size: 12px;
+      line-height: 1.4;
+      white-space: pre;
+      font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
     }
   </style>
 </head>
@@ -46,27 +99,59 @@
     <span id="color-value">#3366ff</span>
   </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th></th>
-        <th>SVG Renderer</th>
-        <th>Canvas Renderer</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <th>Procedural Generator</th>
-        <td><svg id="proc-svg" data-testid="proc-svg"></svg></td>
-        <td><canvas id="proc-canvas" data-testid="proc-canvas"></canvas></td>
-      </tr>
-      <tr>
-        <th>Object Generator</th>
-        <td><svg id="obj-svg" data-testid="obj-svg"></svg></td>
-        <td><canvas id="obj-canvas" data-testid="obj-canvas"></canvas></td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="grid">
+    <div class="app-card">
+      <div class="app-header">
+        <span>Procedural + SVG</span>
+        <button data-toggle="proc-svg-code">Show Code</button>
+      </div>
+      <div class="app-render">
+        <svg id="proc-svg" data-testid="proc-svg"></svg>
+      </div>
+      <div id="proc-svg-code" class="app-code">
+        <pre></pre>
+      </div>
+    </div>
+
+    <div class="app-card">
+      <div class="app-header">
+        <span>Procedural + Canvas</span>
+        <button data-toggle="proc-canvas-code">Show Code</button>
+      </div>
+      <div class="app-render">
+        <canvas id="proc-canvas" data-testid="proc-canvas"></canvas>
+      </div>
+      <div id="proc-canvas-code" class="app-code">
+        <pre></pre>
+      </div>
+    </div>
+
+    <div class="app-card">
+      <div class="app-header">
+        <span>Object + SVG</span>
+        <button data-toggle="obj-svg-code">Show Code</button>
+      </div>
+      <div class="app-render">
+        <svg id="obj-svg" data-testid="obj-svg"></svg>
+      </div>
+      <div id="obj-svg-code" class="app-code">
+        <pre></pre>
+      </div>
+    </div>
+
+    <div class="app-card">
+      <div class="app-header">
+        <span>Object + Canvas</span>
+        <button data-toggle="obj-canvas-code">Show Code</button>
+      </div>
+      <div class="app-render">
+        <canvas id="obj-canvas" data-testid="obj-canvas"></canvas>
+      </div>
+      <div id="obj-canvas-code" class="app-code">
+        <pre></pre>
+      </div>
+    </div>
+  </div>
 
   <script type="module" src="/src/main.ts"></script>
 </body>
