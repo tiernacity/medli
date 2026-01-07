@@ -1,14 +1,13 @@
-import type { Generator, Renderer } from "@medli/spec";
+import type { Generator } from "@medli/spec";
+import { BaseRenderer } from "@medli/renderer-common";
 
-export class SvgRenderer implements Renderer {
+export class SvgRenderer extends BaseRenderer {
   private element: SVGSVGElement;
-  private generator: Generator;
-  private animationId: number | null = null;
   private rect: SVGRectElement;
 
   constructor(element: SVGSVGElement, generator: Generator) {
+    super(generator);
     this.element = element;
-    this.generator = generator;
 
     // Set up 100x100 viewport
     this.element.setAttribute("width", "100");
@@ -24,21 +23,6 @@ export class SvgRenderer implements Renderer {
 
   render(time: number = 0): void {
     const frame = this.generator.frame(time);
-    this.rect.setAttribute("fill", frame.backgroundColor);
-  }
-
-  loop(): void {
-    const animate = (time: number) => {
-      this.render(time);
-      this.animationId = requestAnimationFrame(animate);
-    };
-    this.animationId = requestAnimationFrame(animate);
-  }
-
-  stop(): void {
-    if (this.animationId !== null) {
-      cancelAnimationFrame(this.animationId);
-      this.animationId = null;
-    }
+    this.rect.setAttribute("fill", frame.backgroundColor ?? "#ffffff");
   }
 }

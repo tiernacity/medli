@@ -4,10 +4,10 @@
 
 /**
  * A frame represents the current state to render.
- * Contains only a background color for now.
+ * All properties are optional - renderers provide defaults.
  */
 export type Frame = {
-  backgroundColor: string;
+  backgroundColor?: string;
 };
 
 /**

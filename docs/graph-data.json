@@ -340,6 +340,226 @@
       "created_at": "2026-01-07T14:37:48.821602+00:00",
       "updated_at": "2026-01-07T14:37:48.821602+00:00",
       "metadata_json": "{\"branch\":\"feat/background-color\",\"commit\":\"fd888fb\",\"confidence\":95}"
+    },
+    {
+      "id": 32,
+      "change_id": "5932ab9e-3ddd-4045-852d-45ec09c4c5b4",
+      "node_type": "goal",
+      "title": "Refactor test app: 2 generators, 4 renderers, show generator+harness code",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T14:53:00.737918+00:00",
+      "updated_at": "2026-01-07T14:53:15.239967+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":85,\"prompt\":\"The test app should have only two generators - one procedural and one object. There should be four renderers (for future reasons). Each renderer can use one of the two generators. The code shown in the test app should show the generator used, and the harness that links generator to renderer\"}"
+    },
+    {
+      "id": 33,
+      "change_id": "fedd1e43-02fb-4002-adc0-27c09a5cfa5d",
+      "node_type": "goal",
+      "title": "Create renderers/common package for shared render loop functionality",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T14:53:00.814879+00:00",
+      "updated_at": "2026-01-07T14:53:00.814879+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":80}"
+    },
+    {
+      "id": 34,
+      "change_id": "cec0d153-502c-4e0e-9b6e-5285e3d7e7a0",
+      "node_type": "goal",
+      "title": "Design object generator with Scene/Background classes and recursive frame()",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T14:53:00.888504+00:00",
+      "updated_at": "2026-01-07T14:59:25.292166+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":80,\"prompt\":\"The object generator is nearly empty. Our app's Background class belongs in the generator. There should probably be a Scene class too. The background can be a child of the scene. Classes should implement a frame() method and scene should recurse down its tree to generate a Frame instance. Investigate a minimal, but representative design, document design/decisions in the README for this package, and implement\"}"
+    },
+    {
+      "id": 35,
+      "change_id": "bb4d5462-6edb-4302-855c-f1420c51f9be",
+      "node_type": "goal",
+      "title": "Design procedural generator with p5.js-like sketch pattern",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T14:53:00.965145+00:00",
+      "updated_at": "2026-01-07T15:02:05.055103+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":80,\"prompt\":\"The procedural generator is nearly empty. Design a pattern that looks like p5.js-like sketch mechanism. The sketch should use a background function from the procedural package. The procedural generator should create a frame based on the function calls in the sketch. Investigate a minimal, but representative design, document design/decisions in the README for this package, and implement\"}"
+    },
+    {
+      "id": 36,
+      "change_id": "7819f73c-a641-4f77-aa1d-22f9cc03be21",
+      "node_type": "action",
+      "title": "Designing test app structure: 2 generators + 4 harnesses",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T14:53:35.981874+00:00",
+      "updated_at": "2026-01-07T14:53:35.981874+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":85}"
+    },
+    {
+      "id": 37,
+      "change_id": "b39e46c1-59ed-4dc4-93ec-ceb3292569bc",
+      "node_type": "outcome",
+      "title": "Test app refactored: 2 generators, 4 renderers with harness code display",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T14:56:22.460845+00:00",
+      "updated_at": "2026-01-07T14:56:22.460845+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":95}"
+    },
+    {
+      "id": 38,
+      "change_id": "07ca12e9-a78c-4202-964e-5556470ca13d",
+      "node_type": "decision",
+      "title": "Choose pattern for shared renderer functionality",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T14:56:53.355220+00:00",
+      "updated_at": "2026-01-07T14:56:53.355220+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":80}"
+    },
+    {
+      "id": 39,
+      "change_id": "7f4ae647-e4ad-4da1-91f5-ab500040bbc8",
+      "node_type": "option",
+      "title": "Abstract base class with loop/stop implementation",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T14:57:00.611899+00:00",
+      "updated_at": "2026-01-07T14:57:00.611899+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":85}"
+    },
+    {
+      "id": 40,
+      "change_id": "f4f8a0b4-8c0a-418d-8ebd-179abc0d233b",
+      "node_type": "option",
+      "title": "Composition with createAnimationLoop utility",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T14:57:00.692234+00:00",
+      "updated_at": "2026-01-07T14:57:00.692234+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":70}"
+    },
+    {
+      "id": 41,
+      "change_id": "0fd7a3a7-2b6c-43c7-8565-ccf0190a502a",
+      "node_type": "observation",
+      "title": "loop() and stop() are identical in both renderers, only render() differs",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T14:57:00.777318+00:00",
+      "updated_at": "2026-01-07T14:57:00.777318+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":95}"
+    },
+    {
+      "id": 42,
+      "change_id": "1ecc6c85-359f-4547-b997-e334bffd34e6",
+      "node_type": "outcome",
+      "title": "Selected: Abstract base class - simplest approach",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T14:57:10.501951+00:00",
+      "updated_at": "2026-01-07T14:57:10.501951+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":90}"
+    },
+    {
+      "id": 43,
+      "change_id": "2fde64d2-30d4-42d9-9261-f020bc1bfc90",
+      "node_type": "action",
+      "title": "Creating renderers/common package with BaseRenderer",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T14:57:17.538585+00:00",
+      "updated_at": "2026-01-07T14:57:17.538585+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":85}"
+    },
+    {
+      "id": 44,
+      "change_id": "61387e44-a593-4688-a365-db79ef6a2b44",
+      "node_type": "outcome",
+      "title": "Created @medli/renderer-common with BaseRenderer, updated SVG/Canvas to extend it",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T14:59:14.393625+00:00",
+      "updated_at": "2026-01-07T14:59:14.393625+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":95}"
+    },
+    {
+      "id": 45,
+      "change_id": "e28df72e-b986-4f30-b795-19ae96823f07",
+      "node_type": "action",
+      "title": "Designing object generator with Scene/Background tree pattern",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T14:59:41.959127+00:00",
+      "updated_at": "2026-01-07T14:59:41.959127+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":85}"
+    },
+    {
+      "id": 46,
+      "change_id": "ec7ef49c-b632-49b1-8903-60dae2b3967c",
+      "node_type": "outcome",
+      "title": "Object generator redesigned with Scene/Background pattern, README documented",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T15:01:53.426017+00:00",
+      "updated_at": "2026-01-07T15:01:53.426017+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":95}"
+    },
+    {
+      "id": 47,
+      "change_id": "84d73e32-8054-429f-afdb-5031327b9160",
+      "node_type": "action",
+      "title": "Designing procedural generator with p5.js sketch/draw pattern",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T15:02:20.735385+00:00",
+      "updated_at": "2026-01-07T15:02:20.735385+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":85}"
+    },
+    {
+      "id": 48,
+      "change_id": "06f35adf-681f-4623-9a52-6bb163024509",
+      "node_type": "outcome",
+      "title": "Procedural generator redesigned with p5.js sketch/draw pattern, README documented",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T15:04:08.978590+00:00",
+      "updated_at": "2026-01-07T15:04:08.978590+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":95}"
+    },
+    {
+      "id": 49,
+      "change_id": "14b5a297-1fb2-4e8e-a80d-8c6cb8a041e7",
+      "node_type": "goal",
+      "title": "Remove ObjectGenerator, Scene as root with optional Background child",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T15:14:03.398240+00:00",
+      "updated_at": "2026-01-07T15:14:03.490516+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":85,\"prompt\":\"Remove ObjectGenerator. The object-oriented app should create an instance of Scene, then create a Background that is a child of it. Scene will need a method to attach a generic child (implements the frame() method) or a background specifically. Make sure the app can omit the background if it wants to. Update Frame so that backgroundColor is optional. Make the renderers default to a white background.\"}"
+    },
+    {
+      "id": 50,
+      "change_id": "85747807-2ee3-4a68-bedb-dfa690eede57",
+      "node_type": "action",
+      "title": "Implementing Scene as root generator with optional Background",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T15:14:11.637585+00:00",
+      "updated_at": "2026-01-07T15:14:11.637585+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":85}"
+    },
+    {
+      "id": 51,
+      "change_id": "ecd3cd9b-abaa-4349-8d24-93bb5c988711",
+      "node_type": "outcome",
+      "title": "Removed ObjectGenerator, Scene is now root Generator with optional Background",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T15:17:04.997917+00:00",
+      "updated_at": "2026-01-07T15:17:04.997917+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -628,6 +848,171 @@
       "weight": 1.0,
       "rationale": "Code committed and pushed",
       "created_at": "2026-01-07T14:37:48.893399+00:00"
+    },
+    {
+      "id": 27,
+      "from_node_id": 32,
+      "to_node_id": 36,
+      "from_change_id": "5932ab9e-3ddd-4045-852d-45ec09c4c5b4",
+      "to_change_id": "7819f73c-a641-4f77-aa1d-22f9cc03be21",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation approach",
+      "created_at": "2026-01-07T14:53:36.059540+00:00"
+    },
+    {
+      "id": 28,
+      "from_node_id": 36,
+      "to_node_id": 37,
+      "from_change_id": "7819f73c-a641-4f77-aa1d-22f9cc03be21",
+      "to_change_id": "b39e46c1-59ed-4dc4-93ec-ceb3292569bc",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation complete",
+      "created_at": "2026-01-07T14:56:33.067217+00:00"
+    },
+    {
+      "id": 29,
+      "from_node_id": 33,
+      "to_node_id": 38,
+      "from_change_id": "fedd1e43-02fb-4002-adc0-27c09a5cfa5d",
+      "to_change_id": "07ca12e9-a78c-4202-964e-5556470ca13d",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Need to decide on sharing pattern",
+      "created_at": "2026-01-07T14:56:53.426726+00:00"
+    },
+    {
+      "id": 30,
+      "from_node_id": 38,
+      "to_node_id": 39,
+      "from_change_id": "07ca12e9-a78c-4202-964e-5556470ca13d",
+      "to_change_id": "7f4ae647-e4ad-4da1-91f5-ab500040bbc8",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Simplest, TypeScript-friendly",
+      "created_at": "2026-01-07T14:57:10.265067+00:00"
+    },
+    {
+      "id": 31,
+      "from_node_id": 38,
+      "to_node_id": 40,
+      "from_change_id": "07ca12e9-a78c-4202-964e-5556470ca13d",
+      "to_change_id": "f4f8a0b4-8c0a-418d-8ebd-179abc0d233b",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "More flexible but complex",
+      "created_at": "2026-01-07T14:57:10.344490+00:00"
+    },
+    {
+      "id": 32,
+      "from_node_id": 38,
+      "to_node_id": 41,
+      "from_change_id": "07ca12e9-a78c-4202-964e-5556470ca13d",
+      "to_change_id": "0fd7a3a7-2b6c-43c7-8565-ccf0190a502a",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Informs design decision",
+      "created_at": "2026-01-07T14:57:10.423336+00:00"
+    },
+    {
+      "id": 33,
+      "from_node_id": 39,
+      "to_node_id": 42,
+      "from_change_id": "7f4ae647-e4ad-4da1-91f5-ab500040bbc8",
+      "to_change_id": "1ecc6c85-359f-4547-b997-e334bffd34e6",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Selected simplest option",
+      "created_at": "2026-01-07T14:57:17.459798+00:00"
+    },
+    {
+      "id": 34,
+      "from_node_id": 42,
+      "to_node_id": 43,
+      "from_change_id": "1ecc6c85-359f-4547-b997-e334bffd34e6",
+      "to_change_id": "2fde64d2-30d4-42d9-9261-f020bc1bfc90",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementing selected approach",
+      "created_at": "2026-01-07T14:57:25.450528+00:00"
+    },
+    {
+      "id": 35,
+      "from_node_id": 43,
+      "to_node_id": 44,
+      "from_change_id": "2fde64d2-30d4-42d9-9261-f020bc1bfc90",
+      "to_change_id": "61387e44-a593-4688-a365-db79ef6a2b44",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation complete",
+      "created_at": "2026-01-07T14:59:14.474034+00:00"
+    },
+    {
+      "id": 36,
+      "from_node_id": 34,
+      "to_node_id": 45,
+      "from_change_id": "cec0d153-502c-4e0e-9b6e-5285e3d7e7a0",
+      "to_change_id": "e28df72e-b986-4f30-b795-19ae96823f07",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation approach",
+      "created_at": "2026-01-07T14:59:42.037693+00:00"
+    },
+    {
+      "id": 37,
+      "from_node_id": 45,
+      "to_node_id": 46,
+      "from_change_id": "e28df72e-b986-4f30-b795-19ae96823f07",
+      "to_change_id": "ec7ef49c-b632-49b1-8903-60dae2b3967c",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation complete",
+      "created_at": "2026-01-07T15:01:53.500049+00:00"
+    },
+    {
+      "id": 38,
+      "from_node_id": 35,
+      "to_node_id": 47,
+      "from_change_id": "bb4d5462-6edb-4302-855c-f1420c51f9be",
+      "to_change_id": "84d73e32-8054-429f-afdb-5031327b9160",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation approach",
+      "created_at": "2026-01-07T15:02:20.805510+00:00"
+    },
+    {
+      "id": 39,
+      "from_node_id": 47,
+      "to_node_id": 48,
+      "from_change_id": "84d73e32-8054-429f-afdb-5031327b9160",
+      "to_change_id": "06f35adf-681f-4623-9a52-6bb163024509",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation complete",
+      "created_at": "2026-01-07T15:04:09.079436+00:00"
+    },
+    {
+      "id": 40,
+      "from_node_id": 49,
+      "to_node_id": 50,
+      "from_change_id": "14b5a297-1fb2-4e8e-a80d-8c6cb8a041e7",
+      "to_change_id": "85747807-2ee3-4a68-bedb-dfa690eede57",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation",
+      "created_at": "2026-01-07T15:14:11.711831+00:00"
+    },
+    {
+      "id": 41,
+      "from_node_id": 50,
+      "to_node_id": 51,
+      "from_change_id": "85747807-2ee3-4a68-bedb-dfa690eede57",
+      "to_change_id": "ecd3cd9b-abaa-4349-8d24-93bb5c988711",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation complete",
+      "created_at": "2026-01-07T15:17:05.082375+00:00"
     }
   ]
 }

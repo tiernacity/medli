@@ -1,21 +1,27 @@
-// Import app modules
-import { createApp as createProcSvg } from "./apps/proc-svg";
-import { createApp as createProcCanvas } from "./apps/proc-canvas";
-import { createApp as createObjSvg } from "./apps/obj-svg";
-import { createApp as createObjCanvas } from "./apps/obj-canvas";
+// Import generators (for color control)
+import { background as setProceduralBg } from "./generators/procedural";
+import { background as objectBg } from "./generators/object";
 
-// Import source code as raw text (auto-updates with Vite HMR)
-import procSvgSource from "./apps/proc-svg.ts?raw";
-import procCanvasSource from "./apps/proc-canvas.ts?raw";
-import objSvgSource from "./apps/obj-svg.ts?raw";
-import objCanvasSource from "./apps/obj-canvas.ts?raw";
+// Import harnesses
+import { createRenderer as createProcSvg } from "./harnesses/proc-svg";
+import { createRenderer as createProcCanvas } from "./harnesses/proc-canvas";
+import { createRenderer as createObjSvg } from "./harnesses/obj-svg";
+import { createRenderer as createObjCanvas } from "./harnesses/obj-canvas";
 
-// Get DOM elements
+// Import source code as raw text
+import genProceduralSource from "./generators/procedural.ts?raw";
+import genObjectSource from "./generators/object.ts?raw";
+import harnessProcSvgSource from "./harnesses/proc-svg.ts?raw";
+import harnessProcCanvasSource from "./harnesses/proc-canvas.ts?raw";
+import harnessObjSvgSource from "./harnesses/obj-svg.ts?raw";
+import harnessObjCanvasSource from "./harnesses/obj-canvas.ts?raw";
+
+// DOM elements
 const colorInput = document.getElementById("bg-color") as HTMLInputElement;
 const colorValue = document.getElementById("color-value") as HTMLSpanElement;
 
-// Create all apps
-const apps = [
+// Create all renderers
+const renderers = [
   createProcSvg(document.getElementById("proc-svg") as SVGSVGElement),
   createProcCanvas(document.getElementById("proc-canvas") as HTMLCanvasElement),
   createObjSvg(document.getElementById("obj-svg") as SVGSVGElement),
@@ -24,19 +30,19 @@ const apps = [
 
 // Populate source code displays
 const sourceMap: Record<string, string> = {
-  "proc-svg-code": procSvgSource,
-  "proc-canvas-code": procCanvasSource,
-  "obj-svg-code": objSvgSource,
-  "obj-canvas-code": objCanvasSource,
+  "gen-procedural-code": genProceduralSource,
+  "gen-object-code": genObjectSource,
+  "harness-proc-svg": harnessProcSvgSource,
+  "harness-proc-canvas": harnessProcCanvasSource,
+  "harness-obj-svg": harnessObjSvgSource,
+  "harness-obj-canvas": harnessObjCanvasSource,
 };
 
 for (const [id, source] of Object.entries(sourceMap)) {
   const container = document.getElementById(id);
   if (container) {
     const pre = container.querySelector("pre");
-    if (pre) {
-      pre.textContent = source;
-    }
+    if (pre) pre.textContent = source;
   }
 }
 
@@ -45,25 +51,32 @@ document.querySelectorAll<HTMLButtonElement>("[data-toggle]").forEach((btn) => {
   btn.addEventListener("click", () => {
     const targetId = btn.dataset.toggle;
     if (!targetId) return;
-
     const codeContainer = document.getElementById(targetId);
     if (!codeContainer) return;
-
     const isVisible = codeContainer.classList.toggle("visible");
-    btn.textContent = isVisible ? "Hide Code" : "Show Code";
+    btn.textContent = isVisible
+      ? btn.textContent?.includes("Harness")
+        ? "Hide Harness"
+        : "Hide Code"
+      : btn.textContent?.includes("Harness")
+        ? "Show Harness"
+        : "Show Code";
   });
 });
 
-// Set initial color and start all apps
-const initialColor = colorInput.value;
-apps.forEach((app) => {
-  app.setBackgroundColor(initialColor);
-  app.start();
-});
+// Set background color on both generators
+function setBackgroundColor(color: string) {
+  setProceduralBg(color); // Procedural style: call function
+  objectBg.color = color; // Object style: set property
+}
 
-// Update all apps on color change
+// Initial setup
+setBackgroundColor(colorInput.value);
+renderers.forEach((r) => r.start());
+
+// Update on color change
 colorInput.addEventListener("input", () => {
   const color = colorInput.value;
   colorValue.textContent = color;
-  apps.forEach((app) => app.setBackgroundColor(color));
+  setBackgroundColor(color);
 });
