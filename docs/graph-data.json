@@ -637,6 +637,17 @@
       "created_at": "2026-01-07T15:53:56.445902+00:00",
       "updated_at": "2026-01-07T15:53:56.445902+00:00",
       "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":95}"
+    },
+    {
+      "id": 59,
+      "change_id": "eab45689-c9fe-412e-9111-6fb384420c15",
+      "node_type": "action",
+      "title": "Committed layout reorganization",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T15:54:54.233507+00:00",
+      "updated_at": "2026-01-07T15:54:54.233507+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"commit\":\"dd27045\",\"confidence\":100}"
     }
   ],
   "edges": [
@@ -1145,6 +1156,17 @@
       "weight": 1.0,
       "rationale": "Implementation complete",
       "created_at": "2026-01-07T15:54:01.965771+00:00"
+    },
+    {
+      "id": 47,
+      "from_node_id": 58,
+      "to_node_id": 59,
+      "from_change_id": "3774b0ef-027e-4d20-881d-00eb3d73e953",
+      "to_change_id": "eab45689-c9fe-412e-9111-6fb384420c15",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Committed",
+      "created_at": "2026-01-07T15:54:54.257276+00:00"
     }
   ]
 }
