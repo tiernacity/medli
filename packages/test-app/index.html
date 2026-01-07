@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medli Test App</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      padding: 20px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .controls {
+      margin-bottom: 20px;
+    }
+    .controls label {
+      font-weight: bold;
+      margin-right: 10px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background: #f5f5f5;
+    }
+    svg, canvas {
+      display: block;
+      margin: 0 auto;
+      border: 1px solid #999;
+    }
+  </style>
+</head>
+<body>
+  <h1>Medli Renderer Test</h1>
+
+  <div class="controls">
+    <label for="bg-color">Background Color:</label>
+    <input type="color" id="bg-color" value="#3366ff">
+    <span id="color-value">#3366ff</span>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th></th>
+        <th>SVG Renderer</th>
+        <th>Canvas Renderer</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>Procedural Generator</th>
+        <td><svg id="proc-svg" data-testid="proc-svg"></svg></td>
+        <td><canvas id="proc-canvas" data-testid="proc-canvas"></canvas></td>
+      </tr>
+      <tr>
+        <th>Object Generator</th>
+        <td><svg id="obj-svg" data-testid="obj-svg"></svg></td>
+        <td><canvas id="obj-canvas" data-testid="obj-canvas"></canvas></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

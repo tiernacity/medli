@@ -1,0 +1,22 @@
+{
+  "name": "@medli/test-app",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Visual test app for medli renderer verification",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@medli/spec": "*",
+    "@medli/generator-procedural": "*",
+    "@medli/generator-object": "*",
+    "@medli/renderer-svg": "*",
+    "@medli/renderer-canvas": "*"
+  },
+  "devDependencies": {
+    "vite": "^6.0.0"
+  }
+}

@@ -1,1 +1,314 @@
-{"nodes":[],"edges":[]}
+{
+  "nodes": [
+    {
+      "id": 1,
+      "change_id": "2e3771e8-08cd-4b1b-9105-90f2fab50f51",
+      "node_type": "goal",
+      "title": "Bootstrap TypeScript monorepo",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-06T12:54:25.668974+00:00",
+      "updated_at": "2026-01-06T12:54:25.668974+00:00",
+      "metadata_json": "{\"branch\":\"main\",\"confidence\":95,\"prompt\":\"Bootstrap a typescript-based monorepo. Use npm. Create one package called spec. Two generator packages in a sub-dir called procedural and object. Two renderer packages in a sub-dir called svg and canvas. Bootstrap jest testing, eslint linting, prettier formatting and type checking. Append instructions to CLAUDE.md that describe success criteria for edits, and acceptance criteria before committing.\"}"
+    },
+    {
+      "id": 2,
+      "change_id": "ec7a1c98-47f5-4495-aadc-75837f9e07fe",
+      "node_type": "outcome",
+      "title": "Monorepo bootstrapped successfully",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-06T13:00:34.955152+00:00",
+      "updated_at": "2026-01-06T13:00:34.955152+00:00",
+      "metadata_json": "{\"branch\":\"main\",\"confidence\":95}"
+    },
+    {
+      "id": 3,
+      "change_id": "a85d0983-da31-4173-93fc-77d8264b0ce0",
+      "node_type": "action",
+      "title": "Committed monorepo bootstrap",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-06T13:21:39.678970+00:00",
+      "updated_at": "2026-01-06T13:21:39.678970+00:00",
+      "metadata_json": "{\"branch\":\"main\",\"commit\":\"bfecf05\",\"confidence\":100}"
+    },
+    {
+      "id": 4,
+      "change_id": "315e8aaf-0cd2-4faf-9ce8-63ea50321690",
+      "node_type": "goal",
+      "title": "Fix draft frame spec",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T12:09:17.713046+00:00",
+      "updated_at": "2026-01-07T12:09:17.713046+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":90,\"prompt\":\"Let's fix the draft frame spec. Shape is not yet needed. We want Frame and it should be a type not an interface. It should specify only a background color. Renderers should render a 100x100 square of the color. The Generator interface has a single function `frame (time: number): Frame`. Renderer has `render(time: number): void`. It also have `loop(): void` and `stop(): void` to start and stop a render loop. Neither interfaces are generic. Implementations should default time to zero. renderers expect request animation frame support. renderers render a 100x100 square of the background color, and replace it if that is changed. Renderer constructors accept HTML elements of the relevant type.\"}"
+    },
+    {
+      "id": 5,
+      "change_id": "86cd6ab5-8e62-4c89-8bff-4ca3b5b672fe",
+      "node_type": "outcome",
+      "title": "Spec updated successfully",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T12:12:43.195494+00:00",
+      "updated_at": "2026-01-07T12:12:43.195494+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":100}"
+    },
+    {
+      "id": 6,
+      "change_id": "2a45e32a-4728-4c23-9261-54c150034819",
+      "node_type": "action",
+      "title": "Committed and pushed changes",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T12:14:43.388643+00:00",
+      "updated_at": "2026-01-07T12:14:43.388643+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"commit\":\"08cded7\",\"confidence\":100}"
+    },
+    {
+      "id": 7,
+      "change_id": "b837976c-4208-4897-a3a4-01f94641ed52",
+      "node_type": "goal",
+      "title": "Create visual test app for renderer verification",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T12:27:12.661095+00:00",
+      "updated_at": "2026-01-07T12:27:12.661095+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":85,\"prompt\":\"Create a test app so that we can visually confirm rendering is correct. It does not need to be a fully-fledged npm package, but it can be if that's best. Make it as simple as possible, with as few dependencies as possible. We want a page that displays the matrix of generator/renderer combinations. Each combination should render the same view, which for now is simply a background color. There should be an input field on the page to change the background color, all of the combinations should update when that happens. We need a way for claude code to run the app, inspect the page, and verify that the page is as expected. Examine the options for that, we can install any new claude code plugins if required.\"}"
+    },
+    {
+      "id": 8,
+      "change_id": "ff860ed1-9667-4f6b-88bc-c63da02814fa",
+      "node_type": "decision",
+      "title": "Choose visual verification approach for Claude Code",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T12:27:19.521536+00:00",
+      "updated_at": "2026-01-07T12:27:19.521536+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":80}"
+    },
+    {
+      "id": 9,
+      "change_id": "fd9f77b1-769e-453f-b231-bb8cc5dfb42a",
+      "node_type": "option",
+      "title": "Playwright MCP Server",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T12:27:29.975737+00:00",
+      "updated_at": "2026-01-07T12:27:29.975737+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":90}"
+    },
+    {
+      "id": 10,
+      "change_id": "4defac9d-4856-4518-95a2-6dca801290b2",
+      "node_type": "option",
+      "title": "Puppeteer MCP Server",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T12:27:30.039463+00:00",
+      "updated_at": "2026-01-07T12:27:30.039463+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":70}"
+    },
+    {
+      "id": 11,
+      "change_id": "81bf28a1-3715-4300-a32c-034537aba3e5",
+      "node_type": "option",
+      "title": "Screenshot files + Claude image reading",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T12:27:30.102505+00:00",
+      "updated_at": "2026-01-07T12:27:30.102505+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":60}"
+    },
+    {
+      "id": 12,
+      "change_id": "8251d507-015a-4575-bf64-5c464bbd2deb",
+      "node_type": "observation",
+      "title": "Codebase has 2x2 matrix: ProceduralGenerator/ObjectGenerator x SvgRenderer/CanvasRenderer, all 100x100 viewport",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T12:27:44.170474+00:00",
+      "updated_at": "2026-01-07T12:27:44.170474+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":95}"
+    },
+    {
+      "id": 13,
+      "change_id": "0a6d889a-2c9e-40f1-aeea-1d7363f523a7",
+      "node_type": "outcome",
+      "title": "Selected Playwright MCP for visual verification",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T12:29:18.437210+00:00",
+      "updated_at": "2026-01-07T12:29:18.437210+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":95}"
+    },
+    {
+      "id": 14,
+      "change_id": "a2cb50ee-42a0-4419-9a34-848ac005d790",
+      "node_type": "action",
+      "title": "Implementing test-app package",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T12:29:59.891017+00:00",
+      "updated_at": "2026-01-07T12:29:59.891017+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":90}"
+    },
+    {
+      "id": 15,
+      "change_id": "2ccab223-16be-4d82-8674-c636c4567845",
+      "node_type": "outcome",
+      "title": "Test app created successfully, Playwright MCP installed",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T12:51:48.427415+00:00",
+      "updated_at": "2026-01-07T12:51:48.427415+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":95}"
+    }
+  ],
+  "edges": [
+    {
+      "id": 1,
+      "from_node_id": 1,
+      "to_node_id": 2,
+      "from_change_id": "2e3771e8-08cd-4b1b-9105-90f2fab50f51",
+      "to_change_id": "ec7a1c98-47f5-4495-aadc-75837f9e07fe",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation complete",
+      "created_at": "2026-01-06T13:00:43.595703+00:00"
+    },
+    {
+      "id": 2,
+      "from_node_id": 1,
+      "to_node_id": 3,
+      "from_change_id": "2e3771e8-08cd-4b1b-9105-90f2fab50f51",
+      "to_change_id": "a85d0983-da31-4173-93fc-77d8264b0ce0",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Commit for goal",
+      "created_at": "2026-01-06T13:21:43.438626+00:00"
+    },
+    {
+      "id": 3,
+      "from_node_id": 4,
+      "to_node_id": 5,
+      "from_change_id": "315e8aaf-0cd2-4faf-9ce8-63ea50321690",
+      "to_change_id": "86cd6ab5-8e62-4c89-8bff-4ca3b5b672fe",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation complete",
+      "created_at": "2026-01-07T12:12:43.218260+00:00"
+    },
+    {
+      "id": 4,
+      "from_node_id": 5,
+      "to_node_id": 6,
+      "from_change_id": "86cd6ab5-8e62-4c89-8bff-4ca3b5b672fe",
+      "to_change_id": "2a45e32a-4728-4c23-9261-54c150034819",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Deployed",
+      "created_at": "2026-01-07T12:14:43.410546+00:00"
+    },
+    {
+      "id": 5,
+      "from_node_id": 7,
+      "to_node_id": 8,
+      "from_change_id": "b837976c-4208-4897-a3a4-01f94641ed52",
+      "to_change_id": "ff860ed1-9667-4f6b-88bc-c63da02814fa",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Need to decide how Claude Code will verify rendering",
+      "created_at": "2026-01-07T12:27:23.621275+00:00"
+    },
+    {
+      "id": 6,
+      "from_node_id": 8,
+      "to_node_id": 9,
+      "from_change_id": "ff860ed1-9667-4f6b-88bc-c63da02814fa",
+      "to_change_id": "fd9f77b1-769e-453f-b231-bb8cc5dfb42a",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Microsoft official, best documented",
+      "created_at": "2026-01-07T12:27:34.533772+00:00"
+    },
+    {
+      "id": 7,
+      "from_node_id": 8,
+      "to_node_id": 10,
+      "from_change_id": "ff860ed1-9667-4f6b-88bc-c63da02814fa",
+      "to_change_id": "4defac9d-4856-4518-95a2-6dca801290b2",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Alternative browser automation",
+      "created_at": "2026-01-07T12:27:34.578699+00:00"
+    },
+    {
+      "id": 8,
+      "from_node_id": 8,
+      "to_node_id": 11,
+      "from_change_id": "ff860ed1-9667-4f6b-88bc-c63da02814fa",
+      "to_change_id": "81bf28a1-3715-4300-a32c-034537aba3e5",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Simpler but less interactive",
+      "created_at": "2026-01-07T12:27:34.604224+00:00"
+    },
+    {
+      "id": 9,
+      "from_node_id": 7,
+      "to_node_id": 12,
+      "from_change_id": "b837976c-4208-4897-a3a4-01f94641ed52",
+      "to_change_id": "8251d507-015a-4575-bf64-5c464bbd2deb",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Context for test app design",
+      "created_at": "2026-01-07T12:27:47.788138+00:00"
+    },
+    {
+      "id": 10,
+      "from_node_id": 9,
+      "to_node_id": 13,
+      "from_change_id": "fd9f77b1-769e-453f-b231-bb8cc5dfb42a",
+      "to_change_id": "0a6d889a-2c9e-40f1-aeea-1d7363f523a7",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "User selected this option",
+      "created_at": "2026-01-07T12:29:21.965328+00:00"
+    },
+    {
+      "id": 11,
+      "from_node_id": 7,
+      "to_node_id": 14,
+      "from_change_id": "b837976c-4208-4897-a3a4-01f94641ed52",
+      "to_change_id": "a2cb50ee-42a0-4419-9a34-848ac005d790",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation of goal",
+      "created_at": "2026-01-07T12:30:04.504563+00:00"
+    },
+    {
+      "id": 12,
+      "from_node_id": 13,
+      "to_node_id": 14,
+      "from_change_id": "0a6d889a-2c9e-40f1-aeea-1d7363f523a7",
+      "to_change_id": "a2cb50ee-42a0-4419-9a34-848ac005d790",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Using selected verification approach",
+      "created_at": "2026-01-07T12:30:04.529511+00:00"
+    },
+    {
+      "id": 13,
+      "from_node_id": 14,
+      "to_node_id": 15,
+      "from_change_id": "a2cb50ee-42a0-4419-9a34-848ac005d790",
+      "to_change_id": "2ccab223-16be-4d82-8674-c636c4567845",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation complete",
+      "created_at": "2026-01-07T12:51:57.843422+00:00"
+    }
+  ]
+}

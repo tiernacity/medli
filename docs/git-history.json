@@ -1,0 +1,18 @@
+[
+  {
+    "hash": "08cded78e34592bcc0f293c372099cd5b36ba005",
+    "short_hash": "08cded7",
+    "author": "Chris Tierney",
+    "date": "2026-01-07T12:14:35Z",
+    "message": "feat: simplify spec to Frame type with background color\n\nReplace the generic Shape-based spec with a simpler Frame-based approach:\n- Frame type contains only backgroundColor\n- Generator.frame(time) returns a Frame\n- Renderer has render(time), loop(), and stop() methods\n- Renderers accept HTML elements and render 100x100 squares\n- Added DOM lib support for renderer packages\n- Added jest-environment-jsdom for renderer tests\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 14
+  },
+  {
+    "hash": "bfecf05fe3ba212eb31216faaf87e0d2941d62f9",
+    "short_hash": "bfecf05",
+    "author": "Chris Tierney",
+    "date": "2026-01-06T13:21:30Z",
+    "message": "feat: bootstrap TypeScript monorepo with npm workspaces\n\nSet up a monorepo structure with five packages:\n- @medli/spec: Core types and interfaces\n- @medli/generator-procedural: Procedural shape generation\n- @medli/generator-object: Object-based shape generation\n- @medli/renderer-svg: SVG rendering\n- @medli/renderer-canvas: Canvas rendering\n\nConfigured tooling:\n- TypeScript with project references\n- Jest with ts-jest for testing\n- ESLint with flat config\n- Prettier for formatting\n\nUpdated CLAUDE.md with success criteria for edits and\nacceptance criteria before committing.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 30
+  }
+]

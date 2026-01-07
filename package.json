@@ -6,7 +6,8 @@
   "workspaces": [
     "packages/spec",
     "packages/generators/*",
-    "packages/renderers/*"
+    "packages/renderers/*",
+    "packages/test-app"
   ],
   "scripts": {
     "build": "npm run build --workspaces",
