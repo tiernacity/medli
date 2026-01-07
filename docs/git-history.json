@@ -1,5 +1,13 @@
 [
   {
+    "hash": "d9b79db59e672e5356b7ddb4d3b583d6700b0167",
+    "short_hash": "d9b79db",
+    "author": "Chris Tierney",
+    "date": "2026-01-07T15:21:38Z",
+    "message": "feat: major architecture improvements across generators and renderers\n\nTest App:\n- Refactor to 2 generators + 4 harnesses with code display\n- Remove old apps/ directory, add generators/ and harnesses/\n- Show generator code and harness code separately\n\nRenderers:\n- Add @medli/renderer-common with BaseRenderer abstract class\n- SVG and Canvas renderers extend BaseRenderer (shared loop/stop)\n- Default to white background when backgroundColor undefined\n\nObject Generator:\n- Remove ObjectGenerator class - Scene IS the generator\n- Scene implements Generator, pass directly to renderers\n- Add SceneObject interface for extensible scene tree\n- Background is optional via setBackground()/add()/remove()\n\nProcedural Generator:\n- Redesign with p5.js-style sketch pattern\n- Pass draw function: new ProceduralGenerator((p) => p.background(color))\n- Sketch context provides background() and time\n\nSpec:\n- Frame.backgroundColor is now optional\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 30
+  },
+  {
     "hash": "fd888fb91e7790f7c68716a87f8a5e3e96f2fac3",
     "short_hash": "fd888fb",
     "author": "Chris Tierney",

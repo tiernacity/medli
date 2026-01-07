@@ -560,6 +560,17 @@
       "created_at": "2026-01-07T15:17:04.997917+00:00",
       "updated_at": "2026-01-07T15:17:04.997917+00:00",
       "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":95}"
+    },
+    {
+      "id": 52,
+      "change_id": "80dca7e0-02a4-4528-a425-84f0ada58c33",
+      "node_type": "action",
+      "title": "Committed architecture improvements",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T15:22:05.051139+00:00",
+      "updated_at": "2026-01-07T15:22:05.051139+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"commit\":\"d9b79db\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -1013,6 +1024,17 @@
       "weight": 1.0,
       "rationale": "Implementation complete",
       "created_at": "2026-01-07T15:17:05.082375+00:00"
+    },
+    {
+      "id": 42,
+      "from_node_id": 51,
+      "to_node_id": 52,
+      "from_change_id": "ecd3cd9b-abaa-4349-8d24-93bb5c988711",
+      "to_change_id": "80dca7e0-02a4-4528-a425-84f0ada58c33",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Code committed and pushed",
+      "created_at": "2026-01-07T15:22:05.131247+00:00"
     }
   ]
 }
