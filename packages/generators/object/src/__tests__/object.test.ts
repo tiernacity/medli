@@ -1,27 +1,15 @@
 import { ObjectGenerator } from "../index";
 
 describe("ObjectGenerator", () => {
-  it("should return the shapes from the definition", () => {
-    const shapes = [
-      { type: "point", x: 1, y: 2 },
-      { type: "point", x: 3, y: 4 },
-    ];
-    const generator = new ObjectGenerator({ shapes });
-    const result = generator.generate();
-    expect(result).toEqual(shapes);
+  it("should return a frame with the defined background color", () => {
+    const generator = new ObjectGenerator({ backgroundColor: "#ff0000" });
+    const frame = generator.frame(0);
+    expect(frame.backgroundColor).toBe("#ff0000");
   });
 
-  it("should return a copy of the shapes array", () => {
-    const shapes = [{ type: "point", x: 1, y: 2 }];
-    const generator = new ObjectGenerator({ shapes });
-    const result = generator.generate();
-    expect(result).not.toBe(shapes);
-    expect(result).toEqual(shapes);
-  });
-
-  it("should handle empty shapes array", () => {
-    const generator = new ObjectGenerator({ shapes: [] });
-    const result = generator.generate();
-    expect(result).toHaveLength(0);
+  it("should default time to zero", () => {
+    const generator = new ObjectGenerator({ backgroundColor: "#00ff00" });
+    const frame = generator.frame();
+    expect(frame.backgroundColor).toBe("#00ff00");
   });
 });

@@ -1,7 +1,7 @@
-import type { Generator, Shape } from "@medli/spec";
+import type { Frame, Generator } from "@medli/spec";
 
 export interface ObjectDefinition {
-  shapes: Shape[];
+  backgroundColor: string;
 }
 
 export class ObjectGenerator implements Generator {
@@ -11,7 +11,9 @@ export class ObjectGenerator implements Generator {
     this.definition = definition;
   }
 
-  generate(): Shape[] {
-    return [...this.definition.shapes];
+  frame(_time: number = 0): Frame {
+    return {
+      backgroundColor: this.definition.backgroundColor,
+    };
   }
 }

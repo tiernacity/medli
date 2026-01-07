@@ -1,26 +1,19 @@
-import type { Generator, Shape } from "@medli/spec";
+import type { Frame, Generator } from "@medli/spec";
 
 export interface ProceduralConfig {
-  seed?: number;
-  count: number;
+  backgroundColor?: string;
 }
 
 export class ProceduralGenerator implements Generator {
   private config: ProceduralConfig;
 
-  constructor(config: ProceduralConfig) {
+  constructor(config: ProceduralConfig = {}) {
     this.config = config;
   }
 
-  generate(): Shape[] {
-    const shapes: Shape[] = [];
-    for (let i = 0; i < this.config.count; i++) {
-      shapes.push({
-        type: "point",
-        x: i,
-        y: i,
-      });
-    }
-    return shapes;
+  frame(_time: number = 0): Frame {
+    return {
+      backgroundColor: this.config.backgroundColor ?? "#000000",
+    };
   }
 }
