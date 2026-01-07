@@ -78,6 +78,21 @@
       gap: 20px;
     }
 
+    .renderer-column {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .renderer-column-header {
+      font-weight: bold;
+      font-size: 14px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      text-align: center;
+    }
+    .renderer-column-header.procedural { background: #9333ea; color: white; }
+    .renderer-column-header.object { background: #059669; color: white; }
+
     .renderer-card {
       background: white;
       border-radius: 8px;
@@ -176,55 +191,59 @@
   <section>
     <h2>Renderers</h2>
     <div class="renderers-grid">
-      <div class="renderer-card">
-        <div class="renderer-header">
-          <span>SVG<span class="tag procedural">Procedural</span></span>
-          <button data-toggle="harness-proc-svg">Show Harness</button>
+      <div class="renderer-column">
+        <div class="renderer-column-header procedural">Procedural Generator</div>
+        <div class="renderer-card">
+          <div class="renderer-header">
+            <span>SVG</span>
+            <button data-toggle="harness-proc-svg">Show Harness</button>
+          </div>
+          <div class="renderer-output">
+            <svg id="proc-svg" data-testid="proc-svg"></svg>
+          </div>
+          <div id="harness-proc-svg" class="renderer-code">
+            <pre></pre>
+          </div>
         </div>
-        <div class="renderer-output">
-          <svg id="proc-svg" data-testid="proc-svg"></svg>
-        </div>
-        <div id="harness-proc-svg" class="renderer-code">
-          <pre></pre>
-        </div>
-      </div>
-
-      <div class="renderer-card">
-        <div class="renderer-header">
-          <span>Canvas<span class="tag procedural">Procedural</span></span>
-          <button data-toggle="harness-proc-canvas">Show Harness</button>
-        </div>
-        <div class="renderer-output">
-          <canvas id="proc-canvas" data-testid="proc-canvas"></canvas>
-        </div>
-        <div id="harness-proc-canvas" class="renderer-code">
-          <pre></pre>
-        </div>
-      </div>
-
-      <div class="renderer-card">
-        <div class="renderer-header">
-          <span>SVG<span class="tag object">Object</span></span>
-          <button data-toggle="harness-obj-svg">Show Harness</button>
-        </div>
-        <div class="renderer-output">
-          <svg id="obj-svg" data-testid="obj-svg"></svg>
-        </div>
-        <div id="harness-obj-svg" class="renderer-code">
-          <pre></pre>
+        <div class="renderer-card">
+          <div class="renderer-header">
+            <span>Canvas</span>
+            <button data-toggle="harness-proc-canvas">Show Harness</button>
+          </div>
+          <div class="renderer-output">
+            <canvas id="proc-canvas" data-testid="proc-canvas"></canvas>
+          </div>
+          <div id="harness-proc-canvas" class="renderer-code">
+            <pre></pre>
+          </div>
         </div>
       </div>
 
-      <div class="renderer-card">
-        <div class="renderer-header">
-          <span>Canvas<span class="tag object">Object</span></span>
-          <button data-toggle="harness-obj-canvas">Show Harness</button>
+      <div class="renderer-column">
+        <div class="renderer-column-header object">Object Generator</div>
+        <div class="renderer-card">
+          <div class="renderer-header">
+            <span>SVG</span>
+            <button data-toggle="harness-obj-svg">Show Harness</button>
+          </div>
+          <div class="renderer-output">
+            <svg id="obj-svg" data-testid="obj-svg"></svg>
+          </div>
+          <div id="harness-obj-svg" class="renderer-code">
+            <pre></pre>
+          </div>
         </div>
-        <div class="renderer-output">
-          <canvas id="obj-canvas" data-testid="obj-canvas"></canvas>
-        </div>
-        <div id="harness-obj-canvas" class="renderer-code">
-          <pre></pre>
+        <div class="renderer-card">
+          <div class="renderer-header">
+            <span>Canvas</span>
+            <button data-toggle="harness-obj-canvas">Show Harness</button>
+          </div>
+          <div class="renderer-output">
+            <canvas id="obj-canvas" data-testid="obj-canvas"></canvas>
+          </div>
+          <div id="harness-obj-canvas" class="renderer-code">
+            <pre></pre>
+          </div>
         </div>
       </div>
     </div>
