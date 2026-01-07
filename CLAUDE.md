@@ -206,11 +206,86 @@ npm run test       # All tests pass
 packages/
 ├── spec/                    # Core types and interfaces
 ├── generators/
-│   ├── procedural/          # Procedural shape generation
-│   └── object/              # Object-based shape generation
-└── renderers/
-    ├── svg/                 # SVG rendering
-    └── canvas/              # Canvas rendering
+│   ├── procedural/          # Procedural shape generation (p5.js-inspired)
+│   └── object/              # Object-based shape generation (three.js-inspired)
+├── renderers/
+│   ├── common/              # Shared renderer functionality
+│   ├── svg/                 # SVG rendering
+│   └── canvas/              # Canvas rendering
+└── test-app/                # Visual verification with Playwright
 ```
 
 All generator and renderer packages depend on `@medli/spec`.
+
+---
+
+## Sub-Agents: Domain-Specific Context
+
+**THIS IS MANDATORY. Use the correct sub-agent when working on a package.**
+
+Sub-agents are defined in `.claude/agents.toml`. Each agent provides domain-specific context, constraints, and instructions for its package.
+
+### Why Sub-Agents Matter
+
+- **Reduced context overhead**: Focus on relevant files rather than the entire codebase
+- **Domain expertise**: Each agent contains instructions tailored to its specific technology area (p5.js patterns, three.js patterns, SVG APIs, Canvas APIs)
+- **Parallel work**: Multiple agents can simultaneously work on different packages without interference
+- **Consistency**: Similar patterns get applied uniformly within each domain
+
+### How to Use Sub-Agents
+
+1. **Identify the domain** by checking which package the work touches against file patterns in `.claude/agents.toml`
+
+2. **Include the sub-agent context** when spawning a Task for exploration or implementation work
+
+3. **Scope file searches** to the relevant patterns associated with that domain
+
+**Example:** When spawning a Task for procedural generator work, include context like:
+
+```
+Working on packages/generators/procedural/...
+
+This is the generator-procedural domain. Key context:
+- INSPIRATION: p5.js
+- Pattern: imperative sketch with draw function called every frame
+- Sketch interface is the user-facing API
+- State resets each frame
+```
+
+### When to Use Sub-Agents
+
+| Action | Requirement |
+|--------|-------------|
+| Designing changes for a package | Reference that package's agent |
+| Making edits to a package | Include agent context in Task prompts |
+| Reviewing changes to a package | Apply agent's constraints and focus areas |
+
+### Available Agents
+
+| Agent | Package | Inspiration/Focus |
+|-------|---------|-------------------|
+| `spec` | `packages/spec` | Data exchange format between generators and renderers |
+| `generator-procedural` | `packages/generators/procedural` | p5.js - imperative sketch pattern |
+| `generator-object` | `packages/generators/object` | three.js - scene graph pattern |
+| `renderer-common` | `packages/renderers/common` | Shared renderer functionality |
+| `renderer-svg` | `packages/renderers/svg` | SVG DOM rendering |
+| `renderer-canvas` | `packages/renderers/canvas` | Canvas 2D rendering |
+| `test-app` | `packages/test-app` | Visual verification with Playwright |
+
+---
+
+## Feature Parity Requirements
+
+### Generator Parity
+
+Both generators MUST support the same primitives:
+- When adding a primitive to `generator-procedural`, add it to `generator-object` too
+- When adding a primitive to `generator-object`, add it to `generator-procedural` too
+- Use `test-app` to verify both produce **identical visual output**
+
+### Renderer Parity
+
+All renderers MUST:
+- Support the full spec encoded in `Frame`
+- Produce **equivalent visual output** when rendering the same Frame
+- Use `test-app` to verify visual equivalence across renderers
