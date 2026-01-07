@@ -1,6 +1,6 @@
 // Import generators (for color control)
 import { background as setProceduralBg } from "./generators/procedural";
-import { background as objectBg } from "./generators/object";
+import { background as setObjectBg } from "./generators/object";
 
 // Import harnesses
 import { createRenderer as createProcSvg } from "./harnesses/proc-svg";
@@ -22,10 +22,10 @@ const colorValue = document.getElementById("color-value") as HTMLSpanElement;
 
 // Create all renderers
 const renderers = [
-  createProcSvg(document.getElementById("proc-svg") as SVGSVGElement),
-  createProcCanvas(document.getElementById("proc-canvas") as HTMLCanvasElement),
-  createObjSvg(document.getElementById("obj-svg") as SVGSVGElement),
-  createObjCanvas(document.getElementById("obj-canvas") as HTMLCanvasElement),
+  createProcSvg(document.querySelector<SVGSVGElement>("#proc-svg")!),
+  createProcCanvas(document.querySelector<HTMLCanvasElement>("#proc-canvas")!),
+  createObjSvg(document.querySelector<SVGSVGElement>("#obj-svg")!),
+  createObjCanvas(document.querySelector<HTMLCanvasElement>("#obj-canvas")!),
 ];
 
 // Populate source code displays
@@ -66,8 +66,8 @@ document.querySelectorAll<HTMLButtonElement>("[data-toggle]").forEach((btn) => {
 
 // Set background color on both generators
 function setBackgroundColor(color: string) {
-  setProceduralBg(color); // Procedural style: call function
-  objectBg.color = color; // Object style: set property
+  setProceduralBg(color);
+  setObjectBg(color);
 }
 
 // Initial setup

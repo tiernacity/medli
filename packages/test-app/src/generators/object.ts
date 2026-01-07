@@ -10,8 +10,16 @@ import { Scene, Background } from "@medli/generator-object";
 export const generator = new Scene();
 
 // Create and attach a background
-export const background = new Background();
-generator.setBackground(background);
+const bg = new Background();
+generator.setBackground(bg);
+
+/**
+ * Set the background color.
+ * Consistent function API matching the procedural generator.
+ */
+export function background(color: string): void {
+  bg.color = color;
+}
 
 // Re-export for convenience
 export { Scene, Background };
