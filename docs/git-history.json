@@ -1,5 +1,13 @@
 [
   {
+    "hash": "fd888fb91e7790f7c68716a87f8a5e3e96f2fac3",
+    "short_hash": "fd888fb",
+    "author": "Chris Tierney",
+    "date": "2026-01-07T14:37:32Z",
+    "message": "feat: refactor test app with separate app files and code display\n\n- Create 4 separate app files demonstrating API styles:\n  - proc-svg.ts, proc-canvas.ts (p5.js-style procedural)\n  - obj-svg.ts, obj-canvas.ts (three.js-style object-oriented)\n- Each app uses animation loop instead of recreating on change\n- Add \"Show Code\" buttons with live source via Vite ?raw imports\n- Add npm run dev script at root level\n- Update Claude Code permissions for deciduous commands\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 10
+  },
+  {
     "hash": "d6f8dcd281eb8d47f6eaff1dc2b9f7d10e738fda",
     "short_hash": "d6f8dcd",
     "author": "Chris Tierney",
