@@ -1,5 +1,13 @@
 [
   {
+    "hash": "fb0155b3fa354c04c9e991523e7e4c6f0f4b12c8",
+    "short_hash": "fb0155b",
+    "author": "Chris Tierney",
+    "date": "2026-01-07T13:01:08Z",
+    "message": "feat: add visual test app for renderer verification\n\n- Add @medli/test-app package with Vite dev server\n- 2x2 matrix testing all generator/renderer combinations\n- Interactive color picker for live verification\n- Configured for Playwright MCP visual testing workflow\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 10
+  },
+  {
     "hash": "08cded78e34592bcc0f293c372099cd5b36ba005",
     "short_hash": "08cded7",
     "author": "Chris Tierney",

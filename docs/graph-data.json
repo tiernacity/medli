@@ -164,6 +164,50 @@
       "created_at": "2026-01-07T12:51:48.427415+00:00",
       "updated_at": "2026-01-07T12:51:48.427415+00:00",
       "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":95}"
+    },
+    {
+      "id": 16,
+      "change_id": "2fafd7ae-9ae8-4609-a40d-981597d4b5ad",
+      "node_type": "action",
+      "title": "Demonstrating Playwright visual verification",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T12:54:56.579568+00:00",
+      "updated_at": "2026-01-07T12:54:56.579568+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":85}"
+    },
+    {
+      "id": 17,
+      "change_id": "1e7d897a-ad66-493a-85e1-7f53b7b3313e",
+      "node_type": "outcome",
+      "title": "Playwright visual verification working - can navigate, screenshot, interact, and verify all 4 renderer outputs",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T12:59:14.632967+00:00",
+      "updated_at": "2026-01-07T12:59:14.632967+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":95}"
+    },
+    {
+      "id": 18,
+      "change_id": "b5d70344-922f-46e2-bb6e-2b0d3b9be62f",
+      "node_type": "action",
+      "title": "Committing test-app package and verification setup",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T13:00:26.144767+00:00",
+      "updated_at": "2026-01-07T13:00:26.144767+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":90}"
+    },
+    {
+      "id": 19,
+      "change_id": "243a469c-9bda-4264-9635-f78ec8beb837",
+      "node_type": "outcome",
+      "title": "Committed test-app package",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T13:01:15.265695+00:00",
+      "updated_at": "2026-01-07T13:01:15.265695+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"commit\":\"fb0155b\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -309,6 +353,39 @@
       "weight": 1.0,
       "rationale": "Implementation complete",
       "created_at": "2026-01-07T12:51:57.843422+00:00"
+    },
+    {
+      "id": 14,
+      "from_node_id": 16,
+      "to_node_id": 17,
+      "from_change_id": "2fafd7ae-9ae8-4609-a40d-981597d4b5ad",
+      "to_change_id": "1e7d897a-ad66-493a-85e1-7f53b7b3313e",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Demo completed successfully",
+      "created_at": "2026-01-07T12:59:14.691101+00:00"
+    },
+    {
+      "id": 15,
+      "from_node_id": 7,
+      "to_node_id": 18,
+      "from_change_id": "b837976c-4208-4897-a3a4-01f94641ed52",
+      "to_change_id": "b5d70344-922f-46e2-bb6e-2b0d3b9be62f",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Completing visual test app goal",
+      "created_at": "2026-01-07T13:00:38.099783+00:00"
+    },
+    {
+      "id": 16,
+      "from_node_id": 18,
+      "to_node_id": 19,
+      "from_change_id": "b5d70344-922f-46e2-bb6e-2b0d3b9be62f",
+      "to_change_id": "243a469c-9bda-4264-9635-f78ec8beb837",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Commit successful",
+      "created_at": "2026-01-07T13:01:15.330140+00:00"
     }
   ]
 }
