@@ -13,8 +13,8 @@
     "build": "npm run build --workspaces",
     "dev": "npm run dev -w @medli/test-app",
     "test": "jest",
-    "lint": "eslint 'packages/**/src/**/*.ts'",
-    "lint:fix": "eslint 'packages/**/src/**/*.ts' --fix",
+    "lint": "eslint 'packages/**/src/**/*.ts' --ignore-pattern '**/__tests__/**'",
+    "lint:fix": "eslint 'packages/**/src/**/*.ts' --ignore-pattern '**/__tests__/**' --fix",
     "format": "prettier --write 'packages/**/src/**/*.ts'",
     "format:check": "prettier --check 'packages/**/src/**/*.ts'",
     "typecheck": "tsc --build"

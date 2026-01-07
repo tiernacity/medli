@@ -1,6 +1,7 @@
 {
   "name": "@medli/generator-object",
   "version": "0.0.1",
+  "type": "module",
   "description": "Object-based shape generator for medli",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

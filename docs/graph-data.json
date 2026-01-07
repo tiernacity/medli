@@ -571,6 +571,39 @@
       "created_at": "2026-01-07T15:22:05.051139+00:00",
       "updated_at": "2026-01-07T15:22:05.051139+00:00",
       "metadata_json": "{\"branch\":\"feat/background-color\",\"commit\":\"d9b79db\",\"confidence\":95}"
+    },
+    {
+      "id": 53,
+      "change_id": "5de94ad9-8d84-4861-b0eb-ca53654e4691",
+      "node_type": "goal",
+      "title": "Fix test app - ESM module mismatch breaking browser",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T15:47:03.540277+00:00",
+      "updated_at": "2026-01-07T15:47:03.540277+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":100}"
+    },
+    {
+      "id": 54,
+      "change_id": "c6f6882c-9634-4f8c-8a7c-cbd82b3c3b29",
+      "node_type": "action",
+      "title": "Added type:module to all package.json files, excluded __tests__ from tsc builds, fixed Jest moduleNameMapper",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T15:47:09.022363+00:00",
+      "updated_at": "2026-01-07T15:47:09.022363+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":100}"
+    },
+    {
+      "id": 55,
+      "change_id": "edf0a224-39a4-49d6-a675-a89c5e84fa17",
+      "node_type": "outcome",
+      "title": "All 4 renderers working in browser, 30 tests pass, lint/format/typecheck pass",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-07T15:47:09.103102+00:00",
+      "updated_at": "2026-01-07T15:47:09.103102+00:00",
+      "metadata_json": "{\"branch\":\"feat/background-color\",\"confidence\":100}"
     }
   ],
   "edges": [
@@ -1035,6 +1068,28 @@
       "weight": 1.0,
       "rationale": "Code committed and pushed",
       "created_at": "2026-01-07T15:22:05.131247+00:00"
+    },
+    {
+      "id": 43,
+      "from_node_id": 53,
+      "to_node_id": 54,
+      "from_change_id": "5de94ad9-8d84-4861-b0eb-ca53654e4691",
+      "to_change_id": "c6f6882c-9634-4f8c-8a7c-cbd82b3c3b29",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation",
+      "created_at": "2026-01-07T15:47:16.548990+00:00"
+    },
+    {
+      "id": 44,
+      "from_node_id": 54,
+      "to_node_id": 55,
+      "from_change_id": "c6f6882c-9634-4f8c-8a7c-cbd82b3c3b29",
+      "to_change_id": "edf0a224-39a4-49d6-a675-a89c5e84fa17",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Result",
+      "created_at": "2026-01-07T15:47:16.570629+00:00"
     }
   ]
 }

@@ -1,6 +1,7 @@
 {
   "name": "@medli/spec",
   "version": "0.0.1",
+  "type": "module",
   "description": "Specification types and interfaces for medli",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

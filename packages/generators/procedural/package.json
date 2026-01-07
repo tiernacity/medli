@@ -1,6 +1,7 @@
 {
   "name": "@medli/generator-procedural",
   "version": "0.0.1",
+  "type": "module",
   "description": "Procedural shape generator for medli",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
