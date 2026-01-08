@@ -40,11 +40,68 @@ The `frame()` method on Scene:
 Scene
 ├── background?: Background
 ├── children: SceneObject[]
-│   ├── Rectangle { x, y, width, height, fill }
-│   ├── Circle { cx, cy, r, fill }
-│   └── Group
+│   ├── Material { fill?, stroke?, strokeWidth? }
+│   │   └── children: SceneObject[]
+│   ├── Rectangle { x, y, width, height }
+│   ├── Circle { cx, cy, r }
+│   └── Transform { translate?, rotate?, scale? }
 │       └── children: SceneObject[]
 ```
+
+## Material-Based Frame Output
+
+The object generator emits a **Material-based tree** (see `@medli/spec` README).
+
+### Material objects in the scene
+
+Materials are scene objects that provide style context for their children:
+
+```typescript
+const scene = new Scene();
+const bg = new Background("#ffffff");
+scene.setBackground(bg);
+
+// Create a material with style properties
+const primaryStyle = new Material({ fill: "#0066cc" });
+primaryStyle.add(new Circle(25, 25, 10));
+primaryStyle.add(new Circle(75, 25, 10));
+scene.add(primaryStyle);
+
+// Another material with different style
+const dangerStyle = new Material({ fill: "#cc0000" });
+dangerStyle.add(new Circle(50, 75, 15));
+scene.add(dangerStyle);
+```
+
+Emits:
+```
+RootMaterial (complete defaults from Scene)
+├── ChildMaterial (fill: "#0066cc")
+│   ├── Circle
+│   └── Circle
+└── ChildMaterial (fill: "#cc0000")
+    └── Circle
+```
+
+### Nested materials for overrides
+
+Materials can be nested for partial overrides:
+
+```typescript
+const outer = new Material({ fill: "red", stroke: "black" });
+const inner = new Material({ fill: "blue" }); // inherits stroke from outer
+inner.add(new Circle(50, 50, 10));
+outer.add(inner);
+scene.add(outer);
+```
+
+### Generator responsibilities
+
+The Scene (as Generator) must:
+1. Create RootMaterial with complete defaults
+2. Traverse scene graph, converting Material objects to ChildMaterial nodes
+3. Generate unique Material IDs
+4. Ensure all ChildMaterials reference their parent Material
 
 ## Usage
 

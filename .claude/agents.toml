@@ -19,23 +19,14 @@ focus_areas = [
 instructions = """
 This package defines the DATA EXCHANGE FORMAT between generators and renderers.
 
-CRITICAL CONSTRAINTS:
-- Frame is a pure data type (no methods, no behavior)
-- Generator.frame() returns Frame - this is the ONLY output
-- Renderer.render() consumes Frame - this is the ONLY input
-- Validation happens at generation time, NOT render time
-- Renderers TRUST the Frame data they receive
+BEFORE MAKING CHANGES: Read packages/spec/README.md for the full Frame design.
 
-DESIGN PHILOSOPHY:
-- Minimize coupling: generators don't know about renderers
-- Maximize compatibility: any Generator works with any Renderer
-- Keep Frame flat and serializable (could be JSON)
+Key points:
+- Frame is a Material-based tree structure (not flat)
+- Validation rules are documented in the README
+- Changes here affect ALL packages
 
-BEFORE ADDING TO FRAME:
-1. Is it primitive data (not objects with methods)?
-2. Does it represent something renderable?
-
-Run `npm run typecheck` after changes - spec changes affect ALL packages.
+Run `npm run typecheck` after changes.
 """
 
 [agents.generator-procedural]
@@ -73,11 +64,12 @@ DESIGN RULES:
 - State resets each frame - no accumulation between frames
 - Time is available as sketch.time (milliseconds)
 
-WHEN ADDING NEW PRIMITIVES:
-1. Add method to Sketch interface (e.g., sketch.circle(x, y, r))
-2. Store call data internally during draw execution
-3. Include data in returned Frame
-4. Follow p5.js naming conventions where applicable
+BEFORE MAKING CHANGES: Read packages/generators/procedural/README.md for full design.
+
+Key points:
+- Emits Material-based tree (see spec README)
+- fill()/stroke() create Material nodes
+- push()/pop() map to tree nesting
 
 Test with test-app to verify visual output.
 """
@@ -113,10 +105,12 @@ KEY CONCEPTS:
 - Object graph persists between frames (unlike procedural)
 - Future: transformations and grouping for positioning
 
-WHEN ADDING NEW PRIMITIVES:
-1. Create new class implementing SceneObject
-2. Constructor takes configuration
-3. Export from package index
+BEFORE MAKING CHANGES: Read packages/generators/object/README.md for full design.
+
+Key points:
+- Emits Material-based tree (see spec README)
+- Material class provides style context for children
+- Scene builds tree with RootMaterial
 
 Test with test-app to verify visual output.
 """
@@ -182,6 +176,9 @@ SVG-SPECIFIC CONSIDERATIONS:
 - All SVG elements need correct namespace (http://www.w3.org/2000/svg)
 - Attribute names differ from HTML (e.g., 'fill' not 'background')
 - Group elements with <g> for transforms
+
+BEFORE MAKING CHANGES: Read packages/spec/README.md for Frame structure.
+Renderer must call validateFrame() and traverse Material tree to resolve styles.
 """
 
 [agents.renderer-canvas]
@@ -211,6 +208,9 @@ CANVAS-SPECIFIC CONSIDERATIONS:
 - Coordinate system: (0,0) is top-left
 - Context state: use save()/restore() if changing transforms
 - Path-based shapes need beginPath(), fill()/stroke()
+
+BEFORE MAKING CHANGES: Read packages/spec/README.md for Frame structure.
+Renderer must call validateFrame() and traverse Material tree to resolve styles.
 """
 
 [agents.test-app]
