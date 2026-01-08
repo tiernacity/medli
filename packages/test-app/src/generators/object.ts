@@ -27,6 +27,7 @@ import {
   Line,
   Material,
   Group,
+  Image,
 } from "@medli/generator-object";
 
 // Create scene as the root generator with viewport settings
@@ -246,6 +247,12 @@ line9b.material = material9;
 group9.add(line9a);
 group9.add(line9b);
 generator.add(group9);
+
+// === Section 10: Image rendering test ===
+// Draw a test image in the lower-left corner area
+// The image is 32x32 pixels, we'll render it at 20x20 viewport units
+const image10 = new Image("/test-img.png", -45, -45, 20, 20);
+generator.add(image10);
 
 /**
  * Set the background color.

@@ -2177,6 +2177,193 @@
       "created_at": "2026-01-08T19:44:34.410397+00:00",
       "updated_at": "2026-01-08T19:44:34.410397+00:00",
       "metadata_json": "{\"branch\":\"feat/coordinate-system\",\"commit\":\"91efbf0\",\"confidence\":95}"
+    },
+    {
+      "id": 199,
+      "change_id": "97ec0cd5-77c2-4cda-b8ad-743d00a4a85c",
+      "node_type": "goal",
+      "title": "Add image/resource support to Frame spec and renderers",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T20:41:06.322660+00:00",
+      "updated_at": "2026-01-08T20:41:06.322660+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":90,\"prompt\":\"I have a question. It's about rendering images into our little test-app. A library like p5.js can fetch an image from a URL, and render it (or part of it) onto the canvas.\\n\\np5.js uses the canvas API or webgl to do this, if I remember correctly. Is there support for rendering images (or parts of them) in SVG and/or canvas API? Dispatch task agents to find out\"}"
+    },
+    {
+      "id": 200,
+      "change_id": "afff992c-a790-4f17-80bc-f5df481fefae",
+      "node_type": "observation",
+      "title": "Canvas: drawImage() with 9-param overload supports cropping (sprite sheets). ImageBitmap is optimal format with explicit .close() for memory control.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T20:41:15.358805+00:00",
+      "updated_at": "2026-01-08T20:41:15.358805+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":95}"
+    },
+    {
+      "id": 201,
+      "change_id": "9cfc668b-4c3f-41bb-b887-558ffdf5cee6",
+      "node_type": "observation",
+      "title": "SVG: <image> element with clipPath for cropping. Blob URLs avoid double-fetch. Must revoke URLs manually.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T20:41:15.429108+00:00",
+      "updated_at": "2026-01-08T20:41:15.429108+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":95}"
+    },
+    {
+      "id": 202,
+      "change_id": "885636eb-191f-40fd-bff7-35bc7e803dac",
+      "node_type": "observation",
+      "title": "CORS applies to both: Canvas gets 'tainted' (can't read pixels), SVG won't load cross-origin without headers.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T20:41:15.494657+00:00",
+      "updated_at": "2026-01-08T20:41:15.494657+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":95}"
+    },
+    {
+      "id": 203,
+      "change_id": "8164a93d-44c3-4c61-8bad-829149f887ca",
+      "node_type": "goal",
+      "title": "Design general resource management system (images first, then video, shaders)",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T20:41:28.668699+00:00",
+      "updated_at": "2026-01-08T20:41:28.668699+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":90,\"prompt\":\"Images, in my mind, will be our first example of using *resources* - which are referenced in the frame spec but loaded by a renderer. We may later have other examples of resources (eg video). And some future renderers will have resources required simply to function - for example a webgpu renderer will need to examine the frame spec and determine whether new shader/pipeline resources are required.\\n\\nSo I'd like a strong model for resources in general - potentially one that can be shared between renderers.\"}"
+    },
+    {
+      "id": 204,
+      "change_id": "fb09408b-cc17-455c-84ff-6ae2084688ac",
+      "node_type": "decision",
+      "title": "Choose resource loading strategy",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T20:41:32.963100+00:00",
+      "updated_at": "2026-01-08T20:41:32.963100+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":85}"
+    },
+    {
+      "id": 205,
+      "change_id": "77382f72-729a-41c3-86b0-d1e269b3a369",
+      "node_type": "option",
+      "title": "Native browser loading: rely on <image> href, HTMLImageElement natural loading",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T20:41:38.317827+00:00",
+      "updated_at": "2026-01-08T20:41:38.317827+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":70}"
+    },
+    {
+      "id": 206,
+      "change_id": "8fc00484-412d-4084-bdaf-7f49ce2b4102",
+      "node_type": "option",
+      "title": "Managed resources: fetch blobs ourselves, renderer-specific post-processing, explicit disposal",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T20:41:38.384283+00:00",
+      "updated_at": "2026-01-08T20:41:38.384283+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":90}"
+    },
+    {
+      "id": 207,
+      "change_id": "ebea24d0-8220-401a-bf3e-21d566dbcfa0",
+      "node_type": "outcome",
+      "title": "Selected: Managed resources - consistent behavior across renderers, explicit memory control, future-proof for WebGPU",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T20:41:44.155217+00:00",
+      "updated_at": "2026-01-08T20:41:44.155217+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":95}"
+    },
+    {
+      "id": 208,
+      "change_id": "b224eadc-176c-4212-9300-23d092a3cd93",
+      "node_type": "observation",
+      "title": "Resource tiers: required (blocking), optional (skip/placeholder), defaulting (fallback until ready). V1 implements blocking only.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T20:41:54.159027+00:00",
+      "updated_at": "2026-01-08T20:41:54.159027+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":95}"
+    },
+    {
+      "id": 209,
+      "change_id": "d12e5587-6e32-45b8-b79a-a303148ed479",
+      "node_type": "observation",
+      "title": "Architecture: Renderers extract ResourceRequirements from Frame, hand to ResourceManager, await response. ResourceManager handles fetch/cache.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T20:41:54.241150+00:00",
+      "updated_at": "2026-01-08T20:41:54.241150+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":95}"
+    },
+    {
+      "id": 210,
+      "change_id": "9f47d19d-44f3-4e0e-812e-6286860edea8",
+      "node_type": "observation",
+      "title": "Post-processing injection: ResourceManager<T> with ResourcePostProcessor<T> interface. Canvas injects blob→ImageBitmap, SVG injects blob→blobURL, WebGPU would inject blob→GPUTexture.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T20:41:54.327814+00:00",
+      "updated_at": "2026-01-08T20:41:54.327814+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":95}"
+    },
+    {
+      "id": 211,
+      "change_id": "ac7860cd-bc73-435f-93b9-105bcf23a742",
+      "node_type": "observation",
+      "title": "Disposal: diff-based (resource present last frame but not this frame → dispose). Pre-destroy callbacks paired with post-processing. Renderer.destroy() cleans up all.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T20:41:54.406958+00:00",
+      "updated_at": "2026-01-08T20:41:54.406958+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":95}"
+    },
+    {
+      "id": 212,
+      "change_id": "c59c4f8a-06a4-436d-8959-90fea38d84fe",
+      "node_type": "observation",
+      "title": "V1 simplicity: each renderer owns its ResourceManager (no sharing). Just url in ResourceRequirement. Browser handles HTTP caching.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T20:41:54.500754+00:00",
+      "updated_at": "2026-01-08T20:41:54.500754+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":95}"
+    },
+    {
+      "id": 213,
+      "change_id": "fde3bc84-04c3-44f3-894f-f53e74c64833",
+      "node_type": "action",
+      "title": "Implementing V1 resource management system",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T20:50:41.965445+00:00",
+      "updated_at": "2026-01-08T20:50:41.965445+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":90}"
+    },
+    {
+      "id": 214,
+      "change_id": "b40a77fa-f206-4650-b03a-9af6ed74a67b",
+      "node_type": "outcome",
+      "title": "V1 resource management implemented - 170 tests pass, all checks pass",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T20:59:02.036738+00:00",
+      "updated_at": "2026-01-08T20:59:02.036738+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":95}"
+    },
+    {
+      "id": 215,
+      "change_id": "a5363b0d-094d-4c05-9494-710a3937ba5e",
+      "node_type": "outcome",
+      "title": "Visual verification passed - all 4 renderers show identical image output",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T21:04:44.995294+00:00",
+      "updated_at": "2026-01-08T21:04:44.995294+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -4302,6 +4489,182 @@
       "weight": 1.0,
       "rationale": "Deployment",
       "created_at": "2026-01-08T19:44:34.434963+00:00"
+    },
+    {
+      "id": 194,
+      "from_node_id": 199,
+      "to_node_id": 200,
+      "from_change_id": "97ec0cd5-77c2-4cda-b8ad-743d00a4a85c",
+      "to_change_id": "afff992c-a790-4f17-80bc-f5df481fefae",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Canvas API research",
+      "created_at": "2026-01-08T20:42:04.917641+00:00"
+    },
+    {
+      "id": 195,
+      "from_node_id": 199,
+      "to_node_id": 201,
+      "from_change_id": "97ec0cd5-77c2-4cda-b8ad-743d00a4a85c",
+      "to_change_id": "9cfc668b-4c3f-41bb-b887-558ffdf5cee6",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "SVG API research",
+      "created_at": "2026-01-08T20:42:04.993952+00:00"
+    },
+    {
+      "id": 196,
+      "from_node_id": 199,
+      "to_node_id": 202,
+      "from_change_id": "97ec0cd5-77c2-4cda-b8ad-743d00a4a85c",
+      "to_change_id": "885636eb-191f-40fd-bff7-35bc7e803dac",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Security consideration",
+      "created_at": "2026-01-08T20:42:05.065559+00:00"
+    },
+    {
+      "id": 197,
+      "from_node_id": 199,
+      "to_node_id": 203,
+      "from_change_id": "97ec0cd5-77c2-4cda-b8ad-743d00a4a85c",
+      "to_change_id": "8164a93d-44c3-4c61-8bad-829149f887ca",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Generalize to resource system",
+      "created_at": "2026-01-08T20:42:05.139366+00:00"
+    },
+    {
+      "id": 198,
+      "from_node_id": 203,
+      "to_node_id": 204,
+      "from_change_id": "8164a93d-44c3-4c61-8bad-829149f887ca",
+      "to_change_id": "fb09408b-cc17-455c-84ff-6ae2084688ac",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Key design decision",
+      "created_at": "2026-01-08T20:42:05.213497+00:00"
+    },
+    {
+      "id": 199,
+      "from_node_id": 204,
+      "to_node_id": 205,
+      "from_change_id": "fb09408b-cc17-455c-84ff-6ae2084688ac",
+      "to_change_id": "77382f72-729a-41c3-86b0-d1e269b3a369",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Option: simple but less control",
+      "created_at": "2026-01-08T20:42:05.288848+00:00"
+    },
+    {
+      "id": 200,
+      "from_node_id": 204,
+      "to_node_id": 206,
+      "from_change_id": "fb09408b-cc17-455c-84ff-6ae2084688ac",
+      "to_change_id": "8fc00484-412d-4084-bdaf-7f49ce2b4102",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Option: more control, future-proof",
+      "created_at": "2026-01-08T20:42:05.365224+00:00"
+    },
+    {
+      "id": 201,
+      "from_node_id": 206,
+      "to_node_id": 207,
+      "from_change_id": "8fc00484-412d-4084-bdaf-7f49ce2b4102",
+      "to_change_id": "ebea24d0-8220-401a-bf3e-21d566dbcfa0",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Selected for consistency and extensibility",
+      "created_at": "2026-01-08T20:42:05.447498+00:00"
+    },
+    {
+      "id": 202,
+      "from_node_id": 207,
+      "to_node_id": 208,
+      "from_change_id": "ebea24d0-8220-401a-bf3e-21d566dbcfa0",
+      "to_change_id": "b224eadc-176c-4212-9300-23d092a3cd93",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Resource tier design",
+      "created_at": "2026-01-08T20:42:11.704588+00:00"
+    },
+    {
+      "id": 203,
+      "from_node_id": 207,
+      "to_node_id": 209,
+      "from_change_id": "ebea24d0-8220-401a-bf3e-21d566dbcfa0",
+      "to_change_id": "d12e5587-6e32-45b8-b79a-a303148ed479",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Data flow architecture",
+      "created_at": "2026-01-08T20:42:11.773392+00:00"
+    },
+    {
+      "id": 204,
+      "from_node_id": 207,
+      "to_node_id": 210,
+      "from_change_id": "ebea24d0-8220-401a-bf3e-21d566dbcfa0",
+      "to_change_id": "9f47d19d-44f3-4e0e-812e-6286860edea8",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Renderer extensibility",
+      "created_at": "2026-01-08T20:42:11.842575+00:00"
+    },
+    {
+      "id": 205,
+      "from_node_id": 207,
+      "to_node_id": 211,
+      "from_change_id": "ebea24d0-8220-401a-bf3e-21d566dbcfa0",
+      "to_change_id": "ac7860cd-bc73-435f-93b9-105bcf23a742",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Memory management",
+      "created_at": "2026-01-08T20:42:11.927128+00:00"
+    },
+    {
+      "id": 206,
+      "from_node_id": 207,
+      "to_node_id": 212,
+      "from_change_id": "ebea24d0-8220-401a-bf3e-21d566dbcfa0",
+      "to_change_id": "c59c4f8a-06a4-436d-8959-90fea38d84fe",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "V1 scope",
+      "created_at": "2026-01-08T20:42:11.995511+00:00"
+    },
+    {
+      "id": 207,
+      "from_node_id": 207,
+      "to_node_id": 213,
+      "from_change_id": "ebea24d0-8220-401a-bf3e-21d566dbcfa0",
+      "to_change_id": "fde3bc84-04c3-44f3-894f-f53e74c64833",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation of selected design",
+      "created_at": "2026-01-08T20:50:48.738786+00:00"
+    },
+    {
+      "id": 208,
+      "from_node_id": 213,
+      "to_node_id": 214,
+      "from_change_id": "fde3bc84-04c3-44f3-894f-f53e74c64833",
+      "to_change_id": "b40a77fa-f206-4650-b03a-9af6ed74a67b",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation complete",
+      "created_at": "2026-01-08T20:59:06.954557+00:00"
+    },
+    {
+      "id": 209,
+      "from_node_id": 214,
+      "to_node_id": 215,
+      "from_change_id": "b40a77fa-f206-4650-b03a-9af6ed74a67b",
+      "to_change_id": "a5363b0d-094d-4c05-9494-710a3937ba5e",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Visual verification",
+      "created_at": "2026-01-08T21:04:45.065150+00:00"
     }
   ]
 }

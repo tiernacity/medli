@@ -67,10 +67,10 @@ describe("CanvasRenderer", () => {
     );
   });
 
-  it("should render the background color from the generator", () => {
+  it("should render the background color from the generator", async () => {
     const renderer = new CanvasRenderer(mockElement, mockGenerator);
 
-    renderer.render(0);
+    await renderer.render(0);
 
     expect(mockGenerator.frame).toHaveBeenCalledWith(0);
     // Background is drawn in viewport coordinates after transform
@@ -79,10 +79,10 @@ describe("CanvasRenderer", () => {
     expect(mockContext.fillRect).toHaveBeenCalledWith(-50, -50, 100, 100);
   });
 
-  it("should apply viewport transform before rendering", () => {
+  it("should apply viewport transform before rendering", async () => {
     const renderer = new CanvasRenderer(mockElement, mockGenerator);
 
-    renderer.render(0);
+    await renderer.render(0);
 
     // Should save state, apply transform, then restore
     expect(mockContext.save).toHaveBeenCalled();
@@ -91,18 +91,18 @@ describe("CanvasRenderer", () => {
     expect(mockContext.restore).toHaveBeenCalled();
   });
 
-  it("should clear the canvas before rendering", () => {
+  it("should clear the canvas before rendering", async () => {
     const renderer = new CanvasRenderer(mockElement, mockGenerator);
 
-    renderer.render(0);
+    await renderer.render(0);
 
     expect(mockContext.clearRect).toHaveBeenCalledWith(0, 0, 100, 100);
   });
 
-  it("should default time to zero", () => {
+  it("should default time to zero", async () => {
     const renderer = new CanvasRenderer(mockElement, mockGenerator);
 
-    renderer.render();
+    await renderer.render();
 
     expect(mockGenerator.frame).toHaveBeenCalledWith(0);
   });

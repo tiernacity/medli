@@ -3,6 +3,7 @@ import type {
   Generator,
   Circle,
   Line,
+  Image,
   RootMaterial,
   ChildMaterial,
   FrameNode,
@@ -141,6 +142,9 @@ export interface Sketch {
 
   /** Draw a line from (x, y) with offset (dx, dy) */
   lineOffset(x: number, y: number, dx: number, dy: number): void;
+
+  /** Draw an image at position (x, y) with given dimensions */
+  image(url: string, x: number, y: number, width: number, height: number): void;
 
   /** Save current style and transform state, start a new nested context */
   push(): void;
@@ -288,7 +292,7 @@ export class ProceduralGenerator implements Generator {
     /**
      * Helper: Wrap a shape in a Transform node if the current transform is not identity.
      */
-    const wrapWithTransform = (shape: Circle | Line): FrameNode => {
+    const wrapWithTransform = (shape: Circle | Line | Image): FrameNode => {
       if (isIdentity(currentTransform)) {
         return shape;
       }
@@ -311,7 +315,7 @@ export class ProceduralGenerator implements Generator {
      *   unless style changes WITHIN the pushed context (then new nested ChildMaterial).
      * - If a transform is active, the shape is wrapped in a Transform node.
      */
-    const addShape = (shape: Circle | Line) => {
+    const addShape = (shape: Circle | Line | Image) => {
       const isAtRootLevel = contextStack.length === 0;
       const node = wrapWithTransform(shape);
 
@@ -445,6 +449,16 @@ export class ProceduralGenerator implements Generator {
           end: { x: x + dx, y: y + dy },
         };
         addShape(lineShape);
+      },
+      image(url: string, x: number, y: number, width: number, height: number) {
+        const imageShape: Image = {
+          type: "image",
+          url,
+          position: { x, y },
+          width,
+          height,
+        };
+        addShape(imageShape);
       },
       push() {
         // Lock root style if this is the first operation at root

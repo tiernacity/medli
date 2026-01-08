@@ -5,13 +5,20 @@ import type {
   Material,
   ResolvedMaterial,
   Transform,
+  Image,
 } from "@medli/spec";
 import { validateFrame, resolveMaterial } from "@medli/spec";
-import { BaseRenderer, computeViewportTransform } from "@medli/renderer-common";
+import {
+  BaseRenderer,
+  computeViewportTransform,
+  ResourceManager,
+  extractResourceUrls,
+} from "@medli/renderer-common";
 
 export class CanvasRenderer extends BaseRenderer {
   private element: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
+  private resourceManager: ResourceManager<ImageBitmap>;
 
   constructor(element: HTMLCanvasElement, generator: Generator) {
     super(generator);
@@ -22,15 +29,37 @@ export class CanvasRenderer extends BaseRenderer {
       throw new Error("Could not get 2d context from canvas");
     }
     this.context = ctx;
+
+    this.resourceManager = new ResourceManager({
+      process: (blob) => createImageBitmap(blob),
+      dispose: (bitmap) => bitmap.close(),
+    });
   }
 
-  render(time: number = 0): void {
+  async render(time: number = 0): Promise<void> {
     const frame = this.generator.frame(time);
 
     // Validate frame structure
     const result = validateFrame(frame);
     if (!result.valid) {
       console.error("Invalid frame:", result.error);
+      return;
+    }
+
+    // Extract and load resources
+    const urls = extractResourceUrls(frame);
+    this.resourceManager.markNeeded(urls);
+
+    const resourceMap = new Map<string, ImageBitmap>();
+    try {
+      await Promise.all(
+        Array.from(urls).map(async (url) => {
+          const resource = await this.resourceManager.getResource(url);
+          resourceMap.set(url, resource);
+        })
+      );
+    } catch (error) {
+      console.error("Failed to load resources:", error);
       return;
     }
 
@@ -63,20 +92,36 @@ export class CanvasRenderer extends BaseRenderer {
     );
 
     // Render all shapes (they're now in viewport coords)
-    this.renderNode(frame.root, [frame.root]);
+    this.renderNode(frame.root, [frame.root], resourceMap);
 
     this.context.restore();
+
+    // Cleanup unused resources
+    this.resourceManager.pruneUnused();
   }
 
-  private renderNode(node: FrameNode, ancestors: Material[]): void {
+  destroy(): void {
+    this.stop();
+    this.resourceManager.destroy();
+  }
+
+  private renderNode(
+    node: FrameNode,
+    ancestors: Material[],
+    resourceMap: Map<string, ImageBitmap>
+  ): void {
     if (node.type === "material") {
       // Material node - recurse into children with updated ancestors
       const material = node as Material;
       for (const child of material.children) {
         if (child.type === "material") {
-          this.renderNode(child, [...ancestors, child as Material]);
+          this.renderNode(
+            child,
+            [...ancestors, child as Material],
+            resourceMap
+          );
         } else {
-          this.renderNode(child, ancestors);
+          this.renderNode(child, ancestors, resourceMap);
         }
       }
     } else if (node.type === "transform") {
@@ -90,9 +135,13 @@ export class CanvasRenderer extends BaseRenderer {
       // Recurse into children - transforms don't affect material ancestor tracking
       for (const child of transform.children) {
         if (child.type === "material") {
-          this.renderNode(child, [...ancestors, child as Material]);
+          this.renderNode(
+            child,
+            [...ancestors, child as Material],
+            resourceMap
+          );
         } else {
-          this.renderNode(child, ancestors);
+          this.renderNode(child, ancestors, resourceMap);
         }
       }
 
@@ -100,11 +149,15 @@ export class CanvasRenderer extends BaseRenderer {
     } else {
       // Shape node - render with resolved material
       const resolved = resolveMaterial(ancestors);
-      this.renderShape(node as Shape, resolved);
+      this.renderShape(node as Shape, resolved, resourceMap);
     }
   }
 
-  private renderShape(shape: Shape, material: ResolvedMaterial): void {
+  private renderShape(
+    shape: Shape,
+    material: ResolvedMaterial,
+    resourceMap: Map<string, ImageBitmap>
+  ): void {
     switch (shape.type) {
       case "circle": {
         this.context.beginPath();
@@ -129,6 +182,22 @@ export class CanvasRenderer extends BaseRenderer {
         this.context.strokeStyle = material.stroke;
         this.context.lineWidth = material.strokeWidth;
         this.context.stroke();
+        break;
+      }
+      case "image": {
+        const img = shape as Image;
+        const bitmap = resourceMap.get(img.url);
+        if (bitmap) {
+          // Draw image at position, with width and height
+          // Note: Y is flipped by the viewport transform, so we draw at -height
+          this.context.drawImage(
+            bitmap,
+            img.position.x,
+            img.position.y - img.height,
+            img.width,
+            img.height
+          );
+        }
         break;
       }
     }

@@ -1,4 +1,139 @@
-import type { Generator, Renderer, Viewport } from "@medli/spec";
+import type {
+  Generator,
+  Renderer,
+  Viewport,
+  Frame,
+  FrameNode,
+} from "@medli/spec";
+
+/**
+ * Post-processor for transforming fetched blobs into renderer-specific resources.
+ * Each renderer provides its own implementation.
+ */
+export interface ResourcePostProcessor<T> {
+  /** Transform a fetched blob into the renderer's resource format */
+  process(blob: Blob): Promise<T>;
+  /** Clean up a resource when it's no longer needed */
+  dispose(resource: T): void;
+}
+
+type ResourceState<T> =
+  | { status: "loading"; promise: Promise<Blob> }
+  | { status: "ready"; blob: Blob; processed: T }
+  | { status: "error"; error: Error };
+
+/**
+ * Manages external resources (images, etc.) for a renderer.
+ * Handles fetching, caching, post-processing, and disposal.
+ */
+export class ResourceManager<T> {
+  private postProcessor: ResourcePostProcessor<T>;
+  private resources = new Map<string, ResourceState<T>>();
+  private neededUrls = new Set<string>();
+
+  constructor(postProcessor: ResourcePostProcessor<T>) {
+    this.postProcessor = postProcessor;
+  }
+
+  /**
+   * Get a resource by URL, fetching and processing if needed.
+   * Throws if the fetch or processing fails.
+   */
+  async getResource(url: string): Promise<T> {
+    let state = this.resources.get(url);
+
+    if (!state) {
+      // Start loading
+      const promise = fetch(url).then((r) => {
+        if (!r.ok) throw new Error(`Failed to fetch ${url}: ${r.status}`);
+        return r.blob();
+      });
+      state = { status: "loading", promise };
+      this.resources.set(url, state);
+    }
+
+    if (state.status === "loading") {
+      try {
+        const blob = await state.promise;
+        const processed = await this.postProcessor.process(blob);
+        const readyState: ResourceState<T> = {
+          status: "ready",
+          blob,
+          processed,
+        };
+        this.resources.set(url, readyState);
+        return processed;
+      } catch (error) {
+        const errorState: ResourceState<T> = {
+          status: "error",
+          error: error as Error,
+        };
+        this.resources.set(url, errorState);
+        throw error;
+      }
+    } else if (state.status === "ready") {
+      return state.processed;
+    } else {
+      // Error state - throw stored error
+      throw state.error;
+    }
+  }
+
+  /**
+   * Mark which URLs are needed for the current frame.
+   * Call before rendering, then call pruneUnused() after.
+   */
+  markNeeded(urls: Set<string>): void {
+    this.neededUrls = urls;
+  }
+
+  /**
+   * Dispose resources that are no longer needed.
+   * Call after rendering completes.
+   */
+  pruneUnused(): void {
+    for (const [url, state] of this.resources.entries()) {
+      if (!this.neededUrls.has(url) && state.status === "ready") {
+        this.postProcessor.dispose(state.processed);
+        this.resources.delete(url);
+      }
+    }
+  }
+
+  /**
+   * Dispose all resources. Call when renderer is destroyed.
+   */
+  destroy(): void {
+    for (const state of this.resources.values()) {
+      if (state.status === "ready") {
+        this.postProcessor.dispose(state.processed);
+      }
+    }
+    this.resources.clear();
+    this.neededUrls.clear();
+  }
+}
+
+/**
+ * Extract all resource URLs from a frame by traversing the tree.
+ * Returns a Set of unique URLs for Image shapes.
+ */
+export function extractResourceUrls(frame: Frame): Set<string> {
+  const urls = new Set<string>();
+
+  function visit(node: FrameNode): void {
+    if (node.type === "image") {
+      urls.add(node.url);
+    } else if ("children" in node) {
+      for (const child of node.children) {
+        visit(child);
+      }
+    }
+  }
+
+  visit(frame.root);
+  return urls;
+}
 
 /**
  * Base class for renderers providing common animation loop functionality.
@@ -15,12 +150,15 @@ export abstract class BaseRenderer implements Renderer {
   }
 
   /** Render a single frame. Subclasses implement this. */
-  abstract render(time: number): void;
+  abstract render(time: number): Promise<void>;
+
+  /** Clean up resources. Subclasses implement this. */
+  abstract destroy(): void;
 
   /** Start the animation loop. */
   loop(): void {
-    const animate = (time: number) => {
-      this.render(time);
+    const animate = async (time: number) => {
+      await this.render(time);
       this.animationId = requestAnimationFrame(animate);
     };
     this.animationId = requestAnimationFrame(animate);

@@ -168,6 +168,11 @@ export const generator = new ProceduralGenerator((p) => {
   p.line(0, -5, 0, 5);
 
   p.pop();
+
+  // === Section 10: Image rendering test ===
+  // Draw a test image in the lower-left corner area
+  // The image is 32x32 pixels, we'll render it at 20x20 viewport units
+  p.image("/test-img.png", -45, -45, 20, 20);
 });
 
 /**

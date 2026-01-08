@@ -31,9 +31,21 @@ export type Line = {
 };
 
 /**
+ * An image shape positioned in viewport coordinates.
+ * URL references an external image resource loaded by the renderer.
+ */
+export type Image = {
+  type: "image";
+  url: string;
+  position: Position;
+  width: number;
+  height: number;
+};
+
+/**
  * Union of all shape types.
  */
-export type Shape = Circle | Line;
+export type Shape = Circle | Line | Image;
 
 /**
  * Root material with all style properties required.
@@ -256,8 +268,38 @@ export function validateFrame(frame: Frame): ValidationResult {
         const result = validateNode(child, ancestorIds);
         if (!result.valid) return result;
       }
+    } else if (node.type === "image") {
+      // Validate image URL is non-empty string
+      if (typeof node.url !== "string" || node.url.length === 0) {
+        return {
+          valid: false,
+          error: "Image url must be a non-empty string",
+        };
+      }
+      // Validate width is positive finite number
+      if (
+        typeof node.width !== "number" ||
+        node.width <= 0 ||
+        !isFinite(node.width)
+      ) {
+        return {
+          valid: false,
+          error: "Image width must be a positive finite number",
+        };
+      }
+      // Validate height is positive finite number
+      if (
+        typeof node.height !== "number" ||
+        node.height <= 0 ||
+        !isFinite(node.height)
+      ) {
+        return {
+          valid: false,
+          error: "Image height must be a positive finite number",
+        };
+      }
     }
-    // Shapes are leaves - no validation needed
+    // Other shapes (circle, line) are leaves - no additional validation needed
     return { valid: true };
   }
 
@@ -310,7 +352,8 @@ export interface Generator {
  * Expects requestAnimationFrame support.
  */
 export interface Renderer {
-  render(time: number): void;
+  render(time: number): Promise<void>;
   loop(): void;
   stop(): void;
+  destroy(): void;
 }

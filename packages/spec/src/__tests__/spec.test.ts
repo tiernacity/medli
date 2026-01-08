@@ -52,7 +52,7 @@ describe("spec types", () => {
     let looping = false;
 
     const renderer: Renderer = {
-      render: (time = 0) => {
+      render: async (time = 0) => {
         lastTime = time;
       },
       loop: () => {
@@ -60,6 +60,9 @@ describe("spec types", () => {
       },
       stop: () => {
         looping = false;
+      },
+      destroy: () => {
+        // cleanup
       },
     };
 

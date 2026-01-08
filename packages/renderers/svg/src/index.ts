@@ -5,15 +5,21 @@ import type {
   Material,
   ResolvedMaterial,
   Transform,
+  Image,
 } from "@medli/spec";
 import { validateFrame, resolveMaterial } from "@medli/spec";
-import { BaseRenderer } from "@medli/renderer-common";
+import {
+  BaseRenderer,
+  ResourceManager,
+  extractResourceUrls,
+} from "@medli/renderer-common";
 
 export class SvgRenderer extends BaseRenderer {
   private element: SVGSVGElement;
   private rootGroup: SVGGElement;
   private rect: SVGRectElement;
   private shapeElements: SVGElement[] = [];
+  private resourceManager: ResourceManager<string>;
 
   constructor(element: SVGSVGElement, generator: Generator) {
     super(generator);
@@ -29,15 +35,38 @@ export class SvgRenderer extends BaseRenderer {
     // Create the background rect (inside rootGroup)
     this.rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
     this.rootGroup.appendChild(this.rect);
+
+    // Initialize resource manager for image loading
+    this.resourceManager = new ResourceManager({
+      process: (blob) => Promise.resolve(URL.createObjectURL(blob)),
+      dispose: (url) => URL.revokeObjectURL(url),
+    });
   }
 
-  render(time: number = 0): void {
+  async render(time: number = 0): Promise<void> {
     const frame = this.generator.frame(time);
 
     // Validate frame structure
     const result = validateFrame(frame);
     if (!result.valid) {
       console.error("Invalid frame:", result.error);
+      return;
+    }
+
+    // Extract and load resources
+    const urls = extractResourceUrls(frame);
+    this.resourceManager.markNeeded(urls);
+
+    const resourceMap = new Map<string, string>();
+    try {
+      await Promise.all(
+        Array.from(urls).map(async (url) => {
+          const resource = await this.resourceManager.getResource(url);
+          resourceMap.set(url, resource);
+        })
+      );
+    } catch (error) {
+      console.error("Failed to load resources:", error);
       return;
     }
 
@@ -75,22 +104,36 @@ export class SvgRenderer extends BaseRenderer {
     this.shapeElements = [];
 
     // Traverse material tree and render shapes
-    this.renderNode(frame.root, [frame.root], this.rootGroup);
+    this.renderNode(frame.root, [frame.root], this.rootGroup, resourceMap);
+
+    // Cleanup unused resources
+    this.resourceManager.pruneUnused();
+  }
+
+  destroy(): void {
+    this.stop();
+    this.resourceManager.destroy();
   }
 
   private renderNode(
     node: FrameNode,
     ancestors: Material[],
-    parent: SVGElement
+    parent: SVGElement,
+    resourceMap: Map<string, string>
   ): void {
     if (node.type === "material") {
       // Material node - recurse into children with updated ancestors
       const material = node as Material;
       for (const child of material.children) {
         if (child.type === "material") {
-          this.renderNode(child, [...ancestors, child as Material], parent);
+          this.renderNode(
+            child,
+            [...ancestors, child as Material],
+            parent,
+            resourceMap
+          );
         } else {
-          this.renderNode(child, ancestors, parent);
+          this.renderNode(child, ancestors, parent, resourceMap);
         }
       }
     } else if (node.type === "transform") {
@@ -106,15 +149,20 @@ export class SvgRenderer extends BaseRenderer {
       // Material ancestors continue through transforms unchanged
       for (const child of transform.children) {
         if (child.type === "material") {
-          this.renderNode(child, [...ancestors, child as Material], group);
+          this.renderNode(
+            child,
+            [...ancestors, child as Material],
+            group,
+            resourceMap
+          );
         } else {
-          this.renderNode(child, ancestors, group);
+          this.renderNode(child, ancestors, group, resourceMap);
         }
       }
     } else {
       // Shape node - render with resolved material
       const resolved = resolveMaterial(ancestors);
-      const el = this.renderShape(node, resolved);
+      const el = this.renderShape(node, resolved, resourceMap);
       if (el) {
         parent.appendChild(el);
         this.shapeElements.push(el);
@@ -124,7 +172,8 @@ export class SvgRenderer extends BaseRenderer {
 
   private renderShape(
     shape: Shape,
-    material: ResolvedMaterial
+    material: ResolvedMaterial,
+    resourceMap: Map<string, string>
   ): SVGElement | null {
     switch (shape.type) {
       case "circle": {
@@ -153,6 +202,23 @@ export class SvgRenderer extends BaseRenderer {
         line.setAttribute("stroke-width", String(material.strokeWidth));
         // Lines don't use fill
         return line;
+      }
+      case "image": {
+        const img = shape as Image;
+        const blobUrl = resourceMap.get(img.url);
+        if (!blobUrl) return null;
+
+        const imageEl = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "image"
+        );
+        imageEl.setAttribute("href", blobUrl);
+        imageEl.setAttribute("x", String(img.position.x));
+        // SVG Y is flipped by the scale(1,-1) transform, so position at y - height
+        imageEl.setAttribute("y", String(img.position.y - img.height));
+        imageEl.setAttribute("width", String(img.width));
+        imageEl.setAttribute("height", String(img.height));
+        return imageEl;
       }
       default:
         return null;
