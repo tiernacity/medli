@@ -33,11 +33,33 @@ Visual Output
 | Generator | User-Facing API | Internal Transformation |
 |-----------|-----------------|------------------------|
 | Procedural | Imperative calls in sequence | Builds nested Material tree |
-| Object | Flat object references | Groups by material into tree |
+| Object | Scene graph with transforms + material refs | Groups by material into tree |
 
 Both produce **identical Frame IR** from **different API paradigms**.
 
 Generators are opinionated about ergonomics. The IR is opinionated about validation simplicity.
+
+### Object Generator Class Hierarchy
+
+Inspired by three.js Object3D pattern:
+
+```
+SceneObject (base - position, rotation, scale)
+├── Group (children only, NO material)
+├── Circle (geometry + material ref)
+├── Line (geometry + material ref)
+└── ... other shapes
+
+Material (independent object, NOT a SceneObject)
+Scene (root container, IS the Generator)
+```
+
+**Key design decisions:**
+- SceneObject provides transforms (like three.js Object3D)
+- Shapes have `.material` property (like three.js Mesh)
+- Groups have NO `.material` - purely organizational
+- Shapes without material use Scene's default styles
+- Transform inheritance via scene graph; material via explicit references
 
 ## Frame Spec IR
 

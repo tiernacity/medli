@@ -1,4 +1,4 @@
-import { Scene, Background, Circle, Material, Line, Shape } from "../index";
+import { Scene, Background, Circle, Material, Line } from "../index";
 import type { ChildMaterial, RootMaterial } from "@medli/spec";
 
 describe("Scene", () => {
@@ -1150,28 +1150,66 @@ describe("Group in Scene", () => {
     });
   });
 
-  it("should support Group with material", () => {
+  it("should support Group containing shapes (shapes use Scene defaults)", () => {
+    const scene = new Scene();
+    const group = new Group();
+    group.position = { x: 50, y: 50 };
+
+    // Circle inside the group - uses Scene's default material
+    const circle = new Circle(0, 0, 10);
+    group.add(circle);
+
+    scene.add(group);
+
+    const frame = scene.frame(0);
+
+    // Group emits Transform directly to root
+    const transform = frame.root.children[0] as Transform;
+    expect(transform.type).toBe("transform");
+    expect(transform.matrix).toEqual([1, 0, 0, 1, 50, 50]);
+
+    // Circle geometry is inside the transform (uses root material defaults)
+    expect(transform.children[0]).toEqual({
+      type: "circle",
+      center: { x: 0, y: 0 },
+      radius: 10,
+    });
+  });
+
+  it("should emit empty material when added but not referenced by any direct children", () => {
     const scene = new Scene();
     const material = new Material({ fill: "#ff0000" });
     const group = new Group();
     group.position = { x: 50, y: 50 };
-    group.material = material;
-    group.add(new Circle(0, 0, 10));
+
+    // Circle inside the group with material set
+    // Note: Scene doesn't traverse into Group to find shape materials
+    // so the material will be empty (not referencing the grouped circle)
+    const circle = new Circle(0, 0, 10);
+    circle.material = material;
+    group.add(circle);
 
     scene.add(material);
     scene.add(group);
 
     const frame = scene.frame(0);
 
-    // The material should contain the transform
+    // Material is first (added first)
     const childMaterial = frame.root.children[0] as ChildMaterial;
     expect(childMaterial.type).toBe("material");
     expect(childMaterial.fill).toBe("#ff0000");
-    expect(childMaterial.children.length).toBe(1);
+    // Material has no children since the circle is inside a Group
+    expect(childMaterial.children.length).toBe(0);
 
-    const transform = childMaterial.children[0] as Transform;
+    // Group emits Transform
+    const transform = frame.root.children[1] as Transform;
     expect(transform.type).toBe("transform");
     expect(transform.matrix).toEqual([1, 0, 0, 1, 50, 50]);
+    expect(transform.children[0]).toEqual({
+      type: "circle",
+      center: { x: 0, y: 0 },
+      radius: 10,
+    });
   });
 
   it("should handle rotation with PI/4", () => {
@@ -1208,34 +1246,150 @@ describe("Group in Scene", () => {
     expect(transform.matrix).toEqual([2, 0, 0, 3, 0, 0]);
   });
 
-  it("should work with example from task description", () => {
+  it("should work with shapes having transforms and materials", () => {
     const scene = new Scene();
     const material = new Material({ fill: "#0000ff" });
 
-    const group = new Group();
-    group.position = { x: 50, y: 50 };
-    group.rotation = Math.PI / 4;
-    group.add(new Circle(0, 0, 10));
-    group.material = material;
+    // Shape with both transform and material - no Group needed!
+    const circle = new Circle(0, 0, 10);
+    circle.position = { x: 50, y: 50 };
+    circle.rotation = Math.PI / 4;
+    circle.material = material;
 
     scene.add(material);
-    scene.add(group);
+    scene.add(circle);
 
     const frame = scene.frame(0);
 
-    // Material contains transform
+    // Material contains the transformed circle
     const childMaterial = frame.root.children[0] as ChildMaterial;
     expect(childMaterial.type).toBe("material");
 
-    // Transform is inside material
+    // Transform wraps the circle geometry
     const transform = childMaterial.children[0] as Transform;
     expect(transform.type).toBe("transform");
 
-    // Circle is inside transform
+    // Circle geometry is inside transform
     expect(transform.children[0]).toEqual({
       type: "circle",
       center: { x: 0, y: 0 },
       radius: 10,
     });
+  });
+});
+
+describe("Shape transforms", () => {
+  it("should allow Circle to have position transform", () => {
+    const scene = new Scene();
+    const circle = new Circle(0, 0, 10);
+    circle.position = { x: 50, y: 50 };
+    scene.add(circle);
+
+    const frame = scene.frame(0);
+    const transform = frame.root.children[0] as Transform;
+    expect(transform.type).toBe("transform");
+    expect(transform.matrix).toEqual([1, 0, 0, 1, 50, 50]);
+    expect(transform.children[0]).toEqual({
+      type: "circle",
+      center: { x: 0, y: 0 },
+      radius: 10,
+    });
+  });
+
+  it("should allow Circle to have rotation transform", () => {
+    const scene = new Scene();
+    const circle = new Circle(10, 0, 5);
+    circle.rotation = Math.PI / 2;
+    scene.add(circle);
+
+    const frame = scene.frame(0);
+    const transform = frame.root.children[0] as Transform;
+    expect(transform.type).toBe("transform");
+    expect(transform.matrix[0]).toBeCloseTo(0);
+    expect(transform.matrix[1]).toBeCloseTo(1);
+  });
+
+  it("should allow Circle to have scale transform", () => {
+    const scene = new Scene();
+    const circle = new Circle(0, 0, 10);
+    circle.scale = 2;
+    scene.add(circle);
+
+    const frame = scene.frame(0);
+    const transform = frame.root.children[0] as Transform;
+    expect(transform.type).toBe("transform");
+    expect(transform.matrix).toEqual([2, 0, 0, 2, 0, 0]);
+  });
+
+  it("should allow Line to have position transform", () => {
+    const scene = new Scene();
+    const line = new Line(0, 0, 10, 10);
+    line.position = { x: 25, y: 25 };
+    scene.add(line);
+
+    const frame = scene.frame(0);
+    const transform = frame.root.children[0] as Transform;
+    expect(transform.type).toBe("transform");
+    expect(transform.matrix).toEqual([1, 0, 0, 1, 25, 25]);
+    expect(transform.children[0]).toEqual({
+      type: "line",
+      start: { x: 0, y: 0 },
+      end: { x: 10, y: 10 },
+    });
+  });
+
+  it("should not wrap shape in Transform if no transform applied", () => {
+    const scene = new Scene();
+    const circle = new Circle(50, 50, 10);
+    // No position/rotation/scale set
+    scene.add(circle);
+
+    const frame = scene.frame(0);
+    // Should be the circle directly, not wrapped in transform
+    expect(frame.root.children[0]).toEqual({
+      type: "circle",
+      center: { x: 50, y: 50 },
+      radius: 10,
+    });
+  });
+
+  it("should combine transform and material on shapes", () => {
+    const scene = new Scene();
+    const material = new Material({ fill: "#ff0000" });
+    const circle = new Circle(0, 0, 10);
+    circle.position = { x: 50, y: 50 };
+    circle.material = material;
+
+    scene.add(material);
+    scene.add(circle);
+
+    const frame = scene.frame(0);
+
+    // Material node contains the transform
+    const childMaterial = frame.root.children[0] as ChildMaterial;
+    expect(childMaterial.type).toBe("material");
+    expect(childMaterial.fill).toBe("#ff0000");
+
+    // Transform is inside material
+    const transform = childMaterial.children[0] as Transform;
+    expect(transform.type).toBe("transform");
+    expect(transform.matrix).toEqual([1, 0, 0, 1, 50, 50]);
+
+    // Circle geometry is inside transform
+    expect(transform.children[0]).toEqual({
+      type: "circle",
+      center: { x: 0, y: 0 },
+      radius: 10,
+    });
+  });
+
+  it("should inherit transform properties from SceneObject", () => {
+    const circle = new Circle(0, 0, 10);
+    // These should be inherited from SceneObject
+    expect(circle.position).toEqual({ x: 0, y: 0 });
+    expect(circle.rotation).toBe(0);
+    expect(circle.scale).toBe(1);
+    expect(typeof circle.computeMatrix).toBe("function");
+    expect(typeof circle.hasTransform).toBe("function");
   });
 });
