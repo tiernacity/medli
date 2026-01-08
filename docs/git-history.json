@@ -1,5 +1,13 @@
 [
   {
+    "hash": "1de3de8209f3f059b028bf1f8b0cb42be9ca59f3",
+    "short_hash": "1de3de8",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T21:34:18Z",
+    "message": "feat(test-app): add scene infrastructure with URL-based selection\n\nAdds switchable scene support to test-app:\n- Scene registry with TestScene interface (procedural + object generators)\n- URL param `?scene=<id>` for scene selection\n- Harnesses now accept generator as parameter\n- Two scenes: full-demo (all features) and image-transforms (transform tests)\n\nThis enables testing specific features in isolation via different scenes.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 11
+  },
+  {
     "hash": "6a64deed91f39d68a95512aa445bdd866f0b6771",
     "short_hash": "6a64dee",
     "author": "Chris Tierney",

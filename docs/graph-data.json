@@ -2441,6 +2441,50 @@
       "created_at": "2026-01-08T21:16:57.559849+00:00",
       "updated_at": "2026-01-08T21:16:57.559849+00:00",
       "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":80,\"prompt\":\"perform a detailed code review of renderers and the new support for images and resources. We need to agree the scope of the review, but it should cover at least: code structure, simplicity, extensibility, division of responsibility between modules, security, avoidance of resource leaks\"}"
+    },
+    {
+      "id": 223,
+      "change_id": "3141152f-3165-465e-ad1c-d5df0ed4f72e",
+      "node_type": "goal",
+      "title": "Test infrastructure: different scenes per test + image transform visual tests",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T21:20:33.056522+00:00",
+      "updated_at": "2026-01-08T21:20:33.056522+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":85,\"prompt\":\"User selected option 3 from context recovery menu:\\n\\\"Test infrastructure (217, 218)\\\" - Update test-app to render different scenes for different tests, and add visual tests for image transforms.\"}"
+    },
+    {
+      "id": 224,
+      "change_id": "e5c2f5e1-9f3b-4b0e-bd1b-c2b05d41ec7d",
+      "node_type": "action",
+      "title": "Designing scene registry pattern",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T21:22:01.192932+00:00",
+      "updated_at": "2026-01-08T21:22:01.192932+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":85}"
+    },
+    {
+      "id": 225,
+      "change_id": "ee40cbae-d277-4499-820c-10f0cb5da8d5",
+      "node_type": "outcome",
+      "title": "Scene infrastructure implemented: registry, URL-based scene selection, image transforms scene",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T21:33:32.623144+00:00",
+      "updated_at": "2026-01-08T21:33:32.623144+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":95}"
+    },
+    {
+      "id": 226,
+      "change_id": "b0b1af81-3f26-4b4c-9b66-070d29dcd413",
+      "node_type": "action",
+      "title": "Committed scene infrastructure",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T21:34:24.877543+00:00",
+      "updated_at": "2026-01-08T21:34:24.877543+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"commit\":\"1de3de8\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -4863,6 +4907,72 @@
       "weight": 1.0,
       "rationale": "Dedup pattern affects new resource type integration",
       "created_at": "2026-01-08T21:18:55.831966+00:00"
+    },
+    {
+      "id": 221,
+      "from_node_id": 217,
+      "to_node_id": 223,
+      "from_change_id": "3fe3d2b9-b1ed-4c92-9ee7-2e87798d00ef",
+      "to_change_id": "3141152f-3165-465e-ad1c-d5df0ed4f72e",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Parent goal",
+      "created_at": "2026-01-08T21:20:40.466007+00:00"
+    },
+    {
+      "id": 222,
+      "from_node_id": 218,
+      "to_node_id": 223,
+      "from_change_id": "7e114922-7808-44f0-abff-b73bb84060d0",
+      "to_change_id": "3141152f-3165-465e-ad1c-d5df0ed4f72e",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Parent goal",
+      "created_at": "2026-01-08T21:20:40.487082+00:00"
+    },
+    {
+      "id": 223,
+      "from_node_id": 223,
+      "to_node_id": 224,
+      "from_change_id": "3141152f-3165-465e-ad1c-d5df0ed4f72e",
+      "to_change_id": "e5c2f5e1-9f3b-4b0e-bd1b-c2b05d41ec7d",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation approach",
+      "created_at": "2026-01-08T21:22:34.078261+00:00"
+    },
+    {
+      "id": 224,
+      "from_node_id": 224,
+      "to_node_id": 225,
+      "from_change_id": "e5c2f5e1-9f3b-4b0e-bd1b-c2b05d41ec7d",
+      "to_change_id": "ee40cbae-d277-4499-820c-10f0cb5da8d5",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation complete",
+      "created_at": "2026-01-08T21:33:39.322683+00:00"
+    },
+    {
+      "id": 225,
+      "from_node_id": 223,
+      "to_node_id": 225,
+      "from_change_id": "3141152f-3165-465e-ad1c-d5df0ed4f72e",
+      "to_change_id": "ee40cbae-d277-4499-820c-10f0cb5da8d5",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Goal achieved",
+      "created_at": "2026-01-08T21:33:39.346399+00:00"
+    },
+    {
+      "id": 226,
+      "from_node_id": 225,
+      "to_node_id": 226,
+      "from_change_id": "ee40cbae-d277-4499-820c-10f0cb5da8d5",
+      "to_change_id": "b0b1af81-3f26-4b4c-9b66-070d29dcd413",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Deployment",
+      "created_at": "2026-01-08T21:34:24.899863+00:00"
     }
   ]
 }
