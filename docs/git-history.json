@@ -1,5 +1,13 @@
 [
   {
+    "hash": "6a64deed91f39d68a95512aa445bdd866f0b6771",
+    "short_hash": "6a64dee",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T21:07:13Z",
+    "message": "feat: implement V1 resource management system with image support\n\nAdd blocking resource management for external resources (images).\nEach renderer owns a ResourceManager<T> that fetches blobs and\napplies renderer-specific post-processing.\n\nKey changes:\n- Add Image shape type to spec (url, position, width, height)\n- Add ResourceManager<T> with getResource/markNeeded/pruneUnused/destroy\n- Add ResourcePostProcessor<T> interface for renderer injection\n- Add extractResourceUrls() utility for Frame traversal\n- Make Renderer.render() async (returns Promise<void>)\n- Add Renderer.destroy() for lifecycle cleanup\n- Update BaseRenderer for async render loop\n- Canvas: ResourceManager<ImageBitmap> with createImageBitmap/.close()\n- SVG: ResourceManager<string> with createObjectURL/revokeObjectURL\n- Add image() to both generators (parity)\n- Add test image and visual verification in test-app\n\nV1 constraints:\n- Blocking: render() waits for all resources\n- All-or-nothing: any resource failure fails the frame\n- Each renderer owns its ResourceManager (no sharing)\n- Diff-based disposal: resources removed from frame are disposed\n\nBreaking changes:\n- Renderer.render() now returns Promise<void>\n- Renderer interface requires destroy() method\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 13
+  },
+  {
     "hash": "91efbf00e591d96fe7d5c6338e9e77b79ca50951",
     "short_hash": "91efbf0",
     "author": "Chris Tierney",
