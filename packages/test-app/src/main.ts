@@ -9,10 +9,21 @@ import { createRenderer as createObjCanvas } from "./harnesses/obj-canvas";
 
 // Import source code as raw text
 import fullDemoSource from "./scenes/full-demo.ts?raw";
+import materialsSource from "./scenes/materials.ts?raw";
+import transformsSource from "./scenes/transforms.ts?raw";
+import imageTransformsSource from "./scenes/image-transforms.ts?raw";
 import harnessProcSvgSource from "./harnesses/proc-svg.ts?raw";
 import harnessProcCanvasSource from "./harnesses/proc-canvas.ts?raw";
 import harnessObjSvgSource from "./harnesses/obj-svg.ts?raw";
 import harnessObjCanvasSource from "./harnesses/obj-canvas.ts?raw";
+
+// Map scene IDs to their source code
+const sceneSources: Record<string, string> = {
+  "full-demo": fullDemoSource,
+  materials: materialsSource,
+  transforms: transformsSource,
+  "image-transforms": imageTransformsSource,
+};
 
 // Get scene from URL parameter, fallback to default
 const params = new URLSearchParams(window.location.search);
@@ -22,8 +33,32 @@ const sceneId: SceneId =
 const scene = scenes[sceneId];
 
 // DOM elements
+const sceneSelect = document.getElementById(
+  "scene-select"
+) as HTMLSelectElement;
 const colorInput = document.getElementById("bg-color") as HTMLInputElement;
 const colorValue = document.getElementById("color-value") as HTMLSpanElement;
+
+// Populate scene selector dropdown
+for (const [id, sceneData] of Object.entries(scenes)) {
+  const option = document.createElement("option");
+  option.value = id;
+  option.textContent = sceneData.name;
+  if (id === sceneId) option.selected = true;
+  sceneSelect.appendChild(option);
+}
+
+// Handle scene selection change
+sceneSelect.addEventListener("change", () => {
+  const newSceneId = sceneSelect.value;
+  const url = new URL(window.location.href);
+  if (newSceneId === defaultSceneId) {
+    url.searchParams.delete("scene");
+  } else {
+    url.searchParams.set("scene", newSceneId);
+  }
+  window.location.href = url.toString();
+});
 
 // Canvas elements need buffer size synced with CSS size for crisp rendering
 const canvasElements = [
@@ -72,10 +107,11 @@ const renderers = [
   ),
 ];
 
-// Populate source code displays
+// Populate source code displays with current scene's source
+const currentSceneSource = sceneSources[sceneId] || fullDemoSource;
 const sourceMap: Record<string, string> = {
-  "gen-procedural-code": fullDemoSource,
-  "gen-object-code": fullDemoSource,
+  "gen-procedural-code": currentSceneSource,
+  "gen-object-code": currentSceneSource,
   "harness-proc-svg": harnessProcSvgSource,
   "harness-proc-canvas": harnessProcCanvasSource,
   "harness-obj-svg": harnessObjSvgSource,
