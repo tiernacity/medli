@@ -6,7 +6,87 @@ import type {
   RootMaterial,
   ChildMaterial,
   FrameNode,
+  Matrix2D,
+  Transform,
 } from "@medli/spec";
+
+// ============================================================================
+// Matrix2D helpers for 2D affine transformations
+// ============================================================================
+
+/**
+ * Returns the identity matrix [1, 0, 0, 1, 0, 0].
+ */
+function identityMatrix(): Matrix2D {
+  return [1, 0, 0, 1, 0, 0];
+}
+
+/**
+ * Returns a translation matrix.
+ * | 1  0  x |
+ * | 0  1  y |
+ * | 0  0  1 |
+ */
+function translateMatrix(x: number, y: number): Matrix2D {
+  return [1, 0, 0, 1, x, y];
+}
+
+/**
+ * Returns a rotation matrix for angle in radians.
+ * | cos  -sin  0 |
+ * | sin   cos  0 |
+ * | 0     0    1 |
+ */
+function rotateMatrix(angle: number): Matrix2D {
+  const cos = Math.cos(angle);
+  const sin = Math.sin(angle);
+  return [cos, sin, -sin, cos, 0, 0];
+}
+
+/**
+ * Returns a scale matrix.
+ * | sx  0   0 |
+ * | 0   sy  0 |
+ * | 0   0   1 |
+ */
+function scaleMatrix(sx: number, sy: number): Matrix2D {
+  return [sx, 0, 0, sy, 0, 0];
+}
+
+/**
+ * Multiplies two matrices: result = a * b.
+ * Matrix format: [a, b, c, d, e, f] represents:
+ * | a  c  e |
+ * | b  d  f |
+ * | 0  0  1 |
+ */
+function multiplyMatrices(a: Matrix2D, b: Matrix2D): Matrix2D {
+  const [a0, a1, a2, a3, a4, a5] = a;
+  const [b0, b1, b2, b3, b4, b5] = b;
+
+  return [
+    a0 * b0 + a2 * b1, // new a
+    a1 * b0 + a3 * b1, // new b
+    a0 * b2 + a2 * b3, // new c
+    a1 * b2 + a3 * b3, // new d
+    a0 * b4 + a2 * b5 + a4, // new e
+    a1 * b4 + a3 * b5 + a5, // new f
+  ];
+}
+
+/**
+ * Checks if a matrix is the identity matrix.
+ */
+function isIdentity(m: Matrix2D): boolean {
+  return (
+    m[0] === 1 &&
+    m[1] === 0 &&
+    m[2] === 0 &&
+    m[3] === 1 &&
+    m[4] === 0 &&
+    m[5] === 0
+  );
+}
 
 /**
  * Internal style state for tracking fill, stroke, strokeWidth.
@@ -45,11 +125,21 @@ export interface Sketch {
   /** Draw a line from (x, y) with offset (dx, dy) */
   lineOffset(x: number, y: number, dx: number, dy: number): void;
 
-  /** Save current style state and start a new nested context */
+  /** Save current style and transform state, start a new nested context */
   push(): void;
 
-  /** Restore previous style state and return to parent context */
+  /** Restore previous style and transform state, return to parent context */
   pop(): void;
+
+  /** Translate the coordinate system by (x, y) */
+  translate(x: number, y: number): void;
+
+  /** Rotate the coordinate system by angle in radians */
+  rotate(angle: number): void;
+
+  /** Scale the coordinate system uniformly or non-uniformly */
+  scale(s: number): void;
+  scale(sx: number, sy: number): void;
 
   /** Current time in milliseconds (from requestAnimationFrame) */
   readonly time: number;
@@ -107,6 +197,7 @@ export class ProceduralGenerator implements Generator {
       children: FrameNode[]; // Children for this context's material
       currentChildMaterial: ChildMaterial | null;
       hasShapesAtCurrentLevel: boolean;
+      transform: Matrix2D; // Transform at time of push
     }
     const contextStack: ContextFrame[] = [];
 
@@ -117,6 +208,9 @@ export class ProceduralGenerator implements Generator {
     let currentChildMaterial: ChildMaterial | null = null;
     let hasShapesAtCurrentLevel = false;
     let styleChangedSinceLastShape = false;
+
+    // Current transform state
+    let currentTransform: Matrix2D = identityMatrix();
 
     /**
      * Helper: Get style diff between current and parent style.
@@ -170,6 +264,21 @@ export class ProceduralGenerator implements Generator {
     };
 
     /**
+     * Helper: Wrap a shape in a Transform node if the current transform is not identity.
+     */
+    const wrapWithTransform = (shape: Circle | Line): FrameNode => {
+      if (isIdentity(currentTransform)) {
+        return shape;
+      }
+      const transformNode: Transform = {
+        type: "transform",
+        matrix: [...currentTransform] as Matrix2D,
+        children: [shape],
+      };
+      return transformNode;
+    };
+
+    /**
      * Helper: Add a shape to the current context.
      *
      * Behavior differs based on context:
@@ -178,9 +287,11 @@ export class ProceduralGenerator implements Generator {
      *   style properties (fill, stroke, strokeWidth that were called).
      * - In PUSHED context: Shapes go directly in the pushed ChildMaterial's children,
      *   unless style changes WITHIN the pushed context (then new nested ChildMaterial).
+     * - If a transform is active, the shape is wrapped in a Transform node.
      */
     const addShape = (shape: Circle | Line) => {
       const isAtRootLevel = contextStack.length === 0;
+      const node = wrapWithTransform(shape);
 
       if (isAtRootLevel) {
         // First shape at root locks in root style
@@ -203,7 +314,7 @@ export class ProceduralGenerator implements Generator {
             id,
             ref: currentParentId,
             ...style,
-            children: [shape],
+            children: [node],
           };
           currentChildren.push(currentChildMaterial);
         } else if (styleChangedSinceLastShape) {
@@ -218,13 +329,13 @@ export class ProceduralGenerator implements Generator {
             id,
             ref: currentParentId,
             ...style,
-            children: [shape],
+            children: [node],
           };
           currentChildren.push(currentChildMaterial);
         } else {
           // Same style - add to current ChildMaterial
           if (currentChildMaterial) {
-            currentChildMaterial.children.push(shape);
+            currentChildMaterial.children.push(node);
           }
         }
       } else {
@@ -236,7 +347,7 @@ export class ProceduralGenerator implements Generator {
           // First shape in pushed context - goes directly in children
           hasShapesAtCurrentLevel = true;
           styleChangedSinceLastShape = false;
-          currentChildren.push(shape);
+          currentChildren.push(node);
         } else if (styleChangedSinceLastShape) {
           // Style changed within pushed context - create nested ChildMaterial
           styleChangedSinceLastShape = false;
@@ -248,15 +359,15 @@ export class ProceduralGenerator implements Generator {
             id,
             ref: currentParentId,
             ...diff,
-            children: [shape],
+            children: [node],
           };
           currentChildren.push(currentChildMaterial);
         } else {
           // Same style - add to current group
           if (currentChildMaterial) {
-            currentChildMaterial.children.push(shape);
+            currentChildMaterial.children.push(node);
           } else {
-            currentChildren.push(shape);
+            currentChildren.push(node);
           }
         }
       }
@@ -313,7 +424,7 @@ export class ProceduralGenerator implements Generator {
           rootStyleLocked = true;
         }
 
-        // Save current context to stack
+        // Save current context to stack (including transform state)
         contextStack.push({
           parentId: currentParentId,
           parentStyle: { ...currentStyle }, // Capture style at push time
@@ -321,6 +432,7 @@ export class ProceduralGenerator implements Generator {
           children: currentChildren,
           currentChildMaterial,
           hasShapesAtCurrentLevel,
+          transform: [...currentTransform] as Matrix2D,
         });
 
         // Create new nested context
@@ -343,6 +455,7 @@ export class ProceduralGenerator implements Generator {
         currentChildMaterial = null;
         hasShapesAtCurrentLevel = false;
         styleChangedSinceLastShape = false;
+        // Note: currentTransform is NOT reset - transforms accumulate until pop()
       },
       pop() {
         if (contextStack.length === 0) {
@@ -369,13 +482,34 @@ export class ProceduralGenerator implements Generator {
             pushedMaterial.strokeWidth = diff.strokeWidth;
         }
 
-        // Restore parent context
+        // Restore parent context (including transform)
         currentParentId = savedContext.parentId;
         currentStyle = { ...savedContext.currentStyle }; // Restore style
         currentChildren = savedContext.children;
         currentChildMaterial = savedContext.currentChildMaterial;
         hasShapesAtCurrentLevel = savedContext.hasShapesAtCurrentLevel;
         styleChangedSinceLastShape = false;
+        currentTransform = [...savedContext.transform] as Matrix2D; // Restore transform
+      },
+      translate(x: number, y: number) {
+        currentTransform = multiplyMatrices(
+          currentTransform,
+          translateMatrix(x, y)
+        );
+      },
+      rotate(angle: number) {
+        currentTransform = multiplyMatrices(
+          currentTransform,
+          rotateMatrix(angle)
+        );
+      },
+      scale(sx: number, sy?: number) {
+        // If only one argument, use it for both sx and sy (uniform scale)
+        const actualSy = sy === undefined ? sx : sy;
+        currentTransform = multiplyMatrices(
+          currentTransform,
+          scaleMatrix(sx, actualSy)
+        );
       },
       time,
     };

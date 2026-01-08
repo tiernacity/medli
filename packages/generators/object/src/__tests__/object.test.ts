@@ -1,4 +1,4 @@
-import { Scene, Background, Circle, Material, Line, Shape } from "../index";
+import { Scene, Background, Circle, Material, Line } from "../index";
 import type { ChildMaterial, RootMaterial } from "@medli/spec";
 
 describe("Scene", () => {
@@ -740,5 +740,656 @@ describe("Materials and shapes both added to scene independently", () => {
     const childMaterial = frame.root.children[0] as ChildMaterial;
     expect(childMaterial.fill).toBe("#ff0000");
     expect(childMaterial.children.length).toBe(1);
+  });
+});
+
+// ============================================================================
+// Matrix Math Helpers Tests
+// ============================================================================
+
+import {
+  Group,
+  Position,
+  identityMatrix,
+  translateMatrix,
+  rotateMatrix,
+  scaleMatrix,
+  multiplyMatrices,
+  isIdentityMatrix,
+} from "../index";
+import type { Transform, Matrix2D } from "@medli/spec";
+
+describe("Matrix helpers", () => {
+  describe("identityMatrix", () => {
+    it("should return [1, 0, 0, 1, 0, 0]", () => {
+      expect(identityMatrix()).toEqual([1, 0, 0, 1, 0, 0]);
+    });
+  });
+
+  describe("translateMatrix", () => {
+    it("should create a translation matrix", () => {
+      expect(translateMatrix(10, 20)).toEqual([1, 0, 0, 1, 10, 20]);
+    });
+
+    it("should handle zero translation", () => {
+      expect(translateMatrix(0, 0)).toEqual([1, 0, 0, 1, 0, 0]);
+    });
+
+    it("should handle negative translation", () => {
+      expect(translateMatrix(-5, -10)).toEqual([1, 0, 0, 1, -5, -10]);
+    });
+  });
+
+  describe("rotateMatrix", () => {
+    it("should create a rotation matrix for 0 radians (identity)", () => {
+      const m = rotateMatrix(0);
+      expect(m[0]).toBeCloseTo(1);
+      expect(m[1]).toBeCloseTo(0);
+      expect(m[2]).toBeCloseTo(0);
+      expect(m[3]).toBeCloseTo(1);
+      expect(m[4]).toBe(0);
+      expect(m[5]).toBe(0);
+    });
+
+    it("should create a rotation matrix for PI/2 (90 degrees)", () => {
+      const m = rotateMatrix(Math.PI / 2);
+      expect(m[0]).toBeCloseTo(0);
+      expect(m[1]).toBeCloseTo(1);
+      expect(m[2]).toBeCloseTo(-1);
+      expect(m[3]).toBeCloseTo(0);
+      expect(m[4]).toBe(0);
+      expect(m[5]).toBe(0);
+    });
+
+    it("should create a rotation matrix for PI (180 degrees)", () => {
+      const m = rotateMatrix(Math.PI);
+      expect(m[0]).toBeCloseTo(-1);
+      expect(m[1]).toBeCloseTo(0);
+      expect(m[2]).toBeCloseTo(0);
+      expect(m[3]).toBeCloseTo(-1);
+      expect(m[4]).toBe(0);
+      expect(m[5]).toBe(0);
+    });
+  });
+
+  describe("scaleMatrix", () => {
+    it("should create a uniform scale matrix", () => {
+      expect(scaleMatrix(2, 2)).toEqual([2, 0, 0, 2, 0, 0]);
+    });
+
+    it("should create a non-uniform scale matrix", () => {
+      expect(scaleMatrix(2, 3)).toEqual([2, 0, 0, 3, 0, 0]);
+    });
+
+    it("should handle scale of 1 (identity)", () => {
+      expect(scaleMatrix(1, 1)).toEqual([1, 0, 0, 1, 0, 0]);
+    });
+  });
+
+  describe("multiplyMatrices", () => {
+    it("should return identity when multiplying two identity matrices", () => {
+      const identity = identityMatrix();
+      expect(multiplyMatrices(identity, identity)).toEqual([1, 0, 0, 1, 0, 0]);
+    });
+
+    it("should return the same matrix when multiplying by identity", () => {
+      const translate = translateMatrix(10, 20);
+      const identity = identityMatrix();
+      expect(multiplyMatrices(translate, identity)).toEqual(translate);
+      expect(multiplyMatrices(identity, translate)).toEqual(translate);
+    });
+
+    it("should compose translations correctly", () => {
+      const t1 = translateMatrix(10, 0);
+      const t2 = translateMatrix(0, 20);
+      expect(multiplyMatrices(t1, t2)).toEqual([1, 0, 0, 1, 10, 20]);
+    });
+
+    it("should compose translate * scale correctly", () => {
+      // To apply scale first then translate: T * S
+      // Matrix multiply is right-to-left: (T * S) * point
+      const scale = scaleMatrix(2, 2);
+      const translate = translateMatrix(10, 10);
+      const result = multiplyMatrices(translate, scale); // T * S
+      // Point (0,0) -> scale (0,0) -> translate (10,10)
+      // Point (1,0) -> scale (2,0) -> translate (12,10)
+      expect(result).toEqual([2, 0, 0, 2, 10, 10]);
+    });
+  });
+
+  describe("isIdentityMatrix", () => {
+    it("should return true for identity matrix", () => {
+      expect(isIdentityMatrix([1, 0, 0, 1, 0, 0])).toBe(true);
+    });
+
+    it("should return false for translation matrix", () => {
+      expect(isIdentityMatrix([1, 0, 0, 1, 10, 20])).toBe(false);
+    });
+
+    it("should return false for scale matrix", () => {
+      expect(isIdentityMatrix([2, 0, 0, 2, 0, 0])).toBe(false);
+    });
+
+    it("should return false for rotation matrix", () => {
+      const rot = rotateMatrix(Math.PI / 4);
+      expect(isIdentityMatrix(rot)).toBe(false);
+    });
+  });
+});
+
+// ============================================================================
+// Group Tests
+// ============================================================================
+
+describe("Group", () => {
+  describe("construction and properties", () => {
+    it("should have default position of {x: 0, y: 0}", () => {
+      const group = new Group();
+      expect(group.position).toEqual({ x: 0, y: 0 });
+    });
+
+    it("should have default rotation of 0", () => {
+      const group = new Group();
+      expect(group.rotation).toBe(0);
+    });
+
+    it("should have default scale of 1", () => {
+      const group = new Group();
+      expect(group.scale).toBe(1);
+    });
+
+    it("should allow setting position", () => {
+      const group = new Group();
+      group.position = { x: 50, y: 50 };
+      expect(group.position).toEqual({ x: 50, y: 50 });
+    });
+
+    it("should allow setting rotation", () => {
+      const group = new Group();
+      group.rotation = Math.PI / 4;
+      expect(group.rotation).toBe(Math.PI / 4);
+    });
+
+    it("should allow setting uniform scale", () => {
+      const group = new Group();
+      group.scale = 2;
+      expect(group.scale).toBe(2);
+    });
+
+    it("should allow setting non-uniform scale", () => {
+      const group = new Group();
+      group.scale = { x: 2, y: 3 };
+      expect(group.scale).toEqual({ x: 2, y: 3 });
+    });
+  });
+
+  describe("add/remove children", () => {
+    it("should add children", () => {
+      const group = new Group();
+      const circle = new Circle(0, 0, 10);
+      group.add(circle);
+      expect(group.getChildren()).toContain(circle);
+    });
+
+    it("should support method chaining for add", () => {
+      const group = new Group();
+      const circle = new Circle(0, 0, 10);
+      expect(group.add(circle)).toBe(group);
+    });
+
+    it("should remove children", () => {
+      const group = new Group();
+      const circle = new Circle(0, 0, 10);
+      group.add(circle);
+      group.remove(circle);
+      expect(group.getChildren()).not.toContain(circle);
+    });
+
+    it("should support method chaining for remove", () => {
+      const group = new Group();
+      const circle = new Circle(0, 0, 10);
+      group.add(circle);
+      expect(group.remove(circle)).toBe(group);
+    });
+
+    it("should return a copy of children from getChildren", () => {
+      const group = new Group();
+      const circle = new Circle(0, 0, 10);
+      group.add(circle);
+      const children = group.getChildren();
+      children.push(new Circle(1, 1, 5));
+      expect(group.getChildren().length).toBe(1);
+    });
+  });
+
+  describe("computeMatrix", () => {
+    it("should return identity matrix when no transform is applied", () => {
+      const group = new Group();
+      expect(group.computeMatrix()).toEqual([1, 0, 0, 1, 0, 0]);
+    });
+
+    it("should return translation matrix when only position is set", () => {
+      const group = new Group();
+      group.position = { x: 10, y: 20 };
+      expect(group.computeMatrix()).toEqual([1, 0, 0, 1, 10, 20]);
+    });
+
+    it("should return scale matrix when only scale is set", () => {
+      const group = new Group();
+      group.scale = 2;
+      expect(group.computeMatrix()).toEqual([2, 0, 0, 2, 0, 0]);
+    });
+
+    it("should return rotation matrix when only rotation is set", () => {
+      const group = new Group();
+      group.rotation = Math.PI / 2;
+      const m = group.computeMatrix();
+      expect(m[0]).toBeCloseTo(0);
+      expect(m[1]).toBeCloseTo(1);
+      expect(m[2]).toBeCloseTo(-1);
+      expect(m[3]).toBeCloseTo(0);
+      expect(m[4]).toBe(0);
+      expect(m[5]).toBe(0);
+    });
+
+    it("should combine scale, rotation, and translation in TRS order", () => {
+      const group = new Group();
+      group.scale = 2;
+      group.rotation = Math.PI / 2;
+      group.position = { x: 10, y: 20 };
+
+      const m = group.computeMatrix();
+      // TRS order: scale -> rotate -> translate
+      // Scale by 2, rotate 90deg, translate by (10, 20)
+      expect(m[0]).toBeCloseTo(0); // 2 * cos(90) = 0
+      expect(m[1]).toBeCloseTo(2); // 2 * sin(90) = 2
+      expect(m[2]).toBeCloseTo(-2); // 2 * -sin(90) = -2
+      expect(m[3]).toBeCloseTo(0); // 2 * cos(90) = 0
+      expect(m[4]).toBeCloseTo(10); // translation x
+      expect(m[5]).toBeCloseTo(20); // translation y
+    });
+  });
+
+  describe("hasTransform", () => {
+    it("should return false when no transform is applied", () => {
+      const group = new Group();
+      expect(group.hasTransform()).toBe(false);
+    });
+
+    it("should return true when position is set", () => {
+      const group = new Group();
+      group.position = { x: 10, y: 0 };
+      expect(group.hasTransform()).toBe(true);
+    });
+
+    it("should return true when rotation is set", () => {
+      const group = new Group();
+      group.rotation = 0.1;
+      expect(group.hasTransform()).toBe(true);
+    });
+
+    it("should return true when scale is not 1", () => {
+      const group = new Group();
+      group.scale = 2;
+      expect(group.hasTransform()).toBe(true);
+    });
+
+    it("should return false when scale is 1 (default)", () => {
+      const group = new Group();
+      group.scale = 1;
+      expect(group.hasTransform()).toBe(false);
+    });
+  });
+
+  describe("frame() output", () => {
+    it("should return children directly when no transform is applied", () => {
+      const group = new Group();
+      const circle = new Circle(50, 50, 10);
+      group.add(circle);
+
+      const nodes = group.frame(0);
+      expect(nodes.length).toBe(1);
+      expect(nodes[0]).toEqual({
+        type: "circle",
+        center: { x: 50, y: 50 },
+        radius: 10,
+      });
+    });
+
+    it("should wrap children in Transform node when transform is applied", () => {
+      const group = new Group();
+      group.position = { x: 10, y: 20 };
+      const circle = new Circle(0, 0, 5);
+      group.add(circle);
+
+      const nodes = group.frame(0);
+      expect(nodes.length).toBe(1);
+      expect(nodes[0].type).toBe("transform");
+
+      const transform = nodes[0] as Transform;
+      expect(transform.matrix).toEqual([1, 0, 0, 1, 10, 20]);
+      expect(transform.children.length).toBe(1);
+      expect(transform.children[0]).toEqual({
+        type: "circle",
+        center: { x: 0, y: 0 },
+        radius: 5,
+      });
+    });
+
+    it("should handle multiple children", () => {
+      const group = new Group();
+      group.position = { x: 50, y: 50 };
+      group.add(new Circle(0, 0, 10));
+      group.add(new Circle(20, 0, 5));
+
+      const nodes = group.frame(0);
+      expect(nodes.length).toBe(1);
+
+      const transform = nodes[0] as Transform;
+      expect(transform.children.length).toBe(2);
+    });
+
+    it("should handle nested groups", () => {
+      const outerGroup = new Group();
+      outerGroup.position = { x: 100, y: 100 };
+
+      const innerGroup = new Group();
+      innerGroup.position = { x: 10, y: 10 };
+      innerGroup.add(new Circle(0, 0, 5));
+
+      outerGroup.add(innerGroup);
+
+      const nodes = outerGroup.frame(0);
+      expect(nodes.length).toBe(1);
+
+      const outerTransform = nodes[0] as Transform;
+      expect(outerTransform.matrix).toEqual([1, 0, 0, 1, 100, 100]);
+      expect(outerTransform.children.length).toBe(1);
+
+      const innerTransform = outerTransform.children[0] as Transform;
+      expect(innerTransform.type).toBe("transform");
+      expect(innerTransform.matrix).toEqual([1, 0, 0, 1, 10, 10]);
+    });
+  });
+});
+
+describe("Group in Scene", () => {
+  it("should add Group to scene and emit Transform node", () => {
+    const scene = new Scene();
+    const group = new Group();
+    group.position = { x: 50, y: 50 };
+    group.add(new Circle(0, 0, 10));
+    scene.add(group);
+
+    const frame = scene.frame(0);
+    expect(frame.root.children.length).toBe(1);
+
+    const transform = frame.root.children[0] as Transform;
+    expect(transform.type).toBe("transform");
+    expect(transform.matrix).toEqual([1, 0, 0, 1, 50, 50]);
+    expect(transform.children[0]).toEqual({
+      type: "circle",
+      center: { x: 0, y: 0 },
+      radius: 10,
+    });
+  });
+
+  it("should not emit Transform node when group has no transform", () => {
+    const scene = new Scene();
+    const group = new Group();
+    group.add(new Circle(50, 50, 10));
+    scene.add(group);
+
+    const frame = scene.frame(0);
+    expect(frame.root.children.length).toBe(1);
+    // Should be the circle directly, not wrapped in transform
+    expect(frame.root.children[0]).toEqual({
+      type: "circle",
+      center: { x: 50, y: 50 },
+      radius: 10,
+    });
+  });
+
+  it("should support Group containing shapes (shapes use Scene defaults)", () => {
+    const scene = new Scene();
+    const group = new Group();
+    group.position = { x: 50, y: 50 };
+
+    // Circle inside the group - uses Scene's default material
+    const circle = new Circle(0, 0, 10);
+    group.add(circle);
+
+    scene.add(group);
+
+    const frame = scene.frame(0);
+
+    // Group emits Transform directly to root
+    const transform = frame.root.children[0] as Transform;
+    expect(transform.type).toBe("transform");
+    expect(transform.matrix).toEqual([1, 0, 0, 1, 50, 50]);
+
+    // Circle geometry is inside the transform (uses root material defaults)
+    expect(transform.children[0]).toEqual({
+      type: "circle",
+      center: { x: 0, y: 0 },
+      radius: 10,
+    });
+  });
+
+  it("should emit empty material when added but not referenced by any direct children", () => {
+    const scene = new Scene();
+    const material = new Material({ fill: "#ff0000" });
+    const group = new Group();
+    group.position = { x: 50, y: 50 };
+
+    // Circle inside the group with material set
+    // Note: Scene doesn't traverse into Group to find shape materials
+    // so the material will be empty (not referencing the grouped circle)
+    const circle = new Circle(0, 0, 10);
+    circle.material = material;
+    group.add(circle);
+
+    scene.add(material);
+    scene.add(group);
+
+    const frame = scene.frame(0);
+
+    // Material is first (added first)
+    const childMaterial = frame.root.children[0] as ChildMaterial;
+    expect(childMaterial.type).toBe("material");
+    expect(childMaterial.fill).toBe("#ff0000");
+    // Material has no children since the circle is inside a Group
+    expect(childMaterial.children.length).toBe(0);
+
+    // Group emits Transform
+    const transform = frame.root.children[1] as Transform;
+    expect(transform.type).toBe("transform");
+    expect(transform.matrix).toEqual([1, 0, 0, 1, 50, 50]);
+    expect(transform.children[0]).toEqual({
+      type: "circle",
+      center: { x: 0, y: 0 },
+      radius: 10,
+    });
+  });
+
+  it("should handle rotation with PI/4", () => {
+    const scene = new Scene();
+    const group = new Group();
+    group.rotation = Math.PI / 4;
+    group.add(new Circle(10, 0, 5));
+    scene.add(group);
+
+    const frame = scene.frame(0);
+    const transform = frame.root.children[0] as Transform;
+
+    expect(transform.type).toBe("transform");
+    // PI/4 rotation matrix: [cos, sin, -sin, cos, 0, 0]
+    const cos45 = Math.cos(Math.PI / 4);
+    const sin45 = Math.sin(Math.PI / 4);
+    expect(transform.matrix[0]).toBeCloseTo(cos45);
+    expect(transform.matrix[1]).toBeCloseTo(sin45);
+    expect(transform.matrix[2]).toBeCloseTo(-sin45);
+    expect(transform.matrix[3]).toBeCloseTo(cos45);
+  });
+
+  it("should handle non-uniform scale", () => {
+    const scene = new Scene();
+    const group = new Group();
+    group.scale = { x: 2, y: 3 };
+    group.add(new Circle(10, 10, 5));
+    scene.add(group);
+
+    const frame = scene.frame(0);
+    const transform = frame.root.children[0] as Transform;
+
+    expect(transform.type).toBe("transform");
+    expect(transform.matrix).toEqual([2, 0, 0, 3, 0, 0]);
+  });
+
+  it("should work with shapes having transforms and materials", () => {
+    const scene = new Scene();
+    const material = new Material({ fill: "#0000ff" });
+
+    // Shape with both transform and material - no Group needed!
+    const circle = new Circle(0, 0, 10);
+    circle.position = { x: 50, y: 50 };
+    circle.rotation = Math.PI / 4;
+    circle.material = material;
+
+    scene.add(material);
+    scene.add(circle);
+
+    const frame = scene.frame(0);
+
+    // Material contains the transformed circle
+    const childMaterial = frame.root.children[0] as ChildMaterial;
+    expect(childMaterial.type).toBe("material");
+
+    // Transform wraps the circle geometry
+    const transform = childMaterial.children[0] as Transform;
+    expect(transform.type).toBe("transform");
+
+    // Circle geometry is inside transform
+    expect(transform.children[0]).toEqual({
+      type: "circle",
+      center: { x: 0, y: 0 },
+      radius: 10,
+    });
+  });
+});
+
+describe("Shape transforms", () => {
+  it("should allow Circle to have position transform", () => {
+    const scene = new Scene();
+    const circle = new Circle(0, 0, 10);
+    circle.position = { x: 50, y: 50 };
+    scene.add(circle);
+
+    const frame = scene.frame(0);
+    const transform = frame.root.children[0] as Transform;
+    expect(transform.type).toBe("transform");
+    expect(transform.matrix).toEqual([1, 0, 0, 1, 50, 50]);
+    expect(transform.children[0]).toEqual({
+      type: "circle",
+      center: { x: 0, y: 0 },
+      radius: 10,
+    });
+  });
+
+  it("should allow Circle to have rotation transform", () => {
+    const scene = new Scene();
+    const circle = new Circle(10, 0, 5);
+    circle.rotation = Math.PI / 2;
+    scene.add(circle);
+
+    const frame = scene.frame(0);
+    const transform = frame.root.children[0] as Transform;
+    expect(transform.type).toBe("transform");
+    expect(transform.matrix[0]).toBeCloseTo(0);
+    expect(transform.matrix[1]).toBeCloseTo(1);
+  });
+
+  it("should allow Circle to have scale transform", () => {
+    const scene = new Scene();
+    const circle = new Circle(0, 0, 10);
+    circle.scale = 2;
+    scene.add(circle);
+
+    const frame = scene.frame(0);
+    const transform = frame.root.children[0] as Transform;
+    expect(transform.type).toBe("transform");
+    expect(transform.matrix).toEqual([2, 0, 0, 2, 0, 0]);
+  });
+
+  it("should allow Line to have position transform", () => {
+    const scene = new Scene();
+    const line = new Line(0, 0, 10, 10);
+    line.position = { x: 25, y: 25 };
+    scene.add(line);
+
+    const frame = scene.frame(0);
+    const transform = frame.root.children[0] as Transform;
+    expect(transform.type).toBe("transform");
+    expect(transform.matrix).toEqual([1, 0, 0, 1, 25, 25]);
+    expect(transform.children[0]).toEqual({
+      type: "line",
+      start: { x: 0, y: 0 },
+      end: { x: 10, y: 10 },
+    });
+  });
+
+  it("should not wrap shape in Transform if no transform applied", () => {
+    const scene = new Scene();
+    const circle = new Circle(50, 50, 10);
+    // No position/rotation/scale set
+    scene.add(circle);
+
+    const frame = scene.frame(0);
+    // Should be the circle directly, not wrapped in transform
+    expect(frame.root.children[0]).toEqual({
+      type: "circle",
+      center: { x: 50, y: 50 },
+      radius: 10,
+    });
+  });
+
+  it("should combine transform and material on shapes", () => {
+    const scene = new Scene();
+    const material = new Material({ fill: "#ff0000" });
+    const circle = new Circle(0, 0, 10);
+    circle.position = { x: 50, y: 50 };
+    circle.material = material;
+
+    scene.add(material);
+    scene.add(circle);
+
+    const frame = scene.frame(0);
+
+    // Material node contains the transform
+    const childMaterial = frame.root.children[0] as ChildMaterial;
+    expect(childMaterial.type).toBe("material");
+    expect(childMaterial.fill).toBe("#ff0000");
+
+    // Transform is inside material
+    const transform = childMaterial.children[0] as Transform;
+    expect(transform.type).toBe("transform");
+    expect(transform.matrix).toEqual([1, 0, 0, 1, 50, 50]);
+
+    // Circle geometry is inside transform
+    expect(transform.children[0]).toEqual({
+      type: "circle",
+      center: { x: 0, y: 0 },
+      radius: 10,
+    });
+  });
+
+  it("should inherit transform properties from SceneObject", () => {
+    const circle = new Circle(0, 0, 10);
+    // These should be inherited from SceneObject
+    expect(circle.position).toEqual({ x: 0, y: 0 });
+    expect(circle.rotation).toBe(0);
+    expect(circle.scale).toBe(1);
+    expect(typeof circle.computeMatrix).toBe("function");
+    expect(typeof circle.hasTransform).toBe("function");
   });
 });

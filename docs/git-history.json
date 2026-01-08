@@ -1,5 +1,29 @@
 [
   {
+    "hash": "1489a945ac708f0877044953c05956daac26004e",
+    "short_hash": "1489a94",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T17:05:02Z",
+    "message": "refactor: SceneObject base class with transforms for all scene objects\n\nDesign changes (three.js-inspired):\n- SceneObject abstract base class provides position, rotation, scale\n- Shapes (Circle, Line) extend SceneObject - have transforms directly\n- Group extends SceneObject - has transforms, NO material property\n- Shapes without material use Scene's default styles\n\nThis matches three.js patterns where:\n- Object3D provides transforms for all objects\n- Mesh has both transforms and material\n- Group is purely organizational (no material)\n\nAPI improvement - shapes can now be transformed directly:\n```typescript\nconst circle = new Circle(0, 0, 10);\ncircle.position = { x: 50, y: 50 };\ncircle.material = redMaterial;\nscene.add(circle);\n```\n\nInstead of requiring a Group wrapper for every transform.\n\n- Updated AGENT.md with design decisions and class hierarchy\n- Updated ARCHITECTURE.md with object generator patterns\n- 163 tests passing, visual parity verified\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 5
+  },
+  {
+    "hash": "e2456eb1fe72ee8a7fbce15b2c593a801ce9a6e1",
+    "short_hash": "e2456eb",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T16:16:09Z",
+    "message": "feat: implement transform support across all packages\n\n- Add Transform type with 6-value 2D affine matrix [a,b,c,d,e,f] to spec\n- Add Matrix2D type and matrix validation in validateFrame()\n- Add translate(), rotate(), scale() APIs to procedural generator\n  - Matrix helpers: identityMatrix, translateMatrix, rotateMatrix, scaleMatrix, multiplyMatrices\n  - Transform state saved/restored with push()/pop()\n  - Shapes wrapped in Transform nodes when matrix is non-identity\n- Add Group class to object generator (three.js-style)\n  - position, rotation, scale properties\n  - computeMatrix() composes TRS in standard order\n  - Groups can be nested and contain shapes\n- Update SVG renderer: <g transform=\"matrix(...)\"> for Transform nodes\n- Update Canvas renderer: ctx.save()/transform()/restore() for Transform nodes\n- Update test-app with transform examples: translate, rotate, scale compositions\n- All 4 renderers produce identical visual output\n- 155 tests passing\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 11
+  },
+  {
+    "hash": "7d5bab672c35b27cd7087a9c049f2203bce84fed",
+    "short_hash": "7d5bab6",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T15:52:16Z",
+    "message": "docs: design transform representation for Frame spec\n\nResearch validated user opinions on transform design:\n- Transform nodes distinct from Materials (validated with nuance)\n- Transforms accumulate via matrix multiplication, no inheritance (strongly validated)\n- Matrix as canonical form for render-focused IR (validated)\n\nSelected: 6-value 2D affine matrix [a,b,c,d,e,f]\n- No id attribute (transforms don't need references)\n- Flexible nesting with Materials\n- Compact forms deferred as future optimization\n- Post-processor can merge sequential transforms\n\nUpdated documentation:\n- ARCHITECTURE.md: pipeline, transforms, future optimizer\n- spec/AGENT.md: transform guidance\n- renderer-common/AGENT.md: future candidates\n\nDecision graph: 28 nodes on feat/transforms branch\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 4
+  },
+  {
     "hash": "6c3daecc10c1d68b0c0df0de5637e0b239a139cf",
     "short_hash": "6c3daec",
     "author": "Chris Tierney",

@@ -12,14 +12,16 @@ The Frame spec is an **intermediate representation (IR)**. It:
 
 Generators provide ergonomic APIs. Renderers consume the IR and transform as needed.
 
-## Core Concept: Material-Based Tree
+## Core Concept: Material and Transform Tree
 
 The Frame is a **tree structure** where:
 
 1. **Root is a complete Material** - all style properties defined
 2. **Materials are nodes** with children and style properties
-3. **Shapes are leaves** - pure geometry, no style properties
-4. **Style inheritance** flows down the tree via Material references
+3. **Transforms are nodes** with children and a 2D affine matrix
+4. **Shapes are leaves** - pure geometry, no style properties
+5. **Style inheritance** flows down the tree via Material references
+6. **Transform accumulation** via matrix multiplication during traversal
 
 ### Why Materials?
 
@@ -28,7 +30,7 @@ Materials solve several problems:
 - **Shared styles**: Many shapes can inherit from one Material
 - **Composition**: Partial overrides at any level
 - **Validation**: Single-pass, top-to-bottom, no cycles possible
-- **Future transforms**: Material nodes provide grouping for transforms
+- **Grouping**: Material and Transform nodes provide natural grouping
 
 ## Type Structure
 
@@ -71,8 +73,17 @@ type Line = {
 
 type Shape = Circle | Line;
 
+// Transform - 2D affine transformation
+type Matrix2D = [number, number, number, number, number, number];
+
+type Transform = {
+  type: "transform";
+  matrix: Matrix2D;  // [a, b, c, d, e, f]
+  children: FrameNode[];
+};
+
 // Tree structure
-type FrameNode = Material | Shape;
+type FrameNode = Material | Transform | Shape;
 
 type Frame = {
   backgroundColor?: string;
@@ -87,7 +98,8 @@ Validation is **single-pass, top-to-bottom**:
 1. **Root must be complete**: All style properties (fill, stroke, strokeWidth) defined
 2. **IDs must be unique**: No duplicate Material IDs in the tree
 3. **Refs must be ancestors**: Each ChildMaterial's `ref` must point to an ancestor Material's `id`
-4. **Shapes are leaves**: Shapes cannot have children (enforced by types)
+4. **Transform matrix valid**: Must have exactly 6 finite numbers
+5. **Shapes are leaves**: Shapes cannot have children (enforced by types)
 
 ### Validation Algorithm
 
@@ -213,21 +225,38 @@ In this frame:
 - **Self-documenting**: Types show what can contain what
 - **Sufficient for now**: Revisit when transforms add more container types
 
-## Future Extensions
+## Transforms
 
-### Transforms (planned)
+Transforms apply 2D affine transformations to their children using a 6-value matrix:
 
 ```typescript
+type Matrix2D = [number, number, number, number, number, number];
+
 type Transform = {
   type: "transform";
-  translate?: Position;
-  rotate?: number;
-  scale?: number;
+  matrix: Matrix2D;  // [a, b, c, d, e, f]
   children: FrameNode[];
 };
 
 type FrameNode = Material | Transform | Shape;
 ```
+
+The matrix represents:
+```
+| a  c  e |
+| b  d  f |     Point (x,y) -> (ax + cy + e, bx + dy + f)
+| 0  0  1 |
+```
+
+**Key properties:**
+- Identity matrix: `[1, 0, 0, 1, 0, 0]` (prefer omitting the Transform node)
+- No ID required (transforms don't need references)
+- Transforms accumulate via matrix multiplication during traversal
+- Materials and Transforms nest flexibly and arbitrarily
+
+Generator APIs provide ergonomic `translate()`, `rotate()`, `scale()` that compose into matrices.
+
+## Future Extensions
 
 ### Additional Material Properties
 

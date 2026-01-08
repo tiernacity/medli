@@ -6,35 +6,212 @@ import type {
   RootMaterial,
   ChildMaterial,
   FrameNode,
+  Matrix2D,
+  Transform,
 } from "@medli/spec";
+
+// ============================================================================
+// Matrix Math Helpers
+// ============================================================================
+
+/**
+ * Create an identity matrix [1,0,0,1,0,0].
+ */
+export function identityMatrix(): Matrix2D {
+  return [1, 0, 0, 1, 0, 0];
+}
+
+/**
+ * Create a translation matrix.
+ * [1, 0, 0, 1, x, y]
+ */
+export function translateMatrix(x: number, y: number): Matrix2D {
+  return [1, 0, 0, 1, x, y];
+}
+
+/**
+ * Create a rotation matrix for the given angle in radians.
+ * [cos(a), sin(a), -sin(a), cos(a), 0, 0]
+ */
+export function rotateMatrix(angle: number): Matrix2D {
+  const cos = Math.cos(angle);
+  const sin = Math.sin(angle);
+  return [cos, sin, -sin, cos, 0, 0];
+}
+
+/**
+ * Create a scale matrix.
+ * [sx, 0, 0, sy, 0, 0]
+ */
+export function scaleMatrix(sx: number, sy: number): Matrix2D {
+  return [sx, 0, 0, sy, 0, 0];
+}
+
+/**
+ * Multiply two 2D affine matrices.
+ * Result = a * b
+ *
+ * When applied to a point: (a * b) * point = a * (b * point)
+ * So b is applied first, then a.
+ *
+ * Matrix format: [a, b, c, d, e, f] represents:
+ * | a  c  e |
+ * | b  d  f |
+ * | 0  0  1 |
+ */
+export function multiplyMatrices(a: Matrix2D, b: Matrix2D): Matrix2D {
+  const [a0, a1, a2, a3, a4, a5] = a;
+  const [b0, b1, b2, b3, b4, b5] = b;
+
+  return [
+    a0 * b0 + a2 * b1,
+    a1 * b0 + a3 * b1,
+    a0 * b2 + a2 * b3,
+    a1 * b2 + a3 * b3,
+    a0 * b4 + a2 * b5 + a4,
+    a1 * b4 + a3 * b5 + a5,
+  ];
+}
+
+/**
+ * Check if a matrix is the identity matrix.
+ */
+export function isIdentityMatrix(m: Matrix2D): boolean {
+  return (
+    m[0] === 1 &&
+    m[1] === 0 &&
+    m[2] === 0 &&
+    m[3] === 1 &&
+    m[4] === 0 &&
+    m[5] === 0
+  );
+}
 
 // Global counter for unique material IDs
 let materialIdCounter = 0;
 
 /**
- * SceneObject - base interface for objects that can be added to a scene.
- * Shapes implement this to provide their frame data.
+ * Position in 2D space.
  */
-export interface SceneObject {
-  frame(time: number): FrameNode[];
+export interface Position {
+  x: number;
+  y: number;
 }
 
 /**
- * Shape - base interface for shapes that can reference a Material.
- * Shapes are added to the scene independently and reference materials.
+ * Scale can be uniform (single number) or non-uniform (x, y).
  */
-export interface Shape extends SceneObject {
+export type ScaleValue = number | Position;
+
+/**
+ * SceneObject - abstract base class for all objects in the scene graph.
+ * Provides transform properties (position, rotation, scale) like three.js Object3D.
+ */
+export abstract class SceneObject {
+  /** Position offset (translation) */
+  position: Position = { x: 0, y: 0 };
+
+  /** Rotation in radians */
+  rotation: number = 0;
+
+  /** Scale factor (uniform or non-uniform) */
+  scale: ScaleValue = 1;
+
+  /**
+   * Compute the combined transformation matrix.
+   * Applied in TRS order: scale -> rotate -> translate.
+   *
+   * Matrix composition: T * R * S (applied right-to-left)
+   * This means: first scale, then rotate, then translate.
+   */
+  computeMatrix(): Matrix2D {
+    // Start with identity
+    let matrix = identityMatrix();
+
+    // Build matrix as T * R * S (right-to-left application)
+    // We multiply in reverse order: S first, then R, then T
+
+    // Apply scale (innermost, applied first to points)
+    const sx = typeof this.scale === "number" ? this.scale : this.scale.x;
+    const sy = typeof this.scale === "number" ? this.scale : this.scale.y;
+    if (sx !== 1 || sy !== 1) {
+      matrix = scaleMatrix(sx, sy);
+    }
+
+    // Apply rotation (middle)
+    if (this.rotation !== 0) {
+      matrix = multiplyMatrices(rotateMatrix(this.rotation), matrix);
+    }
+
+    // Apply translation (outermost, applied last to points)
+    if (this.position.x !== 0 || this.position.y !== 0) {
+      matrix = multiplyMatrices(
+        translateMatrix(this.position.x, this.position.y),
+        matrix
+      );
+    }
+
+    return matrix;
+  }
+
+  /**
+   * Check if this object has a non-identity transform.
+   */
+  hasTransform(): boolean {
+    return !isIdentityMatrix(this.computeMatrix());
+  }
+
+  /**
+   * Produce frame nodes for this object.
+   */
+  abstract frame(time: number): FrameNode[];
+}
+
+/**
+ * Shape - abstract base class for shapes that can reference a Material.
+ * Shapes are added to the scene independently and reference materials.
+ * Extends SceneObject to inherit transform properties.
+ */
+export abstract class Shape extends SceneObject {
   material?: Material;
+
+  /**
+   * Get the raw geometry nodes (without transform wrapper).
+   */
+  protected abstract geometry(time: number): FrameNode[];
+
+  /**
+   * Produce frame nodes, wrapping in Transform if this shape has transforms.
+   */
+  frame(time: number): FrameNode[] {
+    const nodes = this.geometry(time);
+
+    // If no transform, return geometry directly
+    if (!this.hasTransform()) {
+      return nodes;
+    }
+
+    // Wrap in Transform node
+    const transform: Transform = {
+      type: "transform",
+      matrix: this.computeMatrix(),
+      children: nodes,
+    };
+
+    return [transform];
+  }
 }
 
 /**
  * Background - represents the scene background color.
  * Does not contribute shapes, only sets backgroundColor on Scene.
+ * Note: Background does not use transforms, but extends SceneObject for consistency.
  */
-export class Background implements SceneObject {
+export class Background extends SceneObject {
   color: string;
 
   constructor(color = "#000000") {
+    super();
     this.color = color;
   }
 
@@ -47,20 +224,21 @@ export class Background implements SceneObject {
 /**
  * Circle - a circle shape with center position and radius.
  * Can optionally reference a Material for styling.
+ * Extends Shape which provides transforms and material reference.
  */
-export class Circle implements Shape {
+export class Circle extends Shape {
   x: number;
   y: number;
   radius: number;
-  material?: Material;
 
   constructor(x: number, y: number, radius: number) {
+    super();
     this.x = x;
     this.y = y;
     this.radius = radius;
   }
 
-  frame(_time: number): FrameNode[] {
+  protected geometry(_time: number): FrameNode[] {
     const shape: CircleShape = {
       type: "circle",
       center: { x: this.x, y: this.y },
@@ -73,15 +251,16 @@ export class Circle implements Shape {
 /**
  * Line - a line from start to end position.
  * Can optionally reference a Material for styling.
+ * Extends Shape which provides transforms and material reference.
  */
-export class Line implements Shape {
+export class Line extends Shape {
   x1: number;
   y1: number;
   x2: number;
   y2: number;
-  material?: Material;
 
   constructor(x1: number, y1: number, x2: number, y2: number) {
+    super();
     this.x1 = x1;
     this.y1 = y1;
     this.x2 = x2;
@@ -92,13 +271,74 @@ export class Line implements Shape {
     return new Line(x, y, x + dx, y + dy);
   }
 
-  frame(_time: number): FrameNode[] {
+  protected geometry(_time: number): FrameNode[] {
     const shape: LineShape = {
       type: "line",
       start: { x: this.x1, y: this.y1 },
       end: { x: this.x2, y: this.y2 },
     };
     return [shape];
+  }
+}
+
+/**
+ * Group - a container for shapes with transform properties.
+ * Extends SceneObject for transform properties.
+ * Unlike three.js Group (which has no material), our Group purely provides
+ * hierarchical transforms - NO material property.
+ *
+ * When frame() is called, Groups emit Transform nodes containing their children.
+ * Transform is applied in order: scale -> rotate -> translate (TRS order).
+ */
+export class Group extends SceneObject {
+  private children: SceneObject[] = [];
+
+  /**
+   * Add a child object to this group.
+   */
+  add(child: SceneObject): this {
+    this.children.push(child);
+    return this;
+  }
+
+  /**
+   * Remove a child object from this group.
+   */
+  remove(child: SceneObject): this {
+    const index = this.children.indexOf(child);
+    if (index !== -1) {
+      this.children.splice(index, 1);
+    }
+    return this;
+  }
+
+  /**
+   * Get all children of this group.
+   */
+  getChildren(): SceneObject[] {
+    return [...this.children];
+  }
+
+  frame(time: number): FrameNode[] {
+    // Collect children frame data
+    const childNodes: FrameNode[] = [];
+    for (const child of this.children) {
+      childNodes.push(...child.frame(time));
+    }
+
+    // If no transform, just return children
+    if (!this.hasTransform()) {
+      return childNodes;
+    }
+
+    // Wrap children in a Transform node
+    const transform: Transform = {
+      type: "transform",
+      matrix: this.computeMatrix(),
+      children: childNodes,
+    };
+
+    return [transform];
   }
 }
 
@@ -115,8 +355,9 @@ export interface MaterialStyle {
  * Material - provides style properties for shapes.
  * Materials are added to scene independently; shapes reference them via .material property.
  * This follows the three.js pattern where materials and shapes are separate scene objects.
+ * Note: Material extends SceneObject for consistency but does not use transforms.
  */
-export class Material implements SceneObject {
+export class Material extends SceneObject {
   readonly id: string;
   fill?: string;
   stroke?: string;
@@ -125,6 +366,7 @@ export class Material implements SceneObject {
   parent?: Material;
 
   constructor(style: MaterialStyle = {}) {
+    super();
     this.id = `m${++materialIdCounter}`;
     this.fill = style.fill;
     this.stroke = style.stroke;
@@ -142,13 +384,17 @@ export class Material implements SceneObject {
 
 /**
  * Helper to check if an object is a Shape (has optional material property).
+ * Now checks for Shape class directly since Group no longer has material.
  */
 function isShape(obj: SceneObject): obj is Shape {
-  return (
-    obj instanceof Circle ||
-    obj instanceof Line ||
-    ("material" in obj && obj !== null)
-  );
+  return obj instanceof Shape;
+}
+
+/**
+ * Helper to check if an object is a Group.
+ */
+function isGroup(obj: SceneObject): obj is Group {
+  return obj instanceof Group;
 }
 
 /**
@@ -227,12 +473,13 @@ export class Scene implements Generator {
           }
         }
       }
+      // Note: Groups don't have materials, so they're not processed here
     }
 
     // Group shapes by their material (undefined = root material)
     const shapesByMaterial = new Map<Material | undefined, Shape[]>();
     for (const child of this.children) {
-      if (isShape(child) && !(child instanceof Material)) {
+      if (isShape(child)) {
         const mat = child.material;
         if (!shapesByMaterial.has(mat)) {
           shapesByMaterial.set(mat, []);
@@ -297,7 +544,9 @@ export class Scene implements Generator {
 
     // Build root children preserving insertion order
     // Process children in order, outputting:
-    // - Shapes without material directly
+    // - Shapes without material directly to root
+    // - Shapes with material grouped under their material's ChildMaterial node
+    // - Groups directly to root (Groups have no material, purely for transforms)
     // - Materials when first encountered (either explicitly added or referenced by shape)
     const rootChildren: FrameNode[] = [];
     const processedMaterials = new Set<Material>();
@@ -309,6 +558,9 @@ export class Scene implements Generator {
           rootChildren.push(buildChildMaterial(child));
           processedMaterials.add(child);
         }
+      } else if (isGroup(child)) {
+        // Groups go directly to root (they don't have materials)
+        rootChildren.push(...child.frame(time));
       } else if (isShape(child)) {
         const mat = child.material;
         if (!mat) {

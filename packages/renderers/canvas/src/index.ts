@@ -4,6 +4,7 @@ import type {
   FrameNode,
   Material,
   ResolvedMaterial,
+  Transform,
 } from "@medli/spec";
 import { validateFrame, resolveMaterial } from "@medli/spec";
 import { BaseRenderer } from "@medli/renderer-common";
@@ -56,10 +57,28 @@ export class CanvasRenderer extends BaseRenderer {
           this.renderNode(child, ancestors);
         }
       }
+    } else if (node.type === "transform") {
+      // Transform node - apply transform, render children, restore state
+      const transform = node as Transform;
+      const [a, b, c, d, e, f] = transform.matrix;
+
+      this.context.save();
+      this.context.transform(a, b, c, d, e, f);
+
+      // Recurse into children - transforms don't affect material ancestor tracking
+      for (const child of transform.children) {
+        if (child.type === "material") {
+          this.renderNode(child, [...ancestors, child as Material]);
+        } else {
+          this.renderNode(child, ancestors);
+        }
+      }
+
+      this.context.restore();
     } else {
       // Shape node - render with resolved material
       const resolved = resolveMaterial(ancestors);
-      this.renderShape(node, resolved);
+      this.renderShape(node as Shape, resolved);
     }
   }
 

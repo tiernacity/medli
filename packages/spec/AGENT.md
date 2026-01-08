@@ -23,6 +23,17 @@ You maintain the **Frame spec** - the intermediate representation (IR) that is t
 - **Validation is single-pass** - top-down tree traversal
 - **Shapes are leaves** - pure geometry, no style properties
 - **Materials provide style** - inheritance via tree structure
+- **Transforms use matrices** - 6-value 2D affine `[a,b,c,d,e,f]`
+
+## Materials vs Transforms
+
+| Concern | Materials | Transforms |
+|---------|-----------|------------|
+| Behavior | **Inherit** with overrides | **Accumulate** via multiplication |
+| ID | Required (for ref) | None needed |
+| Nesting | Can nest with anything | Can nest with anything |
+
+Generator APIs (translate/rotate/scale) compose into matrices. The IR only stores matrices.
 
 ## When Reviewing Changes
 
@@ -37,6 +48,14 @@ You maintain the **Frame spec** - the intermediate representation (IR) that is t
 2. Add to `Shape` union type
 3. Update `FrameNode` if needed
 4. No validation changes needed (shapes are leaves)
+
+## When Adding Transform Type
+
+1. Define `Transform` with `type: 'transform'` and `matrix: Matrix2D`
+2. Define `Matrix2D` as 6-element tuple `[a, b, c, d, e, f]`
+3. Add Transform to `FrameNode` union
+4. Update validateFrame() to check matrix has 6 numbers
+5. **No id required** - transforms don't need references
 
 ## After Changes
 
