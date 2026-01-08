@@ -12,6 +12,8 @@ let currentColor = "#000000";
 // Create generator with a draw function that uses the current color
 export const generator = new ProceduralGenerator((p) => {
   p.background(currentColor);
+  // Draw a circle at center (50, 50) with radius 25
+  p.circle(50, 50, 25);
 });
 
 /**
