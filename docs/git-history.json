@@ -1,5 +1,13 @@
 [
   {
+    "hash": "62cee0ef748614be3684601ba706817b9e1660f5",
+    "short_hash": "62cee0e",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T19:30:27Z",
+    "message": "feat: implement viewport coordinate system across all packages\n\nAdd center-origin, Y-up coordinate system with configurable scaling:\n\nSpec:\n- Add Viewport type (halfWidth, halfHeight, scaleMode)\n- Update Frame to require viewport property\n- Add viewport validation to validateFrame()\n\nRenderer-common:\n- Add computeViewportTransform() for Canvas transform calculation\n- Supports fit/fill/stretch scale modes\n\nSVG Renderer:\n- Use native viewBox and preserveAspectRatio for scaling\n- Y-flip via root group transform scale(1, -1)\n\nCanvas Renderer:\n- Manual viewport transform via computeViewportTransform()\n- Y-flip via scale(sx, -sy)\n- Query element size on each render (don't set it)\n\nGenerators:\n- Procedural: Add viewport() and scaleMode() methods to Sketch\n- Object: Scene constructor requires Viewport parameter\n\nTest-app:\n- Convert all coordinates to center-origin, Y-up system\n- Add ResizeObserver for dynamic canvas buffer sizing\n- CSS ensures SVG and Canvas scale together\n\n170 tests pass, visual parity verified across all 4 renderers.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 16
+  },
+  {
     "hash": "1489a945ac708f0877044953c05956daac26004e",
     "short_hash": "1489a94",
     "author": "Chris Tierney",
