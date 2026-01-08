@@ -2485,6 +2485,28 @@
       "created_at": "2026-01-08T21:34:24.877543+00:00",
       "updated_at": "2026-01-08T21:34:24.877543+00:00",
       "metadata_json": "{\"branch\":\"feat/images\",\"commit\":\"1de3de8\",\"confidence\":95}"
+    },
+    {
+      "id": 227,
+      "change_id": "09cb0ed6-6eab-4994-a02e-b5b09c693098",
+      "node_type": "goal",
+      "title": "Extract materials + transforms scenes, add dropdown navigation",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T21:38:17.454315+00:00",
+      "updated_at": "2026-01-08T21:38:17.454315+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":90,\"prompt\":\"Great. Let's create two more: extract the material specific and transform specific parts of the full demo, into their own standlone scenes. And please add navigation between them - maybe a dropdown menu?\"}"
+    },
+    {
+      "id": 228,
+      "change_id": "295b772f-339f-4b8d-bda0-08fabb641469",
+      "node_type": "outcome",
+      "title": "Materials + Transforms scenes created, dropdown navigation working",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T21:44:15.731036+00:00",
+      "updated_at": "2026-01-08T21:44:15.731036+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -4973,6 +4995,17 @@
       "weight": 1.0,
       "rationale": "Deployment",
       "created_at": "2026-01-08T21:34:24.899863+00:00"
+    },
+    {
+      "id": 227,
+      "from_node_id": 227,
+      "to_node_id": 228,
+      "from_change_id": "09cb0ed6-6eab-4994-a02e-b5b09c693098",
+      "to_change_id": "295b772f-339f-4b8d-bda0-08fabb641469",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Goal achieved",
+      "created_at": "2026-01-08T21:44:23.247741+00:00"
     }
   ]
 }
