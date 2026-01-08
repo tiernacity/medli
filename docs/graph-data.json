@@ -2122,6 +2122,61 @@
       "created_at": "2026-01-08T19:30:35.842188+00:00",
       "updated_at": "2026-01-08T19:30:35.842188+00:00",
       "metadata_json": "{\"branch\":\"feat/coordinate-system\",\"commit\":\"62cee0e\",\"confidence\":100}"
+    },
+    {
+      "id": 194,
+      "change_id": "da071d6b-98f7-4cd8-bfe8-57bde1c989eb",
+      "node_type": "observation",
+      "title": "Bug: Shapes inside Groups don't get material wrappers - Scene.frame() only groups direct children by material, Groups bypass this and emit raw shapes",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T19:41:11.280540+00:00",
+      "updated_at": "2026-01-08T19:41:11.280540+00:00",
+      "metadata_json": "{\"branch\":\"feat/coordinate-system\",\"confidence\":100}"
+    },
+    {
+      "id": 195,
+      "change_id": "bbd95aa2-3b0a-4a3a-a457-12b52f1a71b9",
+      "node_type": "goal",
+      "title": "Fix material handling for shapes inside Groups",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T19:41:11.362796+00:00",
+      "updated_at": "2026-01-08T19:41:11.362796+00:00",
+      "metadata_json": "{\"branch\":\"feat/coordinate-system\",\"confidence\":90}"
+    },
+    {
+      "id": 196,
+      "change_id": "9f983e6a-76d0-4360-85fa-6874c4758b43",
+      "node_type": "action",
+      "title": "Implemented inline material wrapping in Group.frame() for shapes with materials",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T19:44:05.896856+00:00",
+      "updated_at": "2026-01-08T19:44:05.896856+00:00",
+      "metadata_json": "{\"branch\":\"feat/coordinate-system\",\"confidence\":95}"
+    },
+    {
+      "id": 197,
+      "change_id": "8da9c4de-9560-492b-8d0a-4e261f4f7a19",
+      "node_type": "outcome",
+      "title": "Fix verified - all 4 renderers now produce identical output with white cross in lower-left, 170 tests pass",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T19:44:05.976496+00:00",
+      "updated_at": "2026-01-08T19:44:05.976496+00:00",
+      "metadata_json": "{\"branch\":\"feat/coordinate-system\",\"confidence\":100}"
+    },
+    {
+      "id": 198,
+      "change_id": "d26c2922-f7f2-4b1a-9b1a-84bf2b6bad1a",
+      "node_type": "action",
+      "title": "Committed fix for Group material handling",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T19:44:34.410397+00:00",
+      "updated_at": "2026-01-08T19:44:34.410397+00:00",
+      "metadata_json": "{\"branch\":\"feat/coordinate-system\",\"commit\":\"91efbf0\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -4203,6 +4258,50 @@
       "weight": 1.0,
       "rationale": "Deployment",
       "created_at": "2026-01-08T19:30:35.865218+00:00"
+    },
+    {
+      "id": 190,
+      "from_node_id": 194,
+      "to_node_id": 195,
+      "from_change_id": "da071d6b-98f7-4cd8-bfe8-57bde1c989eb",
+      "to_change_id": "bbd95aa2-3b0a-4a3a-a457-12b52f1a71b9",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Bug leads to fix goal",
+      "created_at": "2026-01-08T19:41:16.138859+00:00"
+    },
+    {
+      "id": 191,
+      "from_node_id": 195,
+      "to_node_id": 196,
+      "from_change_id": "bbd95aa2-3b0a-4a3a-a457-12b52f1a71b9",
+      "to_change_id": "9f983e6a-76d0-4360-85fa-6874c4758b43",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementing fix",
+      "created_at": "2026-01-08T19:44:10.617402+00:00"
+    },
+    {
+      "id": 192,
+      "from_node_id": 196,
+      "to_node_id": 197,
+      "from_change_id": "9f983e6a-76d0-4360-85fa-6874c4758b43",
+      "to_change_id": "8da9c4de-9560-492b-8d0a-4e261f4f7a19",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Fix successful",
+      "created_at": "2026-01-08T19:44:10.641726+00:00"
+    },
+    {
+      "id": 193,
+      "from_node_id": 197,
+      "to_node_id": 198,
+      "from_change_id": "8da9c4de-9560-492b-8d0a-4e261f4f7a19",
+      "to_change_id": "d26c2922-f7f2-4b1a-9b1a-84bf2b6bad1a",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Deployment",
+      "created_at": "2026-01-08T19:44:34.434963+00:00"
     }
   ]
 }

@@ -1,5 +1,13 @@
 [
   {
+    "hash": "91efbf00e591d96fe7d5c6338e9e77b79ca50951",
+    "short_hash": "91efbf0",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T19:44:29Z",
+    "message": "fix: wrap shapes inside Groups with inline ChildMaterial nodes\n\nShapes inside Groups now correctly receive their material properties.\nPreviously, only direct Scene children were grouped by material - shapes\ninside Groups were emitted as raw geometry, falling back to root defaults.\n\nAdded inline material wrapping in Group.frame() that creates unique\nChildMaterial nodes for shapes with material references, preserving\nthe material's fill, stroke, and strokeWidth properties.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 3
+  },
+  {
     "hash": "62cee0ef748614be3684601ba706817b9e1660f5",
     "short_hash": "62cee0e",
     "author": "Chris Tierney",
