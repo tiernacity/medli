@@ -1264,6 +1264,39 @@
       "created_at": "2026-01-08T12:38:10.842377+00:00",
       "updated_at": "2026-01-08T12:38:10.842377+00:00",
       "metadata_json": "{\"branch\":\"feat/lines-color-and-fill\",\"confidence\":95}"
+    },
+    {
+      "id": 116,
+      "change_id": "f75333f2-d77d-41f1-b4a0-ed32c10a34f3",
+      "node_type": "action",
+      "title": "Committed design documentation",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T12:39:55.374908+00:00",
+      "updated_at": "2026-01-08T12:39:55.374908+00:00",
+      "metadata_json": "{\"branch\":\"feat/lines-color-and-fill\",\"commit\":\"8ff4c94\",\"confidence\":95}"
+    },
+    {
+      "id": 117,
+      "change_id": "6170951a-2f37-46fe-8560-1593a2446dad",
+      "node_type": "action",
+      "title": "Starting Material-based Frame spec implementation",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T12:42:50.339837+00:00",
+      "updated_at": "2026-01-08T12:42:50.339837+00:00",
+      "metadata_json": "{\"branch\":\"feat/lines-color-and-fill\",\"confidence\":90}"
+    },
+    {
+      "id": 118,
+      "change_id": "4686540c-0563-4c4e-b336-d190af742786",
+      "node_type": "outcome",
+      "title": "Material-based Frame spec implemented and verified - all 4 renderers produce identical output, 30 tests pass",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T12:52:31.166680+00:00",
+      "updated_at": "2026-01-08T12:52:31.166680+00:00",
+      "metadata_json": "{\"branch\":\"feat/lines-color-and-fill\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -2399,6 +2432,50 @@
       "weight": 1.0,
       "rationale": "Documentation for implementation",
       "created_at": "2026-01-08T12:38:10.913962+00:00"
+    },
+    {
+      "id": 104,
+      "from_node_id": 115,
+      "to_node_id": 116,
+      "from_change_id": "7a57a1cd-516e-4c34-951a-14c60ce5166b",
+      "to_change_id": "f75333f2-d77d-41f1-b4a0-ed32c10a34f3",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Committed",
+      "created_at": "2026-01-08T12:39:55.440862+00:00"
+    },
+    {
+      "id": 105,
+      "from_node_id": 107,
+      "to_node_id": 117,
+      "from_change_id": "334af87f-2321-4e1a-a596-a01c379ca0f7",
+      "to_change_id": "6170951a-2f37-46fe-8560-1593a2446dad",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation start",
+      "created_at": "2026-01-08T12:42:57.612811+00:00"
+    },
+    {
+      "id": 106,
+      "from_node_id": 117,
+      "to_node_id": 118,
+      "from_change_id": "6170951a-2f37-46fe-8560-1593a2446dad",
+      "to_change_id": "4686540c-0563-4c4e-b336-d190af742786",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation completed successfully",
+      "created_at": "2026-01-08T12:52:37.003640+00:00"
+    },
+    {
+      "id": 107,
+      "from_node_id": 107,
+      "to_node_id": 118,
+      "from_change_id": "334af87f-2321-4e1a-a596-a01c379ca0f7",
+      "to_change_id": "4686540c-0563-4c4e-b336-d190af742786",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Goal achieved",
+      "created_at": "2026-01-08T12:52:37.024108+00:00"
     }
   ]
 }

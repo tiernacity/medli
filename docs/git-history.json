@@ -1,5 +1,13 @@
 [
   {
+    "hash": "8ff4c94ab2a171e09ea1f97057b848c6dee43e3d",
+    "short_hash": "8ff4c94",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T12:39:46Z",
+    "message": "docs: add Material-based Frame spec design documentation\n\n- Create comprehensive spec/README.md documenting:\n  - Material-based tree structure (RootMaterial, ChildMaterial, Shapes)\n  - Validation rules (single-pass, ancestor-only refs, unique IDs)\n  - Style resolution algorithm\n  - Design decisions and rationale\n  - Future extensions (transforms, additional properties)\n\n- Update generator READMEs with Material output sections:\n  - Procedural: fill()/stroke() create Material nodes, push/pop mapping\n  - Object: Material class provides style context for children\n\n- Update agents.toml to be lightweight pointers to READMEs\n\n- Sync decision graph with design decisions and implementation plan\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 5
+  },
+  {
     "hash": "3816817b83cb419f87936bb0cd8e4dd149674901",
     "short_hash": "3816817",
     "author": "Chris Tierney",

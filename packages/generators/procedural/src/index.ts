@@ -1,4 +1,11 @@
-import type { Frame, Generator, Shape, Circle, Line } from "@medli/spec";
+import type {
+  Frame,
+  Generator,
+  Circle,
+  Line,
+  RootMaterial,
+  FrameNode,
+} from "@medli/spec";
 
 /**
  * Sketch context - provides procedural drawing functions.
@@ -9,6 +16,15 @@ import type { Frame, Generator, Shape, Circle, Line } from "@medli/spec";
 export interface Sketch {
   /** Set the background color for this frame */
   background(color: string): void;
+
+  /** Set the fill color for subsequent shapes */
+  fill(color: string): void;
+
+  /** Set the stroke color for subsequent shapes */
+  stroke(color: string): void;
+
+  /** Set the stroke width for subsequent shapes */
+  strokeWidth(width: number): void;
 
   /** Draw a circle at (x, y) with given radius */
   circle(x: number, y: number, radius: number): void;
@@ -50,14 +66,28 @@ export class ProceduralGenerator implements Generator {
   }
 
   frame(time: number = 0): Frame {
-    // Start with default frame state
+    // Default style state
     let backgroundColor = "#000000";
-    const shapes: Shape[] = [];
+    let currentFill = "#000000";
+    let currentStroke = "#000000";
+    let currentStrokeWidth = 1;
+
+    // Collect shapes (for now, flat list under root material)
+    const shapes: FrameNode[] = [];
 
     // Create sketch context for this frame
     const sketch: Sketch = {
       background(color: string) {
         backgroundColor = color;
+      },
+      fill(color: string) {
+        currentFill = color;
+      },
+      stroke(color: string) {
+        currentStroke = color;
+      },
+      strokeWidth(width: number) {
+        currentStrokeWidth = width;
       },
       circle(x: number, y: number, radius: number) {
         const circleShape: Circle = {
@@ -89,6 +119,16 @@ export class ProceduralGenerator implements Generator {
     // Run user's draw function
     this.drawFn(sketch);
 
-    return { backgroundColor, shapes };
+    // Build root material with all shapes as children
+    const root: RootMaterial = {
+      type: "material",
+      id: "root",
+      fill: currentFill,
+      stroke: currentStroke,
+      strokeWidth: currentStrokeWidth,
+      children: shapes,
+    };
+
+    return { backgroundColor, root };
   }
 }

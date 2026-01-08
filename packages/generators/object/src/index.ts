@@ -1,26 +1,23 @@
 import type {
   Frame,
   Generator,
-  Shape,
   Circle as CircleShape,
   Line as LineShape,
+  RootMaterial,
+  FrameNode,
 } from "@medli/spec";
 
 /**
  * SceneObject - base interface for objects that can be added to a scene.
- * Each object contributes to the frame via its frame() method.
+ * Each object contributes FrameNodes (shapes) to the frame.
  */
 export interface SceneObject {
-  frame(time: number): Partial<Frame>;
+  frame(time: number): FrameNode[];
 }
 
 /**
  * Background - represents the scene background color.
- *
- * Usage:
- *   const bg = new Background("#ff0000");
- *   scene.setBackground(bg);
- *   bg.color = "#00ff00"; // change color
+ * Does not contribute shapes, only sets backgroundColor on Scene.
  */
 export class Background implements SceneObject {
   color: string;
@@ -29,18 +26,14 @@ export class Background implements SceneObject {
     this.color = color;
   }
 
-  frame(_time: number): Partial<Frame> {
-    return { backgroundColor: this.color };
+  frame(_time: number): FrameNode[] {
+    // Background doesn't add shapes, it's handled specially by Scene
+    return [];
   }
 }
 
 /**
  * Circle - a circle shape with center position and radius.
- *
- * Usage:
- *   const circle = new Circle(50, 50, 25);
- *   scene.add(circle);
- *   circle.x = 60; // move center
  */
 export class Circle implements SceneObject {
   x: number;
@@ -53,26 +46,18 @@ export class Circle implements SceneObject {
     this.radius = radius;
   }
 
-  frame(_time: number): Partial<Frame> {
+  frame(_time: number): FrameNode[] {
     const shape: CircleShape = {
       type: "circle",
       center: { x: this.x, y: this.y },
       radius: this.radius,
     };
-    return { shapes: [shape] };
+    return [shape];
   }
 }
 
 /**
  * Line - a line from start to end position.
- *
- * Usage:
- *   const line = new Line(10, 10, 90, 90);
- *   scene.add(line);
- *   line.x2 = 80; // move end point
- *
- *   // Or use fromOffset for relative positioning:
- *   const line2 = Line.fromOffset(10, 10, 80, 80);
  */
 export class Line implements SceneObject {
   x1: number;
@@ -87,50 +72,42 @@ export class Line implements SceneObject {
     this.y2 = y2;
   }
 
-  /** Create a line from start position with offset */
   static fromOffset(x: number, y: number, dx: number, dy: number): Line {
     return new Line(x, y, x + dx, y + dy);
   }
 
-  frame(_time: number): Partial<Frame> {
+  frame(_time: number): FrameNode[] {
     const shape: LineShape = {
       type: "line",
       start: { x: this.x1, y: this.y1 },
       end: { x: this.x2, y: this.y2 },
     };
-    return { shapes: [shape] };
+    return [shape];
   }
 }
 
 /**
  * Scene - the root container and generator for object-oriented scenes.
- *
- * Create a Scene, optionally add a Background and other children.
- * The Scene implements Generator so it can be passed directly to renderers.
- *
- * Usage:
- *   const scene = new Scene();
- *   scene.setBackground(new Background("#ff0000"));
- *   // or
- *   const bg = new Background("#ff0000");
- *   scene.add(bg);
+ * Builds a Material-based tree from its children.
  */
 export class Scene implements Generator {
   private _background: Background | null = null;
   private children: SceneObject[] = [];
 
-  /** Get the current background (may be null) */
+  // Default material properties
+  fill = "#000000";
+  stroke = "#000000";
+  strokeWidth = 1;
+
   get background(): Background | null {
     return this._background;
   }
 
-  /** Set the background (convenience method) */
   setBackground(bg: Background | null): this {
     this._background = bg;
     return this;
   }
 
-  /** Add a generic scene object */
   add(child: SceneObject): this {
     if (child instanceof Background) {
       this._background = child;
@@ -140,7 +117,6 @@ export class Scene implements Generator {
     return this;
   }
 
-  /** Remove a scene object */
   remove(child: SceneObject): this {
     if (child === this._background) {
       this._background = null;
@@ -153,38 +129,26 @@ export class Scene implements Generator {
     return this;
   }
 
-  /**
-   * Generate a frame by traversing the scene tree.
-   * Merges frame data from background and all children.
-   * Shapes arrays are concatenated, other properties are overwritten.
-   */
   frame(time: number): Frame {
-    const result: Frame = {};
-    const allShapes: Shape[] = [];
-
-    // Apply background first
-    if (this._background) {
-      const bgFrame = this._background.frame(time);
-      if (bgFrame.backgroundColor) {
-        result.backgroundColor = bgFrame.backgroundColor;
-      }
-    }
-
-    // Apply children in order, collecting shapes
+    // Collect shapes from all children
+    const allShapes: FrameNode[] = [];
     for (const child of this.children) {
-      const childFrame = child.frame(time);
-      if (childFrame.backgroundColor) {
-        result.backgroundColor = childFrame.backgroundColor;
-      }
-      if (childFrame.shapes) {
-        allShapes.push(...childFrame.shapes);
-      }
+      allShapes.push(...child.frame(time));
     }
 
-    if (allShapes.length > 0) {
-      result.shapes = allShapes;
-    }
+    // Build root material with all shapes as children
+    const root: RootMaterial = {
+      type: "material",
+      id: "root",
+      fill: this.fill,
+      stroke: this.stroke,
+      strokeWidth: this.strokeWidth,
+      children: allShapes,
+    };
 
-    return result;
+    // Get background color
+    const backgroundColor = this._background?.color;
+
+    return { backgroundColor, root };
   }
 }

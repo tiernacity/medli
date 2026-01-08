@@ -22,7 +22,17 @@ describe("CanvasRenderer", () => {
     } as unknown as HTMLCanvasElement;
 
     mockGenerator = {
-      frame: jest.fn().mockReturnValue({ backgroundColor: "#ff0000" }),
+      frame: jest.fn().mockReturnValue({
+        backgroundColor: "#ff0000",
+        root: {
+          type: "material",
+          id: "root",
+          fill: "#000000",
+          stroke: "#000000",
+          strokeWidth: 1,
+          children: [],
+        },
+      }),
     };
   });
 

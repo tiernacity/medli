@@ -1,5 +1,4 @@
-import { Scene, Background, SceneObject } from "../index";
-import type { Frame } from "@medli/spec";
+import { Scene, Background, Circle } from "../index";
 
 describe("Scene", () => {
   it("should return empty frame with no background", () => {
@@ -64,44 +63,39 @@ describe("Background", () => {
 
   it("should implement SceneObject interface", () => {
     const bg = new Background("#ff0000");
-    const partial = bg.frame(0);
-    expect(partial.backgroundColor).toBe("#ff0000");
+    const nodes = bg.frame(0);
+    // Background returns empty array - its color is read directly by Scene
+    expect(nodes).toEqual([]);
   });
 });
 
 describe("SceneObject integration", () => {
-  it("should merge frame data from children", () => {
-    // Custom scene object for testing
-    class TestObject implements SceneObject {
-      frame(_time: number): Partial<Frame> {
-        return { backgroundColor: "#0000ff" };
-      }
-    }
-
+  it("should collect shapes from children", () => {
     const scene = new Scene();
-    scene.setBackground(new Background("#ff0000"));
-    scene.add(new TestObject());
+    scene.add(new Circle(50, 50, 10));
 
-    // Child overwrites background
     const frame = scene.frame(0);
-    expect(frame.backgroundColor).toBe("#0000ff");
+    // Frame has root material with circle as child
+    expect(frame.root.children.length).toBe(1);
+    expect(frame.root.children[0]).toEqual({
+      type: "circle",
+      center: { x: 50, y: 50 },
+      radius: 10,
+    });
   });
 
-  it("should apply children in order", () => {
-    class ColorObject implements SceneObject {
-      constructor(private color: string) {}
-      frame(_time: number): Partial<Frame> {
-        return { backgroundColor: this.color };
-      }
-    }
-
+  it("should collect shapes from multiple children in order", () => {
     const scene = new Scene();
-    scene.add(new ColorObject("#ff0000"));
-    scene.add(new ColorObject("#00ff00"));
-    scene.add(new ColorObject("#0000ff"));
+    scene.add(new Circle(10, 10, 5));
+    scene.add(new Circle(90, 90, 5));
 
-    // Last child wins
     const frame = scene.frame(0);
-    expect(frame.backgroundColor).toBe("#0000ff");
+    expect(frame.root.children.length).toBe(2);
+    expect((frame.root.children[0] as { center: { x: number } }).center.x).toBe(
+      10
+    );
+    expect((frame.root.children[1] as { center: { x: number } }).center.x).toBe(
+      90
+    );
   });
 });
