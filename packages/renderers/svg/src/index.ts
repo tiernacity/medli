@@ -11,6 +11,7 @@ import { BaseRenderer } from "@medli/renderer-common";
 
 export class SvgRenderer extends BaseRenderer {
   private element: SVGSVGElement;
+  private rootGroup: SVGGElement;
   private rect: SVGRectElement;
   private shapeElements: SVGElement[] = [];
 
@@ -18,16 +19,16 @@ export class SvgRenderer extends BaseRenderer {
     super(generator);
     this.element = element;
 
-    // Set up 100x100 viewport
-    this.element.setAttribute("width", "100");
-    this.element.setAttribute("height", "100");
-    this.element.setAttribute("viewBox", "0 0 100 100");
+    // Create root group for Y-flip transform (converts Y-up to SVG's Y-down)
+    this.rootGroup = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "g"
+    );
+    this.element.appendChild(this.rootGroup);
 
-    // Create the background rect
+    // Create the background rect (inside rootGroup)
     this.rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-    this.rect.setAttribute("width", "100");
-    this.rect.setAttribute("height", "100");
-    this.element.appendChild(this.rect);
+    this.rootGroup.appendChild(this.rect);
   }
 
   render(time: number = 0): void {
@@ -40,6 +41,31 @@ export class SvgRenderer extends BaseRenderer {
       return;
     }
 
+    // Configure viewport from frame
+    const vp = frame.viewport;
+
+    // Set viewBox with center origin
+    this.element.setAttribute(
+      "viewBox",
+      `${-vp.halfWidth} ${-vp.halfHeight} ${vp.halfWidth * 2} ${vp.halfHeight * 2}`
+    );
+
+    // Map scaleMode to preserveAspectRatio
+    const preserveAspectRatio = {
+      fit: "xMidYMid meet",
+      fill: "xMidYMid slice",
+      stretch: "none",
+    }[vp.scaleMode];
+    this.element.setAttribute("preserveAspectRatio", preserveAspectRatio);
+
+    // Apply Y-flip to root group (converts Y-up to SVG's Y-down)
+    this.rootGroup.setAttribute("transform", "scale(1, -1)");
+
+    // Position background rect in viewport coords
+    this.rect.setAttribute("x", String(-vp.halfWidth));
+    this.rect.setAttribute("y", String(-vp.halfHeight));
+    this.rect.setAttribute("width", String(vp.halfWidth * 2));
+    this.rect.setAttribute("height", String(vp.halfHeight * 2));
     this.rect.setAttribute("fill", frame.backgroundColor ?? "#ffffff");
 
     // Clear previous shape elements
@@ -49,7 +75,7 @@ export class SvgRenderer extends BaseRenderer {
     this.shapeElements = [];
 
     // Traverse material tree and render shapes
-    this.renderNode(frame.root, [frame.root], this.element);
+    this.renderNode(frame.root, [frame.root], this.rootGroup);
   }
 
   private renderNode(

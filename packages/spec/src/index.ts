@@ -106,10 +106,35 @@ export type ResolvedMaterial = {
 };
 
 /**
+ * Scale mode for mapping viewport to element.
+ * - 'fit': Uniform scale to fit, letterbox/pillarbox empty space
+ * - 'fill': Uniform scale to fill, crop content outside element
+ * - 'stretch': Non-uniform scale to exactly fill (distorts aspect ratio)
+ */
+export type ScaleMode = "fit" | "fill" | "stretch";
+
+/**
+ * Viewport defines the logical coordinate space for rendering.
+ * Origin is at center (0,0) with Y-up convention.
+ * X ranges from -halfWidth to +halfWidth.
+ * Y ranges from -halfHeight to +halfHeight.
+ */
+export type Viewport = {
+  /** Half the viewport width. X ranges from -halfWidth to +halfWidth. */
+  halfWidth: number;
+  /** Half the viewport height. Y ranges from -halfHeight to +halfHeight. */
+  halfHeight: number;
+  /** How viewport maps to differently-sized elements. */
+  scaleMode: ScaleMode;
+};
+
+/**
  * A frame represents the current state to render.
  * Contains a Material-based tree where root has all style properties defined.
  */
 export type Frame = {
+  /** Viewport configuration (required). */
+  viewport: Viewport;
   backgroundColor?: string;
   root: RootMaterial;
 };
@@ -127,6 +152,37 @@ export type ValidationResult =
  * Single-pass, top-to-bottom traversal.
  */
 export function validateFrame(frame: Frame): ValidationResult {
+  // Validate viewport
+  if (!frame.viewport) {
+    return { valid: false, error: "Frame missing required property: viewport" };
+  }
+  if (
+    typeof frame.viewport.halfWidth !== "number" ||
+    frame.viewport.halfWidth <= 0 ||
+    !isFinite(frame.viewport.halfWidth)
+  ) {
+    return {
+      valid: false,
+      error: "Viewport halfWidth must be a positive finite number",
+    };
+  }
+  if (
+    typeof frame.viewport.halfHeight !== "number" ||
+    frame.viewport.halfHeight <= 0 ||
+    !isFinite(frame.viewport.halfHeight)
+  ) {
+    return {
+      valid: false,
+      error: "Viewport halfHeight must be a positive finite number",
+    };
+  }
+  if (!["fit", "fill", "stretch"].includes(frame.viewport.scaleMode)) {
+    return {
+      valid: false,
+      error: "Viewport scaleMode must be 'fit', 'fill', or 'stretch'",
+    };
+  }
+
   // Validate root has all required properties
   const root = frame.root;
   if (root.fill === undefined) {
@@ -248,7 +304,8 @@ export interface Generator {
 
 /**
  * Renderer displays frames to the screen.
- * Renders a 100x100 square of the background color.
+ * Renders content in the Frame's viewport coordinate system.
+ * Queries element size on each render and maps viewport to element based on scaleMode.
  * Constructors accept HTML elements of the relevant type.
  * Expects requestAnimationFrame support.
  */

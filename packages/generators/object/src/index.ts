@@ -8,6 +8,7 @@ import type {
   FrameNode,
   Matrix2D,
   Transform,
+  Viewport,
 } from "@medli/spec";
 
 // ============================================================================
@@ -410,10 +411,17 @@ export class Scene implements Generator {
   private _background: Background | null = null;
   private children: SceneObject[] = [];
 
+  /** Viewport configuration (required). */
+  viewport: Viewport;
+
   // Default material properties (used for root material)
   fill = "#000000";
   stroke = "#000000";
   strokeWidth = 1;
+
+  constructor(viewport: Viewport) {
+    this.viewport = viewport;
+  }
 
   get background(): Background | null {
     return this._background;
@@ -600,6 +608,10 @@ export class Scene implements Generator {
     // Get background color
     const backgroundColor = this._background?.color;
 
-    return { backgroundColor, root };
+    return {
+      viewport: this.viewport,
+      backgroundColor,
+      root,
+    };
   }
 }
