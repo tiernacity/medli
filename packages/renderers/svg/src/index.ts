@@ -4,6 +4,7 @@ import type {
   FrameNode,
   Material,
   ResolvedMaterial,
+  Transform,
 } from "@medli/spec";
 import { validateFrame, resolveMaterial } from "@medli/spec";
 import { BaseRenderer } from "@medli/renderer-common";
@@ -48,18 +49,40 @@ export class SvgRenderer extends BaseRenderer {
     this.shapeElements = [];
 
     // Traverse material tree and render shapes
-    this.renderNode(frame.root, [frame.root]);
+    this.renderNode(frame.root, [frame.root], this.element);
   }
 
-  private renderNode(node: FrameNode, ancestors: Material[]): void {
+  private renderNode(
+    node: FrameNode,
+    ancestors: Material[],
+    parent: SVGElement
+  ): void {
     if (node.type === "material") {
       // Material node - recurse into children with updated ancestors
       const material = node as Material;
       for (const child of material.children) {
         if (child.type === "material") {
-          this.renderNode(child, [...ancestors, child as Material]);
+          this.renderNode(child, [...ancestors, child as Material], parent);
         } else {
-          this.renderNode(child, ancestors);
+          this.renderNode(child, ancestors, parent);
+        }
+      }
+    } else if (node.type === "transform") {
+      // Transform node - create a group with the transform matrix
+      const transform = node as Transform;
+      const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      const [a, b, c, d, e, f] = transform.matrix;
+      group.setAttribute("transform", `matrix(${a},${b},${c},${d},${e},${f})`);
+      parent.appendChild(group);
+      this.shapeElements.push(group);
+
+      // Recurse into children with the group as parent
+      // Material ancestors continue through transforms unchanged
+      for (const child of transform.children) {
+        if (child.type === "material") {
+          this.renderNode(child, [...ancestors, child as Material], group);
+        } else {
+          this.renderNode(child, ancestors, group);
         }
       }
     } else {
@@ -67,7 +90,7 @@ export class SvgRenderer extends BaseRenderer {
       const resolved = resolveMaterial(ancestors);
       const el = this.renderShape(node, resolved);
       if (el) {
-        this.element.appendChild(el);
+        parent.appendChild(el);
         this.shapeElements.push(el);
       }
     }

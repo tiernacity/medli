@@ -1,5 +1,5 @@
 import { ProceduralGenerator, Sketch } from "../index";
-import type { ChildMaterial, RootMaterial } from "@medli/spec";
+import type { ChildMaterial, RootMaterial, Transform } from "@medli/spec";
 
 describe("ProceduralGenerator", () => {
   it("should return default black background when draw does nothing", () => {
@@ -452,6 +452,210 @@ describe("Material output", () => {
     it("should provide pop function", () => {
       const generator = new ProceduralGenerator((p: Sketch) => {
         expect(typeof (p as unknown as { pop: unknown }).pop).toBe("function");
+      });
+      generator.frame(0);
+    });
+  });
+});
+
+describe("Transform output", () => {
+  describe("translate()", () => {
+    it("should wrap shape in Transform node with translation matrix", () => {
+      const generator = new ProceduralGenerator((p) => {
+        p.translate(10, 20);
+        p.circle(0, 0, 5);
+      });
+      const frame = generator.frame(0);
+
+      // Find the circle wrapped in a transform
+      const childMaterial = frame.root.children[0] as ChildMaterial;
+      const transformNode = childMaterial.children[0] as Transform;
+
+      expect(transformNode.type).toBe("transform");
+      // Translation matrix: [1, 0, 0, 1, x, y]
+      expect(transformNode.matrix).toEqual([1, 0, 0, 1, 10, 20]);
+      expect(transformNode.children[0].type).toBe("circle");
+    });
+
+    it("should not create Transform node when no transforms applied", () => {
+      const generator = new ProceduralGenerator((p) => {
+        p.circle(10, 10, 5);
+      });
+      const frame = generator.frame(0);
+
+      // Shape should be directly in the material, not wrapped in Transform
+      const childMaterial = frame.root.children[0] as ChildMaterial;
+      expect(childMaterial.children[0].type).toBe("circle");
+    });
+
+    it("should accumulate multiple translate() calls", () => {
+      const generator = new ProceduralGenerator((p) => {
+        p.translate(10, 20);
+        p.translate(5, 10);
+        p.circle(0, 0, 5);
+      });
+      const frame = generator.frame(0);
+
+      const childMaterial = frame.root.children[0] as ChildMaterial;
+      const transformNode = childMaterial.children[0] as Transform;
+
+      // Accumulated: translate(10,20) then translate(5,10) = translate(15,30)
+      expect(transformNode.matrix).toEqual([1, 0, 0, 1, 15, 30]);
+    });
+  });
+
+  describe("rotate()", () => {
+    it("should wrap shape in Transform node with rotation matrix", () => {
+      const generator = new ProceduralGenerator((p) => {
+        p.rotate(Math.PI / 2); // 90 degrees
+        p.circle(0, 0, 5);
+      });
+      const frame = generator.frame(0);
+
+      const childMaterial = frame.root.children[0] as ChildMaterial;
+      const transformNode = childMaterial.children[0] as Transform;
+
+      expect(transformNode.type).toBe("transform");
+      // Rotation matrix for 90 degrees: [cos, sin, -sin, cos, 0, 0]
+      // cos(90°) ≈ 0, sin(90°) = 1
+      expect(transformNode.matrix[0]).toBeCloseTo(0); // cos
+      expect(transformNode.matrix[1]).toBeCloseTo(1); // sin
+      expect(transformNode.matrix[2]).toBeCloseTo(-1); // -sin
+      expect(transformNode.matrix[3]).toBeCloseTo(0); // cos
+      expect(transformNode.matrix[4]).toBe(0);
+      expect(transformNode.matrix[5]).toBe(0);
+    });
+  });
+
+  describe("scale()", () => {
+    it("should wrap shape in Transform node with uniform scale matrix", () => {
+      const generator = new ProceduralGenerator((p) => {
+        p.scale(2);
+        p.circle(0, 0, 5);
+      });
+      const frame = generator.frame(0);
+
+      const childMaterial = frame.root.children[0] as ChildMaterial;
+      const transformNode = childMaterial.children[0] as Transform;
+
+      expect(transformNode.type).toBe("transform");
+      // Uniform scale matrix: [sx, 0, 0, sy, 0, 0]
+      expect(transformNode.matrix).toEqual([2, 0, 0, 2, 0, 0]);
+    });
+
+    it("should wrap shape in Transform node with non-uniform scale matrix", () => {
+      const generator = new ProceduralGenerator((p) => {
+        p.scale(2, 3);
+        p.circle(0, 0, 5);
+      });
+      const frame = generator.frame(0);
+
+      const childMaterial = frame.root.children[0] as ChildMaterial;
+      const transformNode = childMaterial.children[0] as Transform;
+
+      expect(transformNode.type).toBe("transform");
+      expect(transformNode.matrix).toEqual([2, 0, 0, 3, 0, 0]);
+    });
+  });
+
+  describe("Combined transforms", () => {
+    it("should compose translate then scale correctly", () => {
+      const generator = new ProceduralGenerator((p) => {
+        p.translate(10, 20);
+        p.scale(2);
+        p.circle(0, 0, 5);
+      });
+      const frame = generator.frame(0);
+
+      const childMaterial = frame.root.children[0] as ChildMaterial;
+      const transformNode = childMaterial.children[0] as Transform;
+
+      // translate(10,20) * scale(2,2) = [2, 0, 0, 2, 10, 20]
+      // Matrix multiplication: new = current * transform
+      expect(transformNode.matrix).toEqual([2, 0, 0, 2, 10, 20]);
+    });
+
+    it("should compose scale then translate correctly", () => {
+      const generator = new ProceduralGenerator((p) => {
+        p.scale(2);
+        p.translate(10, 20);
+        p.circle(0, 0, 5);
+      });
+      const frame = generator.frame(0);
+
+      const childMaterial = frame.root.children[0] as ChildMaterial;
+      const transformNode = childMaterial.children[0] as Transform;
+
+      // scale(2,2) * translate(10,20)
+      // Translation is scaled: e' = 2*10 = 20, f' = 2*20 = 40
+      expect(transformNode.matrix).toEqual([2, 0, 0, 2, 20, 40]);
+    });
+  });
+
+  describe("Transform with push/pop", () => {
+    it("should save and restore transform state with push/pop", () => {
+      const generator = new ProceduralGenerator((p) => {
+        p.translate(10, 0);
+        p.push();
+        p.translate(5, 0);
+        p.circle(0, 0, 5); // Should have translate(15, 0)
+        p.pop();
+        p.circle(0, 0, 5); // Should have translate(10, 0)
+      });
+      const frame = generator.frame(0);
+
+      // First child is the pushed context material
+      const pushedMaterial = frame.root.children[0] as ChildMaterial;
+      const pushedTransform = pushedMaterial.children[0] as Transform;
+      expect(pushedTransform.type).toBe("transform");
+      expect(pushedTransform.matrix).toEqual([1, 0, 0, 1, 15, 0]);
+
+      // Second child is the circle after pop (wrapped in material)
+      const afterPopMaterial = frame.root.children[1] as ChildMaterial;
+      const afterPopTransform = afterPopMaterial.children[0] as Transform;
+      expect(afterPopTransform.type).toBe("transform");
+      expect(afterPopTransform.matrix).toEqual([1, 0, 0, 1, 10, 0]);
+    });
+
+    it("should allow independent transforms in nested push/pop", () => {
+      const generator = new ProceduralGenerator((p) => {
+        p.push();
+        p.translate(100, 0);
+        p.circle(0, 0, 5);
+        p.pop();
+        p.circle(0, 0, 5); // No transform
+      });
+      const frame = generator.frame(0);
+
+      // First child is pushed context with translated circle
+      const pushedMaterial = frame.root.children[0] as ChildMaterial;
+      const pushedTransform = pushedMaterial.children[0] as Transform;
+      expect(pushedTransform.matrix).toEqual([1, 0, 0, 1, 100, 0]);
+
+      // Second child has no transform (directly a circle, not wrapped in Transform)
+      const afterPopMaterial = frame.root.children[1] as ChildMaterial;
+      expect(afterPopMaterial.children[0].type).toBe("circle");
+    });
+  });
+
+  describe("Sketch interface for transforms", () => {
+    it("should provide translate function", () => {
+      const generator = new ProceduralGenerator((p: Sketch) => {
+        expect(typeof p.translate).toBe("function");
+      });
+      generator.frame(0);
+    });
+
+    it("should provide rotate function", () => {
+      const generator = new ProceduralGenerator((p: Sketch) => {
+        expect(typeof p.rotate).toBe("function");
+      });
+      generator.frame(0);
+    });
+
+    it("should provide scale function", () => {
+      const generator = new ProceduralGenerator((p: Sketch) => {
+        expect(typeof p.scale).toBe("function");
       });
       generator.frame(0);
     });

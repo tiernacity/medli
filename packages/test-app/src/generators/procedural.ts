@@ -4,19 +4,17 @@
  * p5.js-style API where you define a draw function that runs each frame.
  * The draw function receives a sketch context with procedural functions.
  *
- * This test pattern exercises the material system:
- * - Multiple fill colors (red, green, blue)
- * - Multiple stroke colors (yellow, cyan)
- * - Multiple stroke widths (2, 4)
- * - push/pop nesting for style isolation
- * - Style inheritance verification
+ * This test pattern exercises:
+ * - Material system (fill, stroke, strokeWidth, push/pop)
+ * - Transform system (translate, rotate, scale)
+ * - Composition of transforms with push/pop state management
  */
 import { ProceduralGenerator } from "@medli/generator-procedural";
 
 // Mutable state that the draw function will read
 let currentColor = "#1a1a2e";
 
-// Create generator with a draw function that exercises material features
+// Create generator with a draw function that exercises material and transform features
 export const generator = new ProceduralGenerator((p) => {
   p.background(currentColor);
 
@@ -78,18 +76,82 @@ export const generator = new ProceduralGenerator((p) => {
   p.lineOffset(90, 90, -30, 0); // Bottom edge
   p.lineOffset(60, 90, 0, -30); // Left edge
 
-  // === Section 5: Additional nested context to verify deep nesting ===
+  // === Section 5: Transform demonstration ===
+  // Draw a shape at center, then use transforms to draw rotated copies
   p.push();
   p.fill("#ff6b6b"); // Coral/light red
   p.stroke("#ffffff"); // White stroke
   p.strokeWidth(1);
 
-  // Small circle in the center
+  // Original small circle in the center (no transform)
   p.circle(50, 50, 8);
 
-  // Cross through center
+  // Cross through center (no transform)
   p.line(42, 50, 58, 50);
   p.line(50, 42, 50, 58);
+
+  p.pop();
+
+  // === Section 6: Translate transform ===
+  // Draw a shape translated from origin
+  p.push();
+  p.fill("#9b59b6"); // Purple
+  p.stroke("#ffffff"); // White stroke
+  p.strokeWidth(1);
+
+  // Translate to position (15, 15) and draw a small circle at origin
+  // Visual result: circle appears at (15, 15)
+  p.translate(15, 15);
+  p.circle(0, 0, 5);
+
+  p.pop();
+
+  // === Section 7: Rotate transform ===
+  // Draw a rotated line pattern
+  p.push();
+  p.fill("#f39c12"); // Orange
+  p.stroke("#f39c12"); // Orange stroke
+  p.strokeWidth(2);
+
+  // Translate to center of top-right area, rotate 45 degrees, draw line
+  // The line is drawn from (-8,0) to (8,0) in local space
+  // After rotation: appears as diagonal line
+  p.translate(75, 25);
+  p.rotate(Math.PI / 4); // 45 degrees
+  p.line(-8, -8, 8, 8); // Diagonal in local space becomes different diagonal after rotation
+
+  p.pop();
+
+  // === Section 8: Scale transform ===
+  // Draw a scaled circle
+  p.push();
+  p.fill("#1abc9c"); // Teal
+  p.stroke("#ffffff"); // White stroke
+  p.strokeWidth(1);
+
+  // Translate to bottom area, scale by 0.5, draw a circle
+  // Circle of radius 10 at origin appears as radius 5 circle at (85, 85)
+  p.translate(85, 85);
+  p.scale(0.5);
+  p.circle(0, 0, 10); // Appears as radius 5
+
+  p.pop();
+
+  // === Section 9: Combined transforms (translate + rotate) ===
+  // Draw a rotated shape at a specific position
+  p.push();
+  p.fill("#e74c3c"); // Red
+  p.stroke("#ffffff"); // White stroke
+  p.strokeWidth(1);
+
+  // Position at (15, 85), rotate 30 degrees, draw cross
+  // This tests transform composition
+  p.translate(15, 85);
+  p.rotate(Math.PI / 6); // 30 degrees
+
+  // Draw a small cross at local origin
+  p.line(-5, 0, 5, 0);
+  p.line(0, -5, 0, 5);
 
   p.pop();
 });

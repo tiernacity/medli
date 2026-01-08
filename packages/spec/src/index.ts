@@ -68,9 +68,32 @@ export type ChildMaterial = {
 export type Material = RootMaterial | ChildMaterial;
 
 /**
- * A node in the frame tree - either a material (with children) or a shape (leaf).
+ * 2D affine transformation matrix as 6 values [a, b, c, d, e, f].
+ * Represents:
+ * | a  c  e |
+ * | b  d  f |
+ * | 0  0  1 |
+ *
+ * Point (x, y) transforms to (ax + cy + e, bx + dy + f).
+ * Identity matrix: [1, 0, 0, 1, 0, 0]
  */
-export type FrameNode = Material | Shape;
+export type Matrix2D = [number, number, number, number, number, number];
+
+/**
+ * A transform node applying a 2D affine transformation to its children.
+ * Transforms accumulate via matrix multiplication during traversal.
+ * To express identity, simply omit the Transform node entirely.
+ */
+export type Transform = {
+  type: "transform";
+  matrix: Matrix2D;
+  children: FrameNode[];
+};
+
+/**
+ * A node in the frame tree - material (style), transform (geometry), or shape (leaf).
+ */
+export type FrameNode = Material | Transform | Shape;
 
 /**
  * Resolved material with all properties defined.
@@ -153,6 +176,28 @@ export function validateFrame(frame: Frame): ValidationResult {
       newAncestors.add(node.id);
       for (const child of node.children) {
         const result = validateNode(child, newAncestors);
+        if (!result.valid) return result;
+      }
+    } else if (node.type === "transform") {
+      // Validate matrix has exactly 6 numbers
+      if (node.matrix.length !== 6) {
+        return {
+          valid: false,
+          error: `Transform matrix must have exactly 6 values, got ${node.matrix.length}`,
+        };
+      }
+      for (let i = 0; i < node.matrix.length; i++) {
+        if (typeof node.matrix[i] !== "number" || !isFinite(node.matrix[i])) {
+          return {
+            valid: false,
+            error: `Transform matrix[${i}] must be a finite number`,
+          };
+        }
+      }
+
+      // Recurse into children (transforms don't affect material ancestor tracking)
+      for (const child of node.children) {
+        const result = validateNode(child, ancestorIds);
         if (!result.valid) return result;
       }
     }
