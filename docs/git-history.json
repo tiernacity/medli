@@ -1,5 +1,13 @@
 [
   {
+    "hash": "6c3daecc10c1d68b0c0df0de5637e0b239a139cf",
+    "short_hash": "6c3daec",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T14:49:05Z",
+    "message": "docs: restructure agent instructions for minimal context usage\n\n- Reduce agents.toml from 264 to 38 lines (dispatch table only)\n- Add docs/ARCHITECTURE.md for cross-cutting concerns (83 lines)\n- Add AGENT.md to each package with strong directive instructions\n- Update CLAUDE.md Sub-Agents section for new workflow\n\nStructure:\n- agents.toml: patterns, brief, reading_list per package\n- ARCHITECTURE.md: Frame IR, API vs IR distinction, parity requirements\n- AGENT.md: \"Your job is to be opinionated...\", constraints, review checklist\n\nTask agents now read their reading_list files instead of receiving\nverbose inline instructions, reducing main conversation context.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 12
+  },
+  {
     "hash": "1c769929434697ac59b6dbffa723a09e53f4e649",
     "short_hash": "1c76992",
     "author": "Chris Tierney",
