@@ -3,6 +3,7 @@ import type {
   Generator,
   Shape,
   Circle as CircleShape,
+  Line as LineShape,
 } from "@medli/spec";
 
 /**
@@ -57,6 +58,45 @@ export class Circle implements SceneObject {
       type: "circle",
       center: { x: this.x, y: this.y },
       radius: this.radius,
+    };
+    return { shapes: [shape] };
+  }
+}
+
+/**
+ * Line - a line from start to end position.
+ *
+ * Usage:
+ *   const line = new Line(10, 10, 90, 90);
+ *   scene.add(line);
+ *   line.x2 = 80; // move end point
+ *
+ *   // Or use fromOffset for relative positioning:
+ *   const line2 = Line.fromOffset(10, 10, 80, 80);
+ */
+export class Line implements SceneObject {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+
+  constructor(x1: number, y1: number, x2: number, y2: number) {
+    this.x1 = x1;
+    this.y1 = y1;
+    this.x2 = x2;
+    this.y2 = y2;
+  }
+
+  /** Create a line from start position with offset */
+  static fromOffset(x: number, y: number, dx: number, dy: number): Line {
+    return new Line(x, y, x + dx, y + dy);
+  }
+
+  frame(_time: number): Partial<Frame> {
+    const shape: LineShape = {
+      type: "line",
+      start: { x: this.x1, y: this.y1 },
+      end: { x: this.x2, y: this.y2 },
     };
     return { shapes: [shape] };
   }

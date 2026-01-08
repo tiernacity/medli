@@ -15,15 +15,25 @@ export type Position = {
  * Rendered as black (no color support yet).
  */
 export type Circle = {
-  type: 'circle';
+  type: "circle";
   center: Position;
   radius: number;
 };
 
 /**
+ * A line shape from start to end position.
+ * Rendered as black with 5px stroke width (no color support yet).
+ */
+export type Line = {
+  type: "line";
+  start: Position;
+  end: Position;
+};
+
+/**
  * Union of all shape types.
  */
-export type Shape = Circle;
+export type Shape = Circle | Line;
 
 /**
  * A frame represents the current state to render.

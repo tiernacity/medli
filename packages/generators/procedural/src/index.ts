@@ -1,4 +1,4 @@
-import type { Frame, Generator, Shape, Circle } from "@medli/spec";
+import type { Frame, Generator, Shape, Circle, Line } from "@medli/spec";
 
 /**
  * Sketch context - provides procedural drawing functions.
@@ -12,6 +12,12 @@ export interface Sketch {
 
   /** Draw a circle at (x, y) with given radius */
   circle(x: number, y: number, radius: number): void;
+
+  /** Draw a line from (x1, y1) to (x2, y2) */
+  line(x1: number, y1: number, x2: number, y2: number): void;
+
+  /** Draw a line from (x, y) with offset (dx, dy) */
+  lineOffset(x: number, y: number, dx: number, dy: number): void;
 
   /** Current time in milliseconds (from requestAnimationFrame) */
   readonly time: number;
@@ -60,6 +66,22 @@ export class ProceduralGenerator implements Generator {
           radius,
         };
         shapes.push(circleShape);
+      },
+      line(x1: number, y1: number, x2: number, y2: number) {
+        const lineShape: Line = {
+          type: "line",
+          start: { x: x1, y: y1 },
+          end: { x: x2, y: y2 },
+        };
+        shapes.push(lineShape);
+      },
+      lineOffset(x: number, y: number, dx: number, dy: number) {
+        const lineShape: Line = {
+          type: "line",
+          start: { x, y },
+          end: { x: x + dx, y: y + dy },
+        };
+        shapes.push(lineShape);
       },
       time,
     };

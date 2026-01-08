@@ -221,56 +221,114 @@ All generator and renderer packages depend on `@medli/spec`.
 
 ## Sub-Agents: Domain-Specific Context
 
-**THIS IS MANDATORY. Use the correct sub-agent when working on a package.**
+**THIS IS MANDATORY. ALL file edits MUST be performed via Task agents.**
 
 Sub-agents are defined in `.claude/agents.toml`. Each agent provides domain-specific context, constraints, and instructions for its package.
 
-### Why Sub-Agents Matter
+### ⚠️ CRITICAL: Sub-Agents for ALL File Edits
 
-- **Reduced context overhead**: Focus on relevant files rather than the entire codebase
-- **Domain expertise**: Each agent contains instructions tailored to its specific technology area (p5.js patterns, three.js patterns, SVG APIs, Canvas APIs)
-- **Parallel work**: Multiple agents can simultaneously work on different packages without interference
-- **Consistency**: Similar patterns get applied uniformly within each domain
+**NEVER edit files directly in the main conversation.** Instead:
 
-### How to Use Sub-Agents
+1. **Spawn a Task agent** for each package you need to modify
+2. **Include the agent's instructions** from `.claude/agents.toml` in the Task prompt
+3. **Run agents in parallel** when editing multiple independent packages
 
-1. **Identify the domain** by checking which package the work touches against file patterns in `.claude/agents.toml`
+This is required because:
+- **Context control**: Long-running activities benefit from scoped context per package
+- **Domain expertise**: Each agent has specific knowledge (p5.js patterns, three.js patterns, SVG APIs, Canvas APIs)
+- **Parallel execution**: Multiple packages can be modified simultaneously
+- **Consistency**: Domain-specific rules are applied uniformly
 
-2. **Include the sub-agent context** when spawning a Task for exploration or implementation work
+### File Edit Workflow
 
-3. **Scope file searches** to the relevant patterns associated with that domain
+**Step 1: Identify affected packages**
 
-**Example:** When spawning a Task for procedural generator work, include context like:
+For a feature like "add lines", determine which packages need changes:
+- `spec` - Add Line type
+- `generator-procedural` - Add line() method
+- `generator-object` - Add Line class
+- `renderer-svg` - Add line rendering
+- `renderer-canvas` - Add line rendering
+- `test-app` - Update examples
+
+**Step 2: Spawn Task agents for each package**
+
+Use `subagent_type: "general-purpose"` and include the agent context:
 
 ```
-Working on packages/generators/procedural/...
+# Example Task prompt for generator-procedural:
 
-This is the generator-procedural domain. Key context:
+Working on packages/generators/procedural/
+
+AGENT CONTEXT (from agents.toml):
 - INSPIRATION: p5.js
 - Pattern: imperative sketch with draw function called every frame
 - Sketch interface is the user-facing API
-- State resets each frame
+- When adding primitives: add method to Sketch interface, store call data, include in Frame
+
+TASK: Add line() and lineOffset() methods to the Sketch interface.
+- line(x1, y1, x2, y2) draws from start to end
+- lineOffset(x, y, dx, dy) draws from start with offset
+- Both create Line shapes in the Frame
+
+Edit the file and return confirmation when complete.
+```
+
+**Step 3: Run independent agents in parallel**
+
+When packages don't depend on each other's changes, spawn multiple Task agents in a SINGLE message:
+
+```
+# These can run in parallel:
+- Task 1: generator-procedural (add line methods)
+- Task 2: generator-object (add Line class)
+- Task 3: renderer-svg (add line rendering)
+- Task 4: renderer-canvas (add line rendering)
+
+# This must wait for spec changes:
+- Task 5: test-app (update examples after generators are done)
+```
+
+**Step 4: Verify after all agents complete**
+
+Run checks in the main conversation:
+```bash
+npm run typecheck && npm run lint && npm run format:check && npm run test
 ```
 
 ### When to Use Sub-Agents
 
 | Action | Requirement |
 |--------|-------------|
-| Designing changes for a package | Reference that package's agent |
-| Making edits to a package | Include agent context in Task prompts |
-| Reviewing changes to a package | Apply agent's constraints and focus areas |
+| **ANY file edit** | **MUST use Task agent with domain context** |
+| Exploring a package | Task with Explore subagent_type |
+| Multi-package feature | One Task agent PER package |
+| Verification | Main conversation (run tests, visual check) |
 
 ### Available Agents
 
-| Agent | Package | Inspiration/Focus |
-|-------|---------|-------------------|
-| `spec` | `packages/spec` | Data exchange format between generators and renderers |
-| `generator-procedural` | `packages/generators/procedural` | p5.js - imperative sketch pattern |
-| `generator-object` | `packages/generators/object` | three.js - scene graph pattern |
-| `renderer-common` | `packages/renderers/common` | Shared renderer functionality |
-| `renderer-svg` | `packages/renderers/svg` | SVG DOM rendering |
-| `renderer-canvas` | `packages/renderers/canvas` | Canvas 2D rendering |
-| `test-app` | `packages/test-app` | Visual verification with Playwright |
+| Agent | Package | File Pattern | Focus |
+|-------|---------|--------------|-------|
+| `spec` | `packages/spec` | `packages/spec/**` | Data exchange types |
+| `generator-procedural` | `packages/generators/procedural` | `packages/generators/procedural/**` | p5.js patterns |
+| `generator-object` | `packages/generators/object` | `packages/generators/object/**` | three.js patterns |
+| `renderer-common` | `packages/renderers/common` | `packages/renderers/common/**` | Shared loop logic |
+| `renderer-svg` | `packages/renderers/svg` | `packages/renderers/svg/**` | SVG DOM rendering |
+| `renderer-canvas` | `packages/renderers/canvas` | `packages/renderers/canvas/**` | Canvas 2D rendering |
+| `test-app` | `packages/test-app` | `packages/test-app/**` | Visual verification |
+
+### Example: Adding a New Primitive
+
+For a feature touching 6 packages, spawn **at least 6 Task agents**:
+
+1. **spec agent**: Add type to Frame
+2. **generator-procedural agent**: Add sketch method
+3. **generator-object agent**: Add scene object class
+4. **renderer-svg agent**: Add SVG rendering
+5. **renderer-canvas agent**: Add Canvas rendering
+6. **test-app agent**: Update examples
+
+Agents 2-5 can run in parallel after agent 1 completes (they depend on spec types).
 
 ---
 

@@ -890,6 +890,116 @@
       "created_at": "2026-01-07T17:19:54.224955+00:00",
       "updated_at": "2026-01-07T17:19:54.224955+00:00",
       "metadata_json": "{\"branch\":\"feat/circles\",\"confidence\":95}"
+    },
+    {
+      "id": 82,
+      "change_id": "a282e94b-16c5-4e6f-bda2-346672fb1e5d",
+      "node_type": "action",
+      "title": "Committed and pushed circle feature",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T09:45:24.413609+00:00",
+      "updated_at": "2026-01-08T09:45:24.413609+00:00",
+      "metadata_json": "{\"branch\":\"feat/circles\",\"commit\":\"bd6abfc\",\"confidence\":95}"
+    },
+    {
+      "id": 83,
+      "change_id": "dfc7c983-9870-42d0-933c-e6138292ef2a",
+      "node_type": "goal",
+      "title": "Add line rendering support",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T10:19:29.217251+00:00",
+      "updated_at": "2026-01-08T10:19:29.217251+00:00",
+      "metadata_json": "{\"branch\":\"feat/lines-color-and-fill\",\"confidence\":90,\"prompt\":\"Add support for rendering lines. I want two APIs in each generator: one specifies start and end positions; another specifies start position and offset (also an x,y pair). The Frame spec ONLY uses one variant: start and end. Until we support stroke color, lines will be black.\"}"
+    },
+    {
+      "id": 84,
+      "change_id": "3e7e77da-9273-499a-88e7-5c72ad21da7d",
+      "node_type": "goal",
+      "title": "Add fill color support",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T10:19:30.464839+00:00",
+      "updated_at": "2026-01-08T10:19:30.464839+00:00",
+      "metadata_json": "{\"branch\":\"feat/lines-color-and-fill\",\"confidence\":90,\"prompt\":\"Add support for fill color. I will want to discuss the options for how the Frame spec supports this. So record that a decision needs to be made, options should be developed and the choice should be agreed with me. Once complete, circles can be filled with a color.\"}"
+    },
+    {
+      "id": 85,
+      "change_id": "65837fb3-c81d-4225-9dbb-4fb2237ccf07",
+      "node_type": "goal",
+      "title": "Add stroke color support",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T10:19:31.055663+00:00",
+      "updated_at": "2026-01-08T10:19:31.055663+00:00",
+      "metadata_json": "{\"branch\":\"feat/lines-color-and-fill\",\"confidence\":90,\"prompt\":\"Add support for stroke color. In the Frame spec we will follow the same pattern that we chose for fill color. Once complete, lines will be drawn in the stroke color, and circles will have a colored border.\"}"
+    },
+    {
+      "id": 86,
+      "change_id": "5b08ae48-2ea3-4396-ad53-e0716f1a3080",
+      "node_type": "decision",
+      "title": "Choose pattern for color properties in Frame spec",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T10:19:36.527746+00:00",
+      "updated_at": "2026-01-08T10:19:36.527746+00:00",
+      "metadata_json": "{\"branch\":\"feat/lines-color-and-fill\",\"confidence\":80}"
+    },
+    {
+      "id": 87,
+      "change_id": "2442bd36-d840-4c83-ab1d-51558dd04556",
+      "node_type": "observation",
+      "title": "Stroke width not supported - using fixed 5 units/pixels",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T10:19:36.590744+00:00",
+      "updated_at": "2026-01-08T10:19:36.590744+00:00",
+      "metadata_json": "{\"branch\":\"feat/lines-color-and-fill\",\"confidence\":100}"
+    },
+    {
+      "id": 88,
+      "change_id": "d519292a-97a0-44c2-90ce-1e07864908d3",
+      "node_type": "action",
+      "title": "Implementing line rendering",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T10:20:58.408667+00:00",
+      "updated_at": "2026-01-08T10:20:58.408667+00:00",
+      "metadata_json": "{\"branch\":\"feat/lines-color-and-fill\",\"confidence\":90}"
+    },
+    {
+      "id": 89,
+      "change_id": "0c0baa3b-3f94-4502-ab83-4dbafb07dbb5",
+      "node_type": "outcome",
+      "title": "Line rendering working - all 4 renderers produce identical output",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T10:25:07.495383+00:00",
+      "updated_at": "2026-01-08T10:25:07.495383+00:00",
+      "metadata_json": "{\"branch\":\"feat/lines-color-and-fill\",\"confidence\":100}"
+    },
+    {
+      "id": 90,
+      "change_id": "d3c6d597-0ae4-480f-8c96-d72050ddeb0c",
+      "node_type": "observation",
+      "title": "File edits must use Task agents - updated CLAUDE.md with mandatory sub-agent workflow",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T10:29:43.441098+00:00",
+      "updated_at": "2026-01-08T10:29:43.441098+00:00",
+      "metadata_json": "{\"branch\":\"feat/lines-color-and-fill\",\"confidence\":100}"
+    },
+    {
+      "id": 91,
+      "change_id": "0b758e18-0754-4daf-8587-b2ca4ae5b78b",
+      "node_type": "action",
+      "title": "Committed line rendering and sub-agent workflow",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T10:32:24.308808+00:00",
+      "updated_at": "2026-01-08T10:32:24.308808+00:00",
+      "metadata_json": "{\"branch\":\"feat/lines-color-and-fill\",\"commit\":\"3816817\",\"confidence\":100}"
     }
   ],
   "edges": [
@@ -1629,6 +1739,116 @@
       "weight": 1.0,
       "rationale": "Visual verification passed",
       "created_at": "2026-01-07T17:19:54.246538+00:00"
+    },
+    {
+      "id": 68,
+      "from_node_id": 81,
+      "to_node_id": 82,
+      "from_change_id": "85bde52a-5901-4968-9f87-ed4491211747",
+      "to_change_id": "a282e94b-16c5-4e6f-bda2-346672fb1e5d",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Deployment",
+      "created_at": "2026-01-08T09:45:24.441241+00:00"
+    },
+    {
+      "id": 69,
+      "from_node_id": 83,
+      "to_node_id": 84,
+      "from_change_id": "dfc7c983-9870-42d0-933c-e6138292ef2a",
+      "to_change_id": "3e7e77da-9273-499a-88e7-5c72ad21da7d",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Next goal after lines",
+      "created_at": "2026-01-08T10:19:46.581427+00:00"
+    },
+    {
+      "id": 70,
+      "from_node_id": 84,
+      "to_node_id": 85,
+      "from_change_id": "3e7e77da-9273-499a-88e7-5c72ad21da7d",
+      "to_change_id": "65837fb3-c81d-4225-9dbb-4fb2237ccf07",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Next goal after fill color",
+      "created_at": "2026-01-08T10:19:46.645306+00:00"
+    },
+    {
+      "id": 71,
+      "from_node_id": 84,
+      "to_node_id": 86,
+      "from_change_id": "3e7e77da-9273-499a-88e7-5c72ad21da7d",
+      "to_change_id": "5b08ae48-2ea3-4396-ad53-e0716f1a3080",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Decision required for fill color spec pattern",
+      "created_at": "2026-01-08T10:19:46.707501+00:00"
+    },
+    {
+      "id": 72,
+      "from_node_id": 87,
+      "to_node_id": 83,
+      "from_change_id": "2442bd36-d840-4c83-ab1d-51558dd04556",
+      "to_change_id": "dfc7c983-9870-42d0-933c-e6138292ef2a",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Constraint: lines use fixed stroke width",
+      "created_at": "2026-01-08T10:19:46.766328+00:00"
+    },
+    {
+      "id": 73,
+      "from_node_id": 87,
+      "to_node_id": 85,
+      "from_change_id": "2442bd36-d840-4c83-ab1d-51558dd04556",
+      "to_change_id": "65837fb3-c81d-4225-9dbb-4fb2237ccf07",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Constraint: stroke color without width variation",
+      "created_at": "2026-01-08T10:19:46.824618+00:00"
+    },
+    {
+      "id": 74,
+      "from_node_id": 83,
+      "to_node_id": 88,
+      "from_change_id": "dfc7c983-9870-42d0-933c-e6138292ef2a",
+      "to_change_id": "d519292a-97a0-44c2-90ce-1e07864908d3",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation",
+      "created_at": "2026-01-08T10:21:04.217270+00:00"
+    },
+    {
+      "id": 75,
+      "from_node_id": 88,
+      "to_node_id": 89,
+      "from_change_id": "d519292a-97a0-44c2-90ce-1e07864908d3",
+      "to_change_id": "0c0baa3b-3f94-4502-ab83-4dbafb07dbb5",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation complete",
+      "created_at": "2026-01-08T10:25:13.019072+00:00"
+    },
+    {
+      "id": 76,
+      "from_node_id": 73,
+      "to_node_id": 90,
+      "from_change_id": "4bfd13f0-98f2-4f29-a68f-f476b68efb8c",
+      "to_change_id": "d3c6d597-0ae4-480f-8c96-d72050ddeb0c",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Strengthened sub-agent requirements",
+      "created_at": "2026-01-08T10:29:43.501758+00:00"
+    },
+    {
+      "id": 77,
+      "from_node_id": 89,
+      "to_node_id": 91,
+      "from_change_id": "0c0baa3b-3f94-4502-ab83-4dbafb07dbb5",
+      "to_change_id": "0b758e18-0754-4daf-8587-b2ca4ae5b78b",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Deployment",
+      "created_at": "2026-01-08T10:32:24.373663+00:00"
     }
   ]
 }

@@ -1,5 +1,21 @@
 [
   {
+    "hash": "3816817b83cb419f87936bb0cd8e4dd149674901",
+    "short_hash": "3816817",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T10:32:18Z",
+    "message": "feat: add line primitive with two API variants\n\nLine rendering support:\n- Spec: Line type with start/end positions\n- Procedural: line(x1,y1,x2,y2) and lineOffset(x,y,dx,dy)\n- Object: Line class with fromOffset() factory\n- SVG/Canvas: 5px black stroke rendering\n- Test app: examples using both API variants\n\nAlso strengthened CLAUDE.md sub-agent requirements:\n- ALL file edits must use Task agents\n- One agent per package for multi-package features\n- Parallel execution for independent packages\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 10
+  },
+  {
+    "hash": "bd6abfcd694d6edb69212758cea2a476bf11ee04",
+    "short_hash": "bd6abfc",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T09:45:10Z",
+    "message": "feat: add circle primitive with Position type\n\n- Add Position type (x, y) and Circle shape to spec\n- Add circle(x, y, radius) to procedural generator Sketch\n- Add Circle class to object generator with scene integration\n- Update SVG renderer to create <circle> elements\n- Update Canvas renderer to use arc() API\n- All circles rendered as black (color support coming later)\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 8
+  },
+  {
     "hash": "ba486834897673646902c434a62eb4865d8ee012",
     "short_hash": "ba48683",
     "author": "Chris Tierney",

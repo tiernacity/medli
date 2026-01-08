@@ -14,6 +14,10 @@ export const generator = new ProceduralGenerator((p) => {
   p.background(currentColor);
   // Draw a circle at center (50, 50) with radius 25
   p.circle(50, 50, 25);
+  // Draw a diagonal line from (10, 10) to (40, 40) using start/end API
+  p.line(10, 10, 40, 40);
+  // Draw a line from (60, 10) with offset (30, 30) using offset API
+  p.lineOffset(60, 10, 30, 30);
 });
 
 /**

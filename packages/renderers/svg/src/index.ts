@@ -57,6 +57,19 @@ export class SvgRenderer extends BaseRenderer {
         circle.setAttribute("fill", "#000000");
         return circle;
       }
+      case "line": {
+        const line = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "line"
+        );
+        line.setAttribute("x1", String(shape.start.x));
+        line.setAttribute("y1", String(shape.start.y));
+        line.setAttribute("x2", String(shape.end.x));
+        line.setAttribute("y2", String(shape.end.y));
+        line.setAttribute("stroke", "#000000");
+        line.setAttribute("stroke-width", "5");
+        return line;
+      }
       default:
         return null;
     }

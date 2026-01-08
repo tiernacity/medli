@@ -50,6 +50,15 @@ export class CanvasRenderer extends BaseRenderer {
         this.context.fill();
         break;
       }
+      case "line": {
+        this.context.beginPath();
+        this.context.moveTo(shape.start.x, shape.start.y);
+        this.context.lineTo(shape.end.x, shape.end.y);
+        this.context.strokeStyle = "#000000";
+        this.context.lineWidth = 5;
+        this.context.stroke();
+        break;
+      }
     }
   }
 }
