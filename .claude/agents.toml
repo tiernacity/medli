@@ -58,18 +58,22 @@ KEY DIFFERENCE FROM p5.js:
 - We use parameter: sketch.background("#dcdcdc")
 - This allows multiple generators to coexist
 
+⚠️ CRITICAL: API vs IR DISTINCTION
+
+The user-facing API does NOT mirror the Frame IR tree - this is INTENTIONAL.
+
+- API: Imperative calls (fill(), rect(), push()/pop())
+- IR: Nested tree (shapes nested under their materials)
+
+The generator TRANSFORMS imperative calls into the nested Frame IR.
+See packages/generators/procedural/README.md for full design.
+
 DESIGN RULES:
 - The Sketch interface is the USER-FACING API
 - Methods should feel like p5.js (imperative, chainable where sensible)
 - State resets each frame - no accumulation between frames
 - Time is available as sketch.time (milliseconds)
-
-BEFORE MAKING CHANGES: Read packages/generators/procedural/README.md for full design.
-
-Key points:
-- Emits Material-based tree (see spec README)
-- fill()/stroke() create Material nodes
-- push()/pop() map to tree nesting
+- fill()/stroke() set style state, push()/pop() manage style stack
 
 Test with test-app to verify visual output.
 """
@@ -86,7 +90,8 @@ focus_areas = [
   "Scene graph structure",
   "SceneObject interface",
   "Scene traversal",
-  "three.js patterns"
+  "three.js patterns",
+  "API vs IR distinction"
 ]
 
 instructions = """
@@ -94,23 +99,25 @@ INSPIRATION: three.js (https://threejs.org)
 
 This generator uses a DECLARATIVE, OBJECT-ORIENTED pattern where:
 1. User constructs a Scene (the root Generator)
-2. User adds SceneObjects as children (Background, shapes, etc.)
-3. Scene traverses children to produce a Frame
-4. The Frame structure mirrors the scene graph
+2. User creates Materials and Shapes as INDEPENDENT objects
+3. Shapes REFERENCE materials via `.material` property
+4. Scene TRANSFORMS the object graph into Frame IR
+
+⚠️ CRITICAL: API vs IR DISTINCTION
+
+The user-facing API does NOT mirror the Frame IR tree - this is INTENTIONAL.
+
+- API: Flat references (shapes reference materials via .material property)
+- IR: Nested tree (shapes nested under their materials)
+
+The generator TRANSFORMS the flat-reference API into the nested Frame IR.
+See packages/generators/object/README.md for full design.
 
 KEY CONCEPTS:
 - Scene IS the Generator (not a wrapper around one)
-- SceneObjects have mutable properties (e.g., background.color = "red")
-- Changes take effect on NEXT frame() call
+- Materials are independent objects, not containers for shapes
+- Shapes reference materials, they don't nest inside them in the API
 - Object graph persists between frames (unlike procedural)
-- Future: transformations and grouping for positioning
-
-BEFORE MAKING CHANGES: Read packages/generators/object/README.md for full design.
-
-Key points:
-- Emits Material-based tree (see spec README)
-- Material class provides style context for children
-- Scene builds tree with RootMaterial
 
 Test with test-app to verify visual output.
 """

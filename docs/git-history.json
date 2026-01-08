@@ -1,5 +1,13 @@
 [
   {
+    "hash": "027481e1bd619e1d7b0c45b7c679db4870e8e065",
+    "short_hash": "027481e",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T13:04:06Z",
+    "message": "feat: implement Material-based Frame spec with validation\n\nTransform Frame from flat structure to Material-based tree for style inheritance.\n\nSpec changes:\n- Add RootMaterial (complete) and ChildMaterial (partial with ref) types\n- Add validateFrame() for single-pass tree validation\n- Add resolveMaterial() for style inheritance resolution\n- Frame now uses root: RootMaterial instead of shapes: Shape[]\n\nGenerator changes:\n- ProceduralGenerator emits Material tree, adds fill/stroke/strokeWidth methods\n- ObjectGenerator (Scene) emits Material tree, adds fill/stroke/strokeWidth props\n\nRenderer changes:\n- Both renderers call validateFrame() before rendering\n- Traverse Material tree with renderNode(), resolve styles per shape\n- Shapes now rendered with material fill/stroke/strokeWidth\n\nSafety:\n- resolveMaterial() guards against empty ancestors array\n- validateFrame() checks root has all required properties\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 11
+  },
+  {
     "hash": "8ff4c94ab2a171e09ea1f97057b848c6dee43e3d",
     "short_hash": "8ff4c94",
     "author": "Chris Tierney",
