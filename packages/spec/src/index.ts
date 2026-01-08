@@ -12,27 +12,187 @@ export type Position = {
 
 /**
  * A circle shape with center position and radius.
- * Rendered as black (no color support yet).
+ * Style (fill, stroke) inherited from parent Material.
  */
 export type Circle = {
-  type: 'circle';
+  type: "circle";
   center: Position;
   radius: number;
 };
 
 /**
+ * A line shape from start to end position.
+ * Style (stroke, strokeWidth) inherited from parent Material.
+ */
+export type Line = {
+  type: "line";
+  start: Position;
+  end: Position;
+};
+
+/**
  * Union of all shape types.
  */
-export type Shape = Circle;
+export type Shape = Circle | Line;
+
+/**
+ * Root material with all style properties required.
+ * Must be the root of the Frame tree.
+ */
+export type RootMaterial = {
+  type: "material";
+  id: string;
+  fill: string;
+  stroke: string;
+  strokeWidth: number;
+  children: FrameNode[];
+};
+
+/**
+ * Child material with optional style overrides.
+ * Must reference an ancestor material via ref.
+ */
+export type ChildMaterial = {
+  type: "material";
+  id: string;
+  ref: string;
+  fill?: string;
+  stroke?: string;
+  strokeWidth?: number;
+  children: FrameNode[];
+};
+
+/**
+ * A material node providing style context for children.
+ */
+export type Material = RootMaterial | ChildMaterial;
+
+/**
+ * A node in the frame tree - either a material (with children) or a shape (leaf).
+ */
+export type FrameNode = Material | Shape;
+
+/**
+ * Resolved material with all properties defined.
+ * Used by renderers after resolving inheritance.
+ */
+export type ResolvedMaterial = {
+  fill: string;
+  stroke: string;
+  strokeWidth: number;
+};
 
 /**
  * A frame represents the current state to render.
- * All properties are optional - renderers provide defaults.
+ * Contains a Material-based tree where root has all style properties defined.
  */
 export type Frame = {
   backgroundColor?: string;
-  shapes?: Shape[];
+  root: RootMaterial;
 };
+
+/**
+ * Result of frame validation.
+ */
+export type ValidationResult =
+  | { valid: true }
+  | { valid: false; error: string };
+
+/**
+ * Validate a frame's material tree structure.
+ * Checks: unique IDs, valid ancestor refs, root completeness.
+ * Single-pass, top-to-bottom traversal.
+ */
+export function validateFrame(frame: Frame): ValidationResult {
+  // Validate root has all required properties
+  const root = frame.root;
+  if (root.fill === undefined) {
+    return {
+      valid: false,
+      error: "Root material missing required property: fill",
+    };
+  }
+  if (root.stroke === undefined) {
+    return {
+      valid: false,
+      error: "Root material missing required property: stroke",
+    };
+  }
+  if (root.strokeWidth === undefined) {
+    return {
+      valid: false,
+      error: "Root material missing required property: strokeWidth",
+    };
+  }
+
+  const seenIds = new Set<string>();
+
+  function validateNode(
+    node: FrameNode,
+    ancestorIds: Set<string>
+  ): ValidationResult {
+    if (node.type === "material") {
+      // Check ID uniqueness
+      if (seenIds.has(node.id)) {
+        return { valid: false, error: `Duplicate material ID: ${node.id}` };
+      }
+      seenIds.add(node.id);
+
+      // Check ref is ancestor (for non-root materials)
+      if ("ref" in node) {
+        if (!ancestorIds.has(node.ref)) {
+          return {
+            valid: false,
+            error: `Material "${node.id}" references non-ancestor: "${node.ref}"`,
+          };
+        }
+      }
+
+      // Recurse with updated ancestors
+      const newAncestors = new Set(ancestorIds);
+      newAncestors.add(node.id);
+      for (const child of node.children) {
+        const result = validateNode(child, newAncestors);
+        if (!result.valid) return result;
+      }
+    }
+    // Shapes are leaves - no validation needed
+    return { valid: true };
+  }
+
+  // Start from root
+  return validateNode(frame.root, new Set());
+}
+
+/**
+ * Resolve the effective material for a shape by walking up the ancestor chain.
+ * Starts with root material and applies overrides from each ancestor.
+ */
+export function resolveMaterial(ancestors: Material[]): ResolvedMaterial {
+  if (ancestors.length === 0) {
+    throw new Error(
+      "resolveMaterial requires at least one ancestor (the root material)"
+    );
+  }
+  // Root material is always first and has all properties
+  const root = ancestors[0] as RootMaterial;
+  const resolved: ResolvedMaterial = {
+    fill: root.fill,
+    stroke: root.stroke,
+    strokeWidth: root.strokeWidth,
+  };
+
+  // Apply overrides from each child material (index 1 onwards)
+  for (let i = 1; i < ancestors.length; i++) {
+    const material = ancestors[i] as ChildMaterial;
+    if (material.fill !== undefined) resolved.fill = material.fill;
+    if (material.stroke !== undefined) resolved.stroke = material.stroke;
+    if (material.strokeWidth !== undefined)
+      resolved.strokeWidth = material.strokeWidth;
+  }
+
+  return resolved;
+}
 
 /**
  * Generator produces frames based on time.

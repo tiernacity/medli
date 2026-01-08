@@ -221,56 +221,77 @@ All generator and renderer packages depend on `@medli/spec`.
 
 ## Sub-Agents: Domain-Specific Context
 
-**THIS IS MANDATORY. Use the correct sub-agent when working on a package.**
+**THIS IS MANDATORY. ALL file edits MUST be performed via Task agents.**
 
-Sub-agents are defined in `.claude/agents.toml`. Each agent provides domain-specific context, constraints, and instructions for its package.
+### How It Works
 
-### Why Sub-Agents Matter
+1. `.claude/agents.toml` - Dispatch table with `patterns`, `brief`, and `reading_list` per package
+2. `docs/ARCHITECTURE.md` - Cross-cutting design concerns (Frame IR, API vs IR distinction, parity requirements)
+3. `packages/*/AGENT.md` - Package-specific instructions with strong directives
 
-- **Reduced context overhead**: Focus on relevant files rather than the entire codebase
-- **Domain expertise**: Each agent contains instructions tailored to its specific technology area (p5.js patterns, three.js patterns, SVG APIs, Canvas APIs)
-- **Parallel work**: Multiple agents can simultaneously work on different packages without interference
-- **Consistency**: Similar patterns get applied uniformly within each domain
+### ⚠️ CRITICAL: Sub-Agents for ALL File Edits
 
-### How to Use Sub-Agents
+**NEVER edit files directly in the main conversation.** Instead:
 
-1. **Identify the domain** by checking which package the work touches against file patterns in `.claude/agents.toml`
+1. **Identify the package** from `.claude/agents.toml` using file patterns
+2. **Spawn a Task agent** with the brief and reading list
+3. **Run agents in parallel** when editing multiple independent packages
 
-2. **Include the sub-agent context** when spawning a Task for exploration or implementation work
-
-3. **Scope file searches** to the relevant patterns associated with that domain
-
-**Example:** When spawning a Task for procedural generator work, include context like:
+### Task Agent Prompt Pattern
 
 ```
-Working on packages/generators/procedural/...
+Working on packages/generators/procedural/
 
-This is the generator-procedural domain. Key context:
-- INSPIRATION: p5.js
-- Pattern: imperative sketch with draw function called every frame
-- Sketch interface is the user-facing API
-- State resets each frame
+Read these files first (in order):
+1. docs/ARCHITECTURE.md
+2. packages/generators/procedural/AGENT.md
+
+Brief: Opinionated, p5.js-inspired imperative sketch API. Transforms
+imperative function calls into Frame spec IR.
+
+TASK: Add rectangle() method to the Sketch interface.
+- rectangle(x, y, width, height) draws a rectangle
+- Should create Rectangle shape in the Frame
+
+Edit the file and return confirmation when complete.
+```
+
+The Task agent reads its AGENT.md file which contains:
+- Strong directives ("Your job is to be opinionated about...")
+- Key files to understand
+- Constraints and patterns
+- Review checklist
+
+### Parallel Execution
+
+When packages don't depend on each other's changes, spawn multiple Task agents in a SINGLE message:
+
+```
+# These can run in parallel (after spec changes):
+- Task 1: generator-procedural
+- Task 2: generator-object
+- Task 3: renderer-svg
+- Task 4: renderer-canvas
+
+# This must wait for generators:
+- Task 5: test-app (update examples)
+```
+
+### Verification
+
+After all agents complete, run checks in the main conversation:
+```bash
+npm run typecheck && npm run lint && npm run format:check && npm run test
 ```
 
 ### When to Use Sub-Agents
 
 | Action | Requirement |
 |--------|-------------|
-| Designing changes for a package | Reference that package's agent |
-| Making edits to a package | Include agent context in Task prompts |
-| Reviewing changes to a package | Apply agent's constraints and focus areas |
-
-### Available Agents
-
-| Agent | Package | Inspiration/Focus |
-|-------|---------|-------------------|
-| `spec` | `packages/spec` | Data exchange format between generators and renderers |
-| `generator-procedural` | `packages/generators/procedural` | p5.js - imperative sketch pattern |
-| `generator-object` | `packages/generators/object` | three.js - scene graph pattern |
-| `renderer-common` | `packages/renderers/common` | Shared renderer functionality |
-| `renderer-svg` | `packages/renderers/svg` | SVG DOM rendering |
-| `renderer-canvas` | `packages/renderers/canvas` | Canvas 2D rendering |
-| `test-app` | `packages/test-app` | Visual verification with Playwright |
+| **ANY file edit** | **MUST use Task agent** |
+| Exploring a package | Task with Explore subagent_type |
+| Multi-package feature | One Task agent PER package |
+| Verification | Main conversation (run tests, visual check) |
 
 ---
 

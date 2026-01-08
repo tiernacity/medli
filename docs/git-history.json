@@ -1,5 +1,53 @@
 [
   {
+    "hash": "6c3daecc10c1d68b0c0df0de5637e0b239a139cf",
+    "short_hash": "6c3daec",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T14:49:05Z",
+    "message": "docs: restructure agent instructions for minimal context usage\n\n- Reduce agents.toml from 264 to 38 lines (dispatch table only)\n- Add docs/ARCHITECTURE.md for cross-cutting concerns (83 lines)\n- Add AGENT.md to each package with strong directive instructions\n- Update CLAUDE.md Sub-Agents section for new workflow\n\nStructure:\n- agents.toml: patterns, brief, reading_list per package\n- ARCHITECTURE.md: Frame IR, API vs IR distinction, parity requirements\n- AGENT.md: \"Your job is to be opinionated...\", constraints, review checklist\n\nTask agents now read their reading_list files instead of receiving\nverbose inline instructions, reducing main conversation context.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 12
+  },
+  {
+    "hash": "1c769929434697ac59b6dbffa723a09e53f4e649",
+    "short_hash": "1c76992",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T14:15:14Z",
+    "message": "feat: complete material system with TDD tests and three.js-style API\n\n- Add comprehensive unit tests for both generators (92 tests total)\n- ProceduralGenerator: fill()/stroke()/strokeWidth() create ChildMaterial nodes\n- ProceduralGenerator: push()/pop() for nested material contexts\n- ObjectGenerator: Fix API to use three.js-style material references\n  - Materials are independent objects, not containers\n  - Shapes reference materials via .material property\n  - Generator transforms flat API to nested Frame IR tree\n- Update test-app with visual pattern exercising all material features\n- Update agents.toml to clarify API vs IR distinction\n- All 4 renderer outputs visually identical (verified with Playwright)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 10
+  },
+  {
+    "hash": "027481e1bd619e1d7b0c45b7c679db4870e8e065",
+    "short_hash": "027481e",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T13:04:06Z",
+    "message": "feat: implement Material-based Frame spec with validation\n\nTransform Frame from flat structure to Material-based tree for style inheritance.\n\nSpec changes:\n- Add RootMaterial (complete) and ChildMaterial (partial with ref) types\n- Add validateFrame() for single-pass tree validation\n- Add resolveMaterial() for style inheritance resolution\n- Frame now uses root: RootMaterial instead of shapes: Shape[]\n\nGenerator changes:\n- ProceduralGenerator emits Material tree, adds fill/stroke/strokeWidth methods\n- ObjectGenerator (Scene) emits Material tree, adds fill/stroke/strokeWidth props\n\nRenderer changes:\n- Both renderers call validateFrame() before rendering\n- Traverse Material tree with renderNode(), resolve styles per shape\n- Shapes now rendered with material fill/stroke/strokeWidth\n\nSafety:\n- resolveMaterial() guards against empty ancestors array\n- validateFrame() checks root has all required properties\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 11
+  },
+  {
+    "hash": "8ff4c94ab2a171e09ea1f97057b848c6dee43e3d",
+    "short_hash": "8ff4c94",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T12:39:46Z",
+    "message": "docs: add Material-based Frame spec design documentation\n\n- Create comprehensive spec/README.md documenting:\n  - Material-based tree structure (RootMaterial, ChildMaterial, Shapes)\n  - Validation rules (single-pass, ancestor-only refs, unique IDs)\n  - Style resolution algorithm\n  - Design decisions and rationale\n  - Future extensions (transforms, additional properties)\n\n- Update generator READMEs with Material output sections:\n  - Procedural: fill()/stroke() create Material nodes, push/pop mapping\n  - Object: Material class provides style context for children\n\n- Update agents.toml to be lightweight pointers to READMEs\n\n- Sync decision graph with design decisions and implementation plan\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 5
+  },
+  {
+    "hash": "3816817b83cb419f87936bb0cd8e4dd149674901",
+    "short_hash": "3816817",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T10:32:18Z",
+    "message": "feat: add line primitive with two API variants\n\nLine rendering support:\n- Spec: Line type with start/end positions\n- Procedural: line(x1,y1,x2,y2) and lineOffset(x,y,dx,dy)\n- Object: Line class with fromOffset() factory\n- SVG/Canvas: 5px black stroke rendering\n- Test app: examples using both API variants\n\nAlso strengthened CLAUDE.md sub-agent requirements:\n- ALL file edits must use Task agents\n- One agent per package for multi-package features\n- Parallel execution for independent packages\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 10
+  },
+  {
+    "hash": "bd6abfcd694d6edb69212758cea2a476bf11ee04",
+    "short_hash": "bd6abfc",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T09:45:10Z",
+    "message": "feat: add circle primitive with Position type\n\n- Add Position type (x, y) and Circle shape to spec\n- Add circle(x, y, radius) to procedural generator Sketch\n- Add Circle class to object generator with scene integration\n- Update SVG renderer to create <circle> elements\n- Update Canvas renderer to use arc() API\n- All circles rendered as black (color support coming later)\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 8
+  },
+  {
     "hash": "ba486834897673646902c434a62eb4865d8ee012",
     "short_hash": "ba48683",
     "author": "Chris Tierney",

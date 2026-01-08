@@ -61,6 +61,10 @@ interface Sketch {
   noFill(): void;
   noStroke(): void;
 
+  // State management (like p5.js push/pop)
+  push(): void;  // Save current style state
+  pop(): void;   // Restore previous style state
+
   // Shapes
   rect(x: number, y: number, w: number, h: number): void;
   ellipse(x: number, y: number, w: number, h: number): void;
@@ -71,6 +75,63 @@ interface Sketch {
   readonly frameCount: number;
 }
 ```
+
+## Material-Based Frame Output
+
+The procedural generator emits a **Material-based tree** (see `@medli/spec` README).
+
+### How fill()/stroke() work
+
+Style calls like `fill()` and `stroke()` affect subsequent shapes by creating Material nodes in the tree:
+
+```javascript
+// User code
+p.fill("red");
+p.circle(10, 10, 5);
+p.fill("blue");
+p.circle(20, 20, 5);
+```
+
+Emits a tree like:
+```
+RootMaterial (complete defaults)
+├── ChildMaterial (fill: "red", ref: "root")
+│   └── Circle
+└── ChildMaterial (fill: "blue", ref: "root")
+    └── Circle
+```
+
+### push()/pop() and Material nesting
+
+The `push()` and `pop()` functions map to Material tree nesting:
+
+```javascript
+p.fill("red");
+p.circle(10, 10, 5);    // red
+p.push();
+  p.fill("blue");
+  p.circle(20, 20, 5);  // blue
+p.pop();
+p.circle(30, 30, 5);    // red again
+```
+
+Emits:
+```
+RootMaterial
+└── ChildMaterial (fill: "red")
+    ├── Circle
+    ├── ChildMaterial (fill: "blue")
+    │   └── Circle
+    └── Circle
+```
+
+### Generator responsibilities
+
+The ProceduralGenerator must:
+1. Track current style state (fill, stroke, strokeWidth)
+2. Generate unique Material IDs
+3. Build tree structure based on style changes and push/pop calls
+4. Emit complete RootMaterial with all defaults
 
 ## Usage
 
