@@ -1847,6 +1847,17 @@
       "created_at": "2026-01-08T15:50:03.182145+00:00",
       "updated_at": "2026-01-08T15:50:03.182145+00:00",
       "metadata_json": "{\"branch\":\"feat/transforms\",\"confidence\":80}"
+    },
+    {
+      "id": 169,
+      "change_id": "c53ed2e3-924d-4c93-b0d2-9b75fe71b558",
+      "node_type": "outcome",
+      "title": "Design documentation committed and pushed",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T15:52:27.965810+00:00",
+      "updated_at": "2026-01-08T15:52:27.965810+00:00",
+      "metadata_json": "{\"branch\":\"feat/transforms\",\"commit\":\"7d5bab6\",\"confidence\":100}"
     }
   ],
   "edges": [
@@ -3631,6 +3642,17 @@
       "weight": 1.0,
       "rationale": "Fourth step: visual verification",
       "created_at": "2026-01-08T15:50:10.194607+00:00"
+    },
+    {
+      "id": 163,
+      "from_node_id": 141,
+      "to_node_id": 169,
+      "from_change_id": "b2753188-4584-47c9-ab16-635dbc153b13",
+      "to_change_id": "c53ed2e3-924d-4c93-b0d2-9b75fe71b558",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Design phase complete",
+      "created_at": "2026-01-08T15:52:27.988839+00:00"
     }
   ]
 }

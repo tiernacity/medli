@@ -1,5 +1,13 @@
 [
   {
+    "hash": "7d5bab672c35b27cd7087a9c049f2203bce84fed",
+    "short_hash": "7d5bab6",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T15:52:16Z",
+    "message": "docs: design transform representation for Frame spec\n\nResearch validated user opinions on transform design:\n- Transform nodes distinct from Materials (validated with nuance)\n- Transforms accumulate via matrix multiplication, no inheritance (strongly validated)\n- Matrix as canonical form for render-focused IR (validated)\n\nSelected: 6-value 2D affine matrix [a,b,c,d,e,f]\n- No id attribute (transforms don't need references)\n- Flexible nesting with Materials\n- Compact forms deferred as future optimization\n- Post-processor can merge sequential transforms\n\nUpdated documentation:\n- ARCHITECTURE.md: pipeline, transforms, future optimizer\n- spec/AGENT.md: transform guidance\n- renderer-common/AGENT.md: future candidates\n\nDecision graph: 28 nodes on feat/transforms branch\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 4
+  },
+  {
     "hash": "6c3daecc10c1d68b0c0df0de5637e0b239a139cf",
     "short_hash": "6c3daec",
     "author": "Chris Tierney",
