@@ -8,7 +8,11 @@ describe("ProceduralGenerator", () => {
     });
     const frame = generator.frame(0);
     expect(frame.backgroundColor).toBe("#000000");
-    expect(frame.viewport).toEqual({ halfWidth: 50, halfHeight: 50, scaleMode: "fit" });
+    expect(frame.viewport).toEqual({
+      halfWidth: 50,
+      halfHeight: 50,
+      scaleMode: "fit",
+    });
   });
 
   it("should return background color set in draw function", () => {

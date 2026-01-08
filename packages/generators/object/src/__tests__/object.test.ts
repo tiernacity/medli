@@ -1188,15 +1188,14 @@ describe("Group in Scene", () => {
     });
   });
 
-  it("should emit empty material when added but not referenced by any direct children", () => {
+  it("should wrap shapes inside group with inline ChildMaterial when shape has material", () => {
     const scene = new Scene(defaultViewport);
     const material = new Material({ fill: "#ff0000" });
     const group = new Group();
     group.position = { x: 50, y: 50 };
 
     // Circle inside the group with material set
-    // Note: Scene doesn't traverse into Group to find shape materials
-    // so the material will be empty (not referencing the grouped circle)
+    // Group.frame() wraps this shape in an inline ChildMaterial node
     const circle = new Circle(0, 0, 10);
     circle.material = material;
     group.add(circle);
@@ -1206,22 +1205,30 @@ describe("Group in Scene", () => {
 
     const frame = scene.frame(0);
 
-    // Material is first (added first)
+    // Material is first (added first) - empty since circle is inside Group
     const childMaterial = frame.root.children[0] as ChildMaterial;
     expect(childMaterial.type).toBe("material");
     expect(childMaterial.fill).toBe("#ff0000");
-    // Material has no children since the circle is inside a Group
     expect(childMaterial.children.length).toBe(0);
 
-    // Group emits Transform
+    // Group emits Transform containing inline ChildMaterial
     const transform = frame.root.children[1] as Transform;
     expect(transform.type).toBe("transform");
     expect(transform.matrix).toEqual([1, 0, 0, 1, 50, 50]);
-    expect(transform.children[0]).toEqual({
-      type: "circle",
-      center: { x: 0, y: 0 },
-      radius: 10,
-    });
+
+    // The shape is wrapped in an inline ChildMaterial with the material's properties
+    const inlineMaterial = transform.children[0] as ChildMaterial;
+    expect(inlineMaterial.type).toBe("material");
+    expect(inlineMaterial.fill).toBe("#ff0000");
+    expect(inlineMaterial.ref).toBe("root");
+    expect(inlineMaterial.id).toMatch(/^m\d+_inline_\d+$/);
+    expect(inlineMaterial.children).toEqual([
+      {
+        type: "circle",
+        center: { x: 0, y: 0 },
+        radius: 10,
+      },
+    ]);
   });
 
   it("should handle rotation with PI/4", () => {
