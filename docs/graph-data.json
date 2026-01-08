@@ -2694,6 +2694,182 @@
       "created_at": "2026-01-08T22:38:13.772493+00:00",
       "updated_at": "2026-01-08T22:38:13.772493+00:00",
       "metadata_json": "{\"branch\":\"feat/images\",\"commit\":\"3a4d3dd\",\"confidence\":100}"
+    },
+    {
+      "id": 246,
+      "change_id": "ca448cd4-f613-4c2c-a81f-4d76ae573a48",
+      "node_type": "action",
+      "title": "Examining resource management extensibility",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T22:44:37.591091+00:00",
+      "updated_at": "2026-01-08T22:44:37.591091+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":85}"
+    },
+    {
+      "id": 247,
+      "change_id": "e48d0f89-6565-46c3-9ff1-af8b504d249a",
+      "node_type": "observation",
+      "title": "ResourceManager<T> assumes single resource type per renderer - can't manage videos AND images with same instance",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T22:46:08.137797+00:00",
+      "updated_at": "2026-01-08T22:46:08.137797+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":95}"
+    },
+    {
+      "id": 248,
+      "change_id": "cc1bb795-0330-45c6-9bd1-b59e3c8a39b5",
+      "node_type": "observation",
+      "title": "extractResourceUrls() tightly coupled to Frame tree - only finds image shapes. Fonts/shaders aren't shapes, need different extraction pattern",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T22:46:09.091862+00:00",
+      "updated_at": "2026-01-08T22:46:09.091862+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":95}"
+    },
+    {
+      "id": 249,
+      "change_id": "4aab0e9f-e87a-4cc0-9d6b-ded04cf265c1",
+      "node_type": "observation",
+      "title": "Video: feasible now, needs separate VideoManager. HTMLVideoElement for playback, no frame-accurate sync without requestVideoFrameCallback",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T22:46:09.931647+00:00",
+      "updated_at": "2026-01-08T22:46:09.931647+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":90}"
+    },
+    {
+      "id": 250,
+      "change_id": "7c758729-a962-40e0-9d72-b4433c059c73",
+      "node_type": "observation",
+      "title": "Shaders: don't fit ResourceManager pattern. Need ShaderRegistry, extend Frame spec with resources section. SVG can't render shaders (renderer asymmetry)",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T22:46:10.695807+00:00",
+      "updated_at": "2026-01-08T22:46:10.695807+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":90}"
+    },
+    {
+      "id": 251,
+      "change_id": "1faf24ec-b5c7-4cd2-ab4b-c5753a65a2e1",
+      "node_type": "observation",
+      "title": "Fonts: don't fit ResourceManager. CSS injection is global side-effect, disposal hard. Need separate FontLoader with pre-load before frame",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T22:46:11.854275+00:00",
+      "updated_at": "2026-01-08T22:46:11.854275+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":90}"
+    },
+    {
+      "id": 252,
+      "change_id": "48cdfe65-29a3-4264-bc57-bd10e547a11e",
+      "node_type": "observation",
+      "title": "V2 recommendation: separate manager instances per resource type, extend Frame spec with resources section for non-shape resources, add prefetch/retry APIs",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T22:46:13.657385+00:00",
+      "updated_at": "2026-01-08T22:46:13.657385+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":85}"
+    },
+    {
+      "id": 253,
+      "change_id": "7bf1370b-0281-4aea-a07d-c6a1b21bac71",
+      "node_type": "outcome",
+      "title": "Extensibility review complete: V1 excellent for images (9/10), limited for non-shape resources (4/10). Video feasible now, shaders/fonts need architectural changes",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T22:46:33.015701+00:00",
+      "updated_at": "2026-01-08T22:46:33.015701+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":90}"
+    },
+    {
+      "id": 254,
+      "change_id": "c2575cd0-eb74-4dfa-ae3d-ecf0ef27f209",
+      "node_type": "action",
+      "title": "Re-examining extensibility for renderer-internal derived resources (WebGPU pipelines, shaders)",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T22:53:17.007986+00:00",
+      "updated_at": "2026-01-08T22:53:17.007986+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":85}"
+    },
+    {
+      "id": 255,
+      "change_id": "d058bbb7-a6cb-4e7a-9b11-5a137c45f742",
+      "node_type": "observation",
+      "title": "GPU pipelines are DERIVED resources (from Frame shape types), not EXTERNAL resources (fetched). Different lifecycle: expensive to create, cheap to keep, no pruning",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T22:54:15.979025+00:00",
+      "updated_at": "2026-01-08T22:54:15.979025+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":95}"
+    },
+    {
+      "id": 256,
+      "change_id": "1aa43df2-3d89-4b31-a582-8c6489f07e43",
+      "node_type": "observation",
+      "title": "ResourceManager pruning is WRONG for pipelines - frame with circles then lines would delete circle pipeline, causing expensive recompilation when circles return",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T22:54:16.809020+00:00",
+      "updated_at": "2026-01-08T22:54:16.809020+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":95}"
+    },
+    {
+      "id": 257,
+      "change_id": "778ace10-b55a-492c-8e3f-2e91856eb635",
+      "node_type": "observation",
+      "title": "extractShapeTypes(frame) parallels extractResourceUrls(frame) - same tree walk, different collection. Extraction is reusable, caching strategy differs",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T22:54:17.547160+00:00",
+      "updated_at": "2026-01-08T22:54:17.547160+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":90}"
+    },
+    {
+      "id": 258,
+      "change_id": "b9cb2c79-ab85-4ac4-8866-234daf867269",
+      "node_type": "observation",
+      "title": "WebGPU renderers in wild use static pipeline cache (compile at init) or lazy-forever cache. None use pruning resource manager for pipelines",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T22:54:18.323344+00:00",
+      "updated_at": "2026-01-08T22:54:18.323344+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":90}"
+    },
+    {
+      "id": 259,
+      "change_id": "7f48fb6f-7f04-402b-803a-510554b24808",
+      "node_type": "observation",
+      "title": "Recommendation: GPUPipelineProvider interface - getPipeline(shapeType), prewarmPipelines(types), destroy(). No pruning, explicit warmup, ~20 lines. Separate from ResourceManager",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T22:54:19.133068+00:00",
+      "updated_at": "2026-01-08T22:54:19.133068+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":90}"
+    },
+    {
+      "id": 260,
+      "change_id": "3e1bb9f9-f1f3-46d2-ac52-a6c1a65ccdc7",
+      "node_type": "outcome",
+      "title": "Corrected analysis: ResourceManager is for EXTERNAL fetched resources. GPU pipelines are DERIVED - need separate GPUPipelineProvider with no-prune, cache-forever semantics",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T22:54:27.967097+00:00",
+      "updated_at": "2026-01-08T22:54:27.967097+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":95}"
+    },
+    {
+      "id": 261,
+      "change_id": "d250a861-d082-4b84-94f0-9d9c4c733079",
+      "node_type": "observation",
+      "title": "Other WebGPU resources (e.g., canvas-size-dependent textures for selection) need on-demand creation + pruning. Generic infrastructure handling differing cache/prune strategies may be useful - TBD",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T22:59:45.542375+00:00",
+      "updated_at": "2026-01-08T22:59:45.542375+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":80}"
     }
   ],
   "edges": [
@@ -5413,6 +5589,204 @@
       "weight": 1.0,
       "rationale": "Deployment",
       "created_at": "2026-01-08T22:38:18.783054+00:00"
+    },
+    {
+      "id": 248,
+      "from_node_id": 221,
+      "to_node_id": 246,
+      "from_change_id": "16c43a91-7732-4d30-858f-a0b3157cb1a9",
+      "to_change_id": "ca448cd4-f613-4c2c-a81f-4d76ae573a48",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation of goal",
+      "created_at": "2026-01-08T22:44:37.635581+00:00"
+    },
+    {
+      "id": 249,
+      "from_node_id": 246,
+      "to_node_id": 247,
+      "from_change_id": "ca448cd4-f613-4c2c-a81f-4d76ae573a48",
+      "to_change_id": "e48d0f89-6565-46c3-9ff1-af8b504d249a",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Finding",
+      "created_at": "2026-01-08T22:46:08.182656+00:00"
+    },
+    {
+      "id": 250,
+      "from_node_id": 246,
+      "to_node_id": 248,
+      "from_change_id": "ca448cd4-f613-4c2c-a81f-4d76ae573a48",
+      "to_change_id": "cc1bb795-0330-45c6-9bd1-b59e3c8a39b5",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Finding",
+      "created_at": "2026-01-08T22:46:09.137165+00:00"
+    },
+    {
+      "id": 251,
+      "from_node_id": 246,
+      "to_node_id": 249,
+      "from_change_id": "ca448cd4-f613-4c2c-a81f-4d76ae573a48",
+      "to_change_id": "4aab0e9f-e87a-4cc0-9d6b-ded04cf265c1",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Finding",
+      "created_at": "2026-01-08T22:46:09.977638+00:00"
+    },
+    {
+      "id": 252,
+      "from_node_id": 246,
+      "to_node_id": 250,
+      "from_change_id": "ca448cd4-f613-4c2c-a81f-4d76ae573a48",
+      "to_change_id": "7c758729-a962-40e0-9d72-b4433c059c73",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Finding",
+      "created_at": "2026-01-08T22:46:10.740132+00:00"
+    },
+    {
+      "id": 253,
+      "from_node_id": 246,
+      "to_node_id": 251,
+      "from_change_id": "ca448cd4-f613-4c2c-a81f-4d76ae573a48",
+      "to_change_id": "1faf24ec-b5c7-4cd2-ab4b-c5753a65a2e1",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Finding",
+      "created_at": "2026-01-08T22:46:11.900241+00:00"
+    },
+    {
+      "id": 254,
+      "from_node_id": 246,
+      "to_node_id": 252,
+      "from_change_id": "ca448cd4-f613-4c2c-a81f-4d76ae573a48",
+      "to_change_id": "48cdfe65-29a3-4264-bc57-bd10e547a11e",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Recommendation",
+      "created_at": "2026-01-08T22:46:13.704101+00:00"
+    },
+    {
+      "id": 255,
+      "from_node_id": 246,
+      "to_node_id": 253,
+      "from_change_id": "ca448cd4-f613-4c2c-a81f-4d76ae573a48",
+      "to_change_id": "7bf1370b-0281-4aea-a07d-c6a1b21bac71",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Review complete",
+      "created_at": "2026-01-08T22:46:33.060746+00:00"
+    },
+    {
+      "id": 256,
+      "from_node_id": 221,
+      "to_node_id": 253,
+      "from_change_id": "16c43a91-7732-4d30-858f-a0b3157cb1a9",
+      "to_change_id": "7bf1370b-0281-4aea-a07d-c6a1b21bac71",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Goal achieved",
+      "created_at": "2026-01-08T22:46:33.104055+00:00"
+    },
+    {
+      "id": 257,
+      "from_node_id": 221,
+      "to_node_id": 254,
+      "from_change_id": "16c43a91-7732-4d30-858f-a0b3157cb1a9",
+      "to_change_id": "c2575cd0-eb74-4dfa-ae3d-ecf0ef27f209",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Clarification",
+      "created_at": "2026-01-08T22:53:17.052577+00:00"
+    },
+    {
+      "id": 258,
+      "from_node_id": 254,
+      "to_node_id": 255,
+      "from_change_id": "c2575cd0-eb74-4dfa-ae3d-ecf0ef27f209",
+      "to_change_id": "d058bbb7-a6cb-4e7a-9b11-5a137c45f742",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Key distinction",
+      "created_at": "2026-01-08T22:54:16.023879+00:00"
+    },
+    {
+      "id": 259,
+      "from_node_id": 254,
+      "to_node_id": 256,
+      "from_change_id": "c2575cd0-eb74-4dfa-ae3d-ecf0ef27f209",
+      "to_change_id": "1aa43df2-3d89-4b31-a582-8c6489f07e43",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Pattern mismatch",
+      "created_at": "2026-01-08T22:54:16.854737+00:00"
+    },
+    {
+      "id": 260,
+      "from_node_id": 254,
+      "to_node_id": 257,
+      "from_change_id": "c2575cd0-eb74-4dfa-ae3d-ecf0ef27f209",
+      "to_change_id": "778ace10-b55a-492c-8e3f-2e91856eb635",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Reusable pattern",
+      "created_at": "2026-01-08T22:54:17.592728+00:00"
+    },
+    {
+      "id": 261,
+      "from_node_id": 254,
+      "to_node_id": 258,
+      "from_change_id": "c2575cd0-eb74-4dfa-ae3d-ecf0ef27f209",
+      "to_change_id": "b9cb2c79-ab85-4ac4-8866-234daf867269",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Industry pattern",
+      "created_at": "2026-01-08T22:54:18.369828+00:00"
+    },
+    {
+      "id": 262,
+      "from_node_id": 254,
+      "to_node_id": 259,
+      "from_change_id": "c2575cd0-eb74-4dfa-ae3d-ecf0ef27f209",
+      "to_change_id": "7f48fb6f-7f04-402b-803a-510554b24808",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Design recommendation",
+      "created_at": "2026-01-08T22:54:19.179472+00:00"
+    },
+    {
+      "id": 263,
+      "from_node_id": 254,
+      "to_node_id": 260,
+      "from_change_id": "c2575cd0-eb74-4dfa-ae3d-ecf0ef27f209",
+      "to_change_id": "3e1bb9f9-f1f3-46d2-ac52-a6c1a65ccdc7",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Corrected conclusion",
+      "created_at": "2026-01-08T22:54:28.012005+00:00"
+    },
+    {
+      "id": 264,
+      "from_node_id": 221,
+      "to_node_id": 260,
+      "from_change_id": "16c43a91-7732-4d30-858f-a0b3157cb1a9",
+      "to_change_id": "3e1bb9f9-f1f3-46d2-ac52-a6c1a65ccdc7",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Goal complete",
+      "created_at": "2026-01-08T22:54:28.056243+00:00"
+    },
+    {
+      "id": 265,
+      "from_node_id": 260,
+      "to_node_id": 261,
+      "from_change_id": "3e1bb9f9-f1f3-46d2-ac52-a6c1a65ccdc7",
+      "to_change_id": "d250a861-d082-4b84-94f0-9d9c4c733079",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "User insight",
+      "created_at": "2026-01-08T22:59:45.587968+00:00"
     }
   ]
 }
