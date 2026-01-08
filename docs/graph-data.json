@@ -1880,6 +1880,17 @@
       "created_at": "2026-01-08T16:15:13.504334+00:00",
       "updated_at": "2026-01-08T16:15:13.504334+00:00",
       "metadata_json": "{\"branch\":\"feat/transforms\",\"confidence\":95}"
+    },
+    {
+      "id": 172,
+      "change_id": "889b4553-7626-49c8-8c2a-bc576dd3b9c3",
+      "node_type": "action",
+      "title": "Committed transform implementation",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T16:16:28.513701+00:00",
+      "updated_at": "2026-01-08T16:16:28.513701+00:00",
+      "metadata_json": "{\"branch\":\"feat/transforms\",\"commit\":\"e2456eb\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -3741,6 +3752,17 @@
       "weight": 1.0,
       "rationale": "Test-app exercises transforms",
       "created_at": "2026-01-08T16:15:20.815280+00:00"
+    },
+    {
+      "id": 170,
+      "from_node_id": 171,
+      "to_node_id": 172,
+      "from_change_id": "79ba22ea-0919-43b2-89be-9718b2c43646",
+      "to_change_id": "889b4553-7626-49c8-8c2a-bc576dd3b9c3",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Deployment",
+      "created_at": "2026-01-08T16:16:28.558324+00:00"
     }
   ]
 }

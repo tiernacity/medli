@@ -1,5 +1,13 @@
 [
   {
+    "hash": "e2456eb1fe72ee8a7fbce15b2c593a801ce9a6e1",
+    "short_hash": "e2456eb",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T16:16:09Z",
+    "message": "feat: implement transform support across all packages\n\n- Add Transform type with 6-value 2D affine matrix [a,b,c,d,e,f] to spec\n- Add Matrix2D type and matrix validation in validateFrame()\n- Add translate(), rotate(), scale() APIs to procedural generator\n  - Matrix helpers: identityMatrix, translateMatrix, rotateMatrix, scaleMatrix, multiplyMatrices\n  - Transform state saved/restored with push()/pop()\n  - Shapes wrapped in Transform nodes when matrix is non-identity\n- Add Group class to object generator (three.js-style)\n  - position, rotation, scale properties\n  - computeMatrix() composes TRS in standard order\n  - Groups can be nested and contain shapes\n- Update SVG renderer: <g transform=\"matrix(...)\"> for Transform nodes\n- Update Canvas renderer: ctx.save()/transform()/restore() for Transform nodes\n- Update test-app with transform examples: translate, rotate, scale compositions\n- All 4 renderers produce identical visual output\n- 155 tests passing\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 11
+  },
+  {
     "hash": "7d5bab672c35b27cd7087a9c049f2203bce84fed",
     "short_hash": "7d5bab6",
     "author": "Chris Tierney",
