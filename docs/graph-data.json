@@ -2375,6 +2375,72 @@
       "created_at": "2026-01-08T21:07:20.006839+00:00",
       "updated_at": "2026-01-08T21:07:20.006839+00:00",
       "metadata_json": "{\"branch\":\"feat/images\",\"commit\":\"6a64dee\",\"confidence\":95}"
+    },
+    {
+      "id": 217,
+      "change_id": "3fe3d2b9-b1ed-4c92-9ee7-2e87798d00ef",
+      "node_type": "goal",
+      "title": "Update test-app to render different scenes for different tests",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T21:16:51.933030+00:00",
+      "updated_at": "2026-01-08T21:16:51.933030+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":80,\"prompt\":\"update test-app to render different scenes for different tests. We will need a decision about how to do that in a simple and flexible/extensible way.\"}"
+    },
+    {
+      "id": 218,
+      "change_id": "7e114922-7808-44f0-abff-b73bb84060d0",
+      "node_type": "goal",
+      "title": "Add visual tests for image transforms",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T21:16:53.756903+00:00",
+      "updated_at": "2026-01-08T21:16:53.756903+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":80,\"prompt\":\"add visual tests that confirm image rendering respects translation, rotation and scaling\"}"
+    },
+    {
+      "id": 219,
+      "change_id": "10e58485-56dd-4efc-95af-42ddddb35858",
+      "node_type": "goal",
+      "title": "Add support for cropping of images",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T21:16:54.594793+00:00",
+      "updated_at": "2026-01-08T21:16:54.594793+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":80,\"prompt\":\"add support for cropping of images (rendering only parts of images)\"}"
+    },
+    {
+      "id": 220,
+      "change_id": "cb93b402-9b17-47fe-b6a9-0664edf2530e",
+      "node_type": "goal",
+      "title": "Examine resource deduplication for multiple image nodes",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T21:16:55.885733+00:00",
+      "updated_at": "2026-01-08T21:16:55.885733+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":80,\"prompt\":\"examine how multiple renders of the same image is supported. Multiple image nodes (in the frame) can request the same URL. The resource must be fetched/processed only once. We need to make a decision - either the renderers or the resource manager will deduplicate. I'd prefer the latter.\"}"
+    },
+    {
+      "id": 221,
+      "change_id": "16c43a91-7732-4d30-858f-a0b3157cb1a9",
+      "node_type": "goal",
+      "title": "Examine resource management extensibility for new resource types",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T21:16:56.830755+00:00",
+      "updated_at": "2026-01-08T21:16:56.830755+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":80,\"prompt\":\"examine how the design of resource management will adapt to new common/supported resource types (eg fonts). Including resources that are specific to a renderer implementation (eg webgpu shader compilation)\"}"
+    },
+    {
+      "id": 222,
+      "change_id": "ce52d7da-aeb7-4430-b25b-6a941bb84169",
+      "node_type": "goal",
+      "title": "Code review: renderers and image/resource support",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T21:16:57.559849+00:00",
+      "updated_at": "2026-01-08T21:16:57.559849+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":80,\"prompt\":\"perform a detailed code review of renderers and the new support for images and resources. We need to agree the scope of the review, but it should cover at least: code structure, simplicity, extensibility, division of responsibility between modules, security, avoidance of resource leaks\"}"
     }
   ],
   "edges": [
@@ -4687,6 +4753,116 @@
       "weight": 1.0,
       "rationale": "Deployment",
       "created_at": "2026-01-08T21:07:20.084359+00:00"
+    },
+    {
+      "id": 211,
+      "from_node_id": 216,
+      "to_node_id": 217,
+      "from_change_id": "76c49188-873a-4b46-9519-c01970c2069a",
+      "to_change_id": "3fe3d2b9-b1ed-4c92-9ee7-2e87798d00ef",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Follow-on: test infrastructure",
+      "created_at": "2026-01-08T21:17:12.869595+00:00"
+    },
+    {
+      "id": 212,
+      "from_node_id": 216,
+      "to_node_id": 218,
+      "from_change_id": "76c49188-873a-4b46-9519-c01970c2069a",
+      "to_change_id": "7e114922-7808-44f0-abff-b73bb84060d0",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Follow-on: visual testing",
+      "created_at": "2026-01-08T21:17:12.943339+00:00"
+    },
+    {
+      "id": 213,
+      "from_node_id": 216,
+      "to_node_id": 219,
+      "from_change_id": "76c49188-873a-4b46-9519-c01970c2069a",
+      "to_change_id": "10e58485-56dd-4efc-95af-42ddddb35858",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Follow-on: image feature",
+      "created_at": "2026-01-08T21:17:13.012631+00:00"
+    },
+    {
+      "id": 214,
+      "from_node_id": 216,
+      "to_node_id": 220,
+      "from_change_id": "76c49188-873a-4b46-9519-c01970c2069a",
+      "to_change_id": "cb93b402-9b17-47fe-b6a9-0664edf2530e",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Follow-on: resource management design",
+      "created_at": "2026-01-08T21:17:13.078698+00:00"
+    },
+    {
+      "id": 215,
+      "from_node_id": 216,
+      "to_node_id": 221,
+      "from_change_id": "76c49188-873a-4b46-9519-c01970c2069a",
+      "to_change_id": "16c43a91-7732-4d30-858f-a0b3157cb1a9",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Follow-on: resource management design",
+      "created_at": "2026-01-08T21:17:13.147052+00:00"
+    },
+    {
+      "id": 216,
+      "from_node_id": 216,
+      "to_node_id": 222,
+      "from_change_id": "76c49188-873a-4b46-9519-c01970c2069a",
+      "to_change_id": "ce52d7da-aeb7-4430-b25b-6a941bb84169",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Follow-on: quality assurance",
+      "created_at": "2026-01-08T21:17:13.215261+00:00"
+    },
+    {
+      "id": 217,
+      "from_node_id": 217,
+      "to_node_id": 218,
+      "from_change_id": "3fe3d2b9-b1ed-4c92-9ee7-2e87798d00ef",
+      "to_change_id": "7e114922-7808-44f0-abff-b73bb84060d0",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Scene infrastructure needed for test scenarios",
+      "created_at": "2026-01-08T21:18:55.646563+00:00"
+    },
+    {
+      "id": 218,
+      "from_node_id": 222,
+      "to_node_id": 220,
+      "from_change_id": "ce52d7da-aeb7-4430-b25b-6a941bb84169",
+      "to_change_id": "cb93b402-9b17-47fe-b6a9-0664edf2530e",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Review informs deduplication design",
+      "created_at": "2026-01-08T21:18:55.710634+00:00"
+    },
+    {
+      "id": 219,
+      "from_node_id": 222,
+      "to_node_id": 221,
+      "from_change_id": "ce52d7da-aeb7-4430-b25b-6a941bb84169",
+      "to_change_id": "16c43a91-7732-4d30-858f-a0b3157cb1a9",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Review informs extensibility design",
+      "created_at": "2026-01-08T21:18:55.770032+00:00"
+    },
+    {
+      "id": 220,
+      "from_node_id": 220,
+      "to_node_id": 221,
+      "from_change_id": "cb93b402-9b17-47fe-b6a9-0664edf2530e",
+      "to_change_id": "16c43a91-7732-4d30-858f-a0b3157cb1a9",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Dedup pattern affects new resource type integration",
+      "created_at": "2026-01-08T21:18:55.831966+00:00"
     }
   ]
 }
