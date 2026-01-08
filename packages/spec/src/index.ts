@@ -3,11 +3,35 @@
  */
 
 /**
+ * A 2D position with x and y coordinates.
+ */
+export type Position = {
+  x: number;
+  y: number;
+};
+
+/**
+ * A circle shape with center position and radius.
+ * Rendered as black (no color support yet).
+ */
+export type Circle = {
+  type: 'circle';
+  center: Position;
+  radius: number;
+};
+
+/**
+ * Union of all shape types.
+ */
+export type Shape = Circle;
+
+/**
  * A frame represents the current state to render.
  * All properties are optional - renderers provide defaults.
  */
 export type Frame = {
   backgroundColor?: string;
+  shapes?: Shape[];
 };
 
 /**

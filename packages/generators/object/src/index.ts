@@ -1,4 +1,9 @@
-import type { Frame, Generator } from "@medli/spec";
+import type {
+  Frame,
+  Generator,
+  Shape,
+  Circle as CircleShape,
+} from "@medli/spec";
 
 /**
  * SceneObject - base interface for objects that can be added to a scene.
@@ -25,6 +30,35 @@ export class Background implements SceneObject {
 
   frame(_time: number): Partial<Frame> {
     return { backgroundColor: this.color };
+  }
+}
+
+/**
+ * Circle - a circle shape with center position and radius.
+ *
+ * Usage:
+ *   const circle = new Circle(50, 50, 25);
+ *   scene.add(circle);
+ *   circle.x = 60; // move center
+ */
+export class Circle implements SceneObject {
+  x: number;
+  y: number;
+  radius: number;
+
+  constructor(x: number, y: number, radius: number) {
+    this.x = x;
+    this.y = y;
+    this.radius = radius;
+  }
+
+  frame(_time: number): Partial<Frame> {
+    const shape: CircleShape = {
+      type: "circle",
+      center: { x: this.x, y: this.y },
+      radius: this.radius,
+    };
+    return { shapes: [shape] };
   }
 }
 
@@ -82,18 +116,33 @@ export class Scene implements Generator {
   /**
    * Generate a frame by traversing the scene tree.
    * Merges frame data from background and all children.
+   * Shapes arrays are concatenated, other properties are overwritten.
    */
   frame(time: number): Frame {
     const result: Frame = {};
+    const allShapes: Shape[] = [];
 
     // Apply background first
     if (this._background) {
-      Object.assign(result, this._background.frame(time));
+      const bgFrame = this._background.frame(time);
+      if (bgFrame.backgroundColor) {
+        result.backgroundColor = bgFrame.backgroundColor;
+      }
     }
 
-    // Apply children in order
+    // Apply children in order, collecting shapes
     for (const child of this.children) {
-      Object.assign(result, child.frame(time));
+      const childFrame = child.frame(time);
+      if (childFrame.backgroundColor) {
+        result.backgroundColor = childFrame.backgroundColor;
+      }
+      if (childFrame.shapes) {
+        allShapes.push(...childFrame.shapes);
+      }
+    }
+
+    if (allShapes.length > 0) {
+      result.shapes = allShapes;
     }
 
     return result;

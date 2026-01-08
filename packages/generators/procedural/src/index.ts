@@ -1,4 +1,4 @@
-import type { Frame, Generator } from "@medli/spec";
+import type { Frame, Generator, Shape, Circle } from "@medli/spec";
 
 /**
  * Sketch context - provides procedural drawing functions.
@@ -9,6 +9,9 @@ import type { Frame, Generator } from "@medli/spec";
 export interface Sketch {
   /** Set the background color for this frame */
   background(color: string): void;
+
+  /** Draw a circle at (x, y) with given radius */
+  circle(x: number, y: number, radius: number): void;
 
   /** Current time in milliseconds (from requestAnimationFrame) */
   readonly time: number;
@@ -43,11 +46,20 @@ export class ProceduralGenerator implements Generator {
   frame(time: number = 0): Frame {
     // Start with default frame state
     let backgroundColor = "#000000";
+    const shapes: Shape[] = [];
 
     // Create sketch context for this frame
     const sketch: Sketch = {
       background(color: string) {
         backgroundColor = color;
+      },
+      circle(x: number, y: number, radius: number) {
+        const circleShape: Circle = {
+          type: "circle",
+          center: { x, y },
+          radius,
+        };
+        shapes.push(circleShape);
       },
       time,
     };
@@ -55,6 +67,6 @@ export class ProceduralGenerator implements Generator {
     // Run user's draw function
     this.drawFn(sketch);
 
-    return { backgroundColor };
+    return { backgroundColor, shapes };
   }
 }
