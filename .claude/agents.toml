@@ -1,263 +1,38 @@
-# Medli Project Agent Configuration
-# These agents provide domain-specific context for Claude Code when working on each package.
+# Medli Agent Dispatch Table
+# Main conversation uses this to: detect package, brief agent, provide reading list
 
 [agents.spec]
-name = "spec"
-description = "Core types and interfaces for medli - the contract between generators and renderers"
-
-file_patterns = [
-  "packages/spec/**"
-]
-
-focus_areas = [
-  "Frame type definition",
-  "Generator interface",
-  "Renderer interface",
-  "Type compatibility across packages"
-]
-
-instructions = """
-This package defines the DATA EXCHANGE FORMAT between generators and renderers.
-
-BEFORE MAKING CHANGES: Read packages/spec/README.md for the full Frame design.
-
-Key points:
-- Frame is a Material-based tree structure (not flat)
-- Validation rules are documented in the README
-- Changes here affect ALL packages
-
-Run `npm run typecheck` after changes.
-"""
+patterns = ["packages/spec/**"]
+brief = "Frame spec types and validation. The intermediate representation contract between generators and renderers."
+reading_list = ["docs/ARCHITECTURE.md", "packages/spec/AGENT.md"]
 
 [agents.generator-procedural]
-name = "generator-procedural"
-description = "Procedural generator inspired by p5.js - imperative sketch pattern"
-
-file_patterns = [
-  "packages/generators/procedural/**"
-]
-
-focus_areas = [
-  "Sketch context API (the 'p' parameter)",
-  "Draw function pattern",
-  "Frame building from procedural calls",
-  "p5.js API conventions"
-]
-
-instructions = """
-INSPIRATION: p5.js (https://p5js.org)
-
-This generator uses an IMPERATIVE, PROCEDURAL pattern where:
-1. User provides a draw function: (sketch) => { ... }
-2. Draw function is called EVERY FRAME with fresh context
-3. User calls methods like sketch.background(), sketch.rect()
-4. Generator COLLECTS these calls and BUILDS the Frame
-
-KEY DIFFERENCE FROM p5.js:
-- p5.js uses globals: background(220)
-- We use parameter: sketch.background("#dcdcdc")
-- This allows multiple generators to coexist
-
-⚠️ CRITICAL: API vs IR DISTINCTION
-
-The user-facing API does NOT mirror the Frame IR tree - this is INTENTIONAL.
-
-- API: Imperative calls (fill(), rect(), push()/pop())
-- IR: Nested tree (shapes nested under their materials)
-
-The generator TRANSFORMS imperative calls into the nested Frame IR.
-See packages/generators/procedural/README.md for full design.
-
-DESIGN RULES:
-- The Sketch interface is the USER-FACING API
-- Methods should feel like p5.js (imperative, chainable where sensible)
-- State resets each frame - no accumulation between frames
-- Time is available as sketch.time (milliseconds)
-- fill()/stroke() set style state, push()/pop() manage style stack
-
-Test with test-app to verify visual output.
-"""
+patterns = ["packages/generators/procedural/**"]
+brief = "Opinionated, p5.js-inspired imperative sketch API. Transforms imperative function calls into Frame spec IR."
+reading_list = ["docs/ARCHITECTURE.md", "packages/generators/procedural/AGENT.md"]
 
 [agents.generator-object]
-name = "generator-object"
-description = "Object generator inspired by three.js - scene graph pattern"
-
-file_patterns = [
-  "packages/generators/object/**"
-]
-
-focus_areas = [
-  "Scene graph structure",
-  "SceneObject interface",
-  "Scene traversal",
-  "three.js patterns",
-  "API vs IR distinction"
-]
-
-instructions = """
-INSPIRATION: three.js (https://threejs.org)
-
-This generator uses a DECLARATIVE, OBJECT-ORIENTED pattern where:
-1. User constructs a Scene (the root Generator)
-2. User creates Materials and Shapes as INDEPENDENT objects
-3. Shapes REFERENCE materials via `.material` property
-4. Scene TRANSFORMS the object graph into Frame IR
-
-⚠️ CRITICAL: API vs IR DISTINCTION
-
-The user-facing API does NOT mirror the Frame IR tree - this is INTENTIONAL.
-
-- API: Flat references (shapes reference materials via .material property)
-- IR: Nested tree (shapes nested under their materials)
-
-The generator TRANSFORMS the flat-reference API into the nested Frame IR.
-See packages/generators/object/README.md for full design.
-
-KEY CONCEPTS:
-- Scene IS the Generator (not a wrapper around one)
-- Materials are independent objects, not containers for shapes
-- Shapes reference materials, they don't nest inside them in the API
-- Object graph persists between frames (unlike procedural)
-
-Test with test-app to verify visual output.
-"""
+patterns = ["packages/generators/object/**"]
+brief = "Opinionated, three.js-inspired declarative scene graph API. Transforms object references into Frame spec IR."
+reading_list = ["docs/ARCHITECTURE.md", "packages/generators/object/AGENT.md"]
 
 [agents.renderer-common]
-name = "renderer-common"
-description = "Shared renderer functionality"
-
-file_patterns = [
-  "packages/renderers/common/**"
-]
-
-focus_areas = [
-  "Animation loop management",
-  "requestAnimationFrame handling",
-  "Shared renderer behavior"
-]
-
-instructions = """
-This package provides SHARED FUNCTIONALITY for all renderers.
-
-WHAT BELONGS HERE:
-- Animation loop (loop/stop behavior)
-- requestAnimationFrame management
-- Any behavior identical across ALL renderers
-
-WHAT DOES NOT BELONG HERE:
-- DOM element handling (renderers differ)
-- Actual rendering logic
-- Platform-specific code
-
-CONSTRAINTS:
-- Must work in browser environment (uses requestAnimationFrame)
-- No DOM dependencies (those belong in specific renderers)
-- Keep minimal - only truly shared code
-"""
+patterns = ["packages/renderers/common/**"]
+brief = "Shared renderer functionality including animation loop management."
+reading_list = ["docs/ARCHITECTURE.md", "packages/renderers/common/AGENT.md"]
 
 [agents.renderer-svg]
-name = "renderer-svg"
-description = "SVG renderer - renders Frame to SVG elements"
-
-file_patterns = [
-  "packages/renderers/svg/**"
-]
-
-focus_areas = [
-  "SVG DOM manipulation",
-  "SVGSVGElement setup",
-  "SVG element creation and attributes",
-  "Efficient SVG updates"
-]
-
-instructions = """
-This renderer displays Frame data using SVG elements.
-
-RENDERING APPROACH:
-- Be efficient: reuse existing elements where possible
-- Update attributes rather than recreating elements when feasible
-- Use setAttribute() for SVG attributes
-- Use document.createElementNS() for new SVG elements
-
-SVG-SPECIFIC CONSIDERATIONS:
-- All SVG elements need correct namespace (http://www.w3.org/2000/svg)
-- Attribute names differ from HTML (e.g., 'fill' not 'background')
-- Group elements with <g> for transforms
-
-BEFORE MAKING CHANGES: Read packages/spec/README.md for Frame structure.
-Renderer must call validateFrame() and traverse Material tree to resolve styles.
-"""
+patterns = ["packages/renderers/svg/**"]
+brief = "SVG DOM renderer. Consumes Frame spec, produces SVG elements."
+reading_list = ["docs/ARCHITECTURE.md", "packages/renderers/svg/AGENT.md"]
 
 [agents.renderer-canvas]
-name = "renderer-canvas"
-description = "Canvas renderer - renders Frame to HTML5 Canvas"
-
-file_patterns = [
-  "packages/renderers/canvas/**"
-]
-
-focus_areas = [
-  "Canvas 2D API",
-  "CanvasRenderingContext2D operations",
-  "Efficient canvas drawing"
-]
-
-instructions = """
-This renderer displays Frame data using HTML5 Canvas.
-
-RENDERING APPROACH:
-- Get context ONCE in constructor
-- REDRAW everything each render() call (canvas is immediate mode)
-- Clear or fill background before drawing shapes
-
-CANVAS-SPECIFIC CONSIDERATIONS:
-- Immediate mode: must redraw everything each frame
-- Coordinate system: (0,0) is top-left
-- Context state: use save()/restore() if changing transforms
-- Path-based shapes need beginPath(), fill()/stroke()
-
-BEFORE MAKING CHANGES: Read packages/spec/README.md for Frame structure.
-Renderer must call validateFrame() and traverse Material tree to resolve styles.
-"""
+patterns = ["packages/renderers/canvas/**"]
+brief = "Canvas 2D renderer. Consumes Frame spec, produces Canvas draw calls."
+reading_list = ["docs/ARCHITECTURE.md", "packages/renderers/canvas/AGENT.md"]
 
 [agents.test-app]
-name = "test-app"
-description = "Visual test application for renderer verification with Playwright"
-
-file_patterns = [
-  "packages/test-app/**"
-]
-
-exclude_patterns = [
-  "packages/test-app/dist/**"
-]
-
-focus_areas = [
-  "Visual verification workflow",
-  "Playwright MCP integration",
-  "Generator/renderer combinations",
-  "Code display for inspection"
-]
-
-instructions = """
-This package provides VISUAL VERIFICATION of renderers.
-
-PURPOSE:
-- Show all generator/renderer combinations side-by-side
-- Display source code for each generator
-- Enable Playwright MCP to screenshot and verify output
-- Confirm procedural and object generators produce identical visuals
-
-VERIFICATION WORKFLOW:
-1. Run: npm run dev
-2. Navigate with Playwright: http://localhost:5173
-3. Take screenshots to verify rendering
-4. Compare procedural vs object output (should match)
-
-WHEN ADDING NEW PRIMITIVES:
-1. Update procedural generator example to use new method
-2. Update object generator example to use new class
-3. Verify both produce identical visual output
-
-DO NOT add production features here - this is for testing only.
-"""
+patterns = ["packages/test-app/**"]
+exclude = ["packages/test-app/dist/**"]
+brief = "Visual verification app. Displays all generator/renderer combinations for Playwright comparison."
+reading_list = ["docs/ARCHITECTURE.md", "packages/test-app/AGENT.md"]

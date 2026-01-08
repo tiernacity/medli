@@ -1,5 +1,13 @@
 [
   {
+    "hash": "1c769929434697ac59b6dbffa723a09e53f4e649",
+    "short_hash": "1c76992",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T14:15:14Z",
+    "message": "feat: complete material system with TDD tests and three.js-style API\n\n- Add comprehensive unit tests for both generators (92 tests total)\n- ProceduralGenerator: fill()/stroke()/strokeWidth() create ChildMaterial nodes\n- ProceduralGenerator: push()/pop() for nested material contexts\n- ObjectGenerator: Fix API to use three.js-style material references\n  - Materials are independent objects, not containers\n  - Shapes reference materials via .material property\n  - Generator transforms flat API to nested Frame IR tree\n- Update test-app with visual pattern exercising all material features\n- Update agents.toml to clarify API vs IR distinction\n- All 4 renderer outputs visually identical (verified with Playwright)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 10
+  },
+  {
     "hash": "027481e1bd619e1d7b0c45b7c679db4870e8e065",
     "short_hash": "027481e",
     "author": "Chris Tierney",

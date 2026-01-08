@@ -223,75 +223,63 @@ All generator and renderer packages depend on `@medli/spec`.
 
 **THIS IS MANDATORY. ALL file edits MUST be performed via Task agents.**
 
-Sub-agents are defined in `.claude/agents.toml`. Each agent provides domain-specific context, constraints, and instructions for its package.
+### How It Works
+
+1. `.claude/agents.toml` - Dispatch table with `patterns`, `brief`, and `reading_list` per package
+2. `docs/ARCHITECTURE.md` - Cross-cutting design concerns (Frame IR, API vs IR distinction, parity requirements)
+3. `packages/*/AGENT.md` - Package-specific instructions with strong directives
 
 ### ⚠️ CRITICAL: Sub-Agents for ALL File Edits
 
 **NEVER edit files directly in the main conversation.** Instead:
 
-1. **Spawn a Task agent** for each package you need to modify
-2. **Include the agent's instructions** from `.claude/agents.toml` in the Task prompt
+1. **Identify the package** from `.claude/agents.toml` using file patterns
+2. **Spawn a Task agent** with the brief and reading list
 3. **Run agents in parallel** when editing multiple independent packages
 
-This is required because:
-- **Context control**: Long-running activities benefit from scoped context per package
-- **Domain expertise**: Each agent has specific knowledge (p5.js patterns, three.js patterns, SVG APIs, Canvas APIs)
-- **Parallel execution**: Multiple packages can be modified simultaneously
-- **Consistency**: Domain-specific rules are applied uniformly
-
-### File Edit Workflow
-
-**Step 1: Identify affected packages**
-
-For a feature like "add lines", determine which packages need changes:
-- `spec` - Add Line type
-- `generator-procedural` - Add line() method
-- `generator-object` - Add Line class
-- `renderer-svg` - Add line rendering
-- `renderer-canvas` - Add line rendering
-- `test-app` - Update examples
-
-**Step 2: Spawn Task agents for each package**
-
-Use `subagent_type: "general-purpose"` and include the agent context:
+### Task Agent Prompt Pattern
 
 ```
-# Example Task prompt for generator-procedural:
-
 Working on packages/generators/procedural/
 
-AGENT CONTEXT (from agents.toml):
-- INSPIRATION: p5.js
-- Pattern: imperative sketch with draw function called every frame
-- Sketch interface is the user-facing API
-- When adding primitives: add method to Sketch interface, store call data, include in Frame
+Read these files first (in order):
+1. docs/ARCHITECTURE.md
+2. packages/generators/procedural/AGENT.md
 
-TASK: Add line() and lineOffset() methods to the Sketch interface.
-- line(x1, y1, x2, y2) draws from start to end
-- lineOffset(x, y, dx, dy) draws from start with offset
-- Both create Line shapes in the Frame
+Brief: Opinionated, p5.js-inspired imperative sketch API. Transforms
+imperative function calls into Frame spec IR.
+
+TASK: Add rectangle() method to the Sketch interface.
+- rectangle(x, y, width, height) draws a rectangle
+- Should create Rectangle shape in the Frame
 
 Edit the file and return confirmation when complete.
 ```
 
-**Step 3: Run independent agents in parallel**
+The Task agent reads its AGENT.md file which contains:
+- Strong directives ("Your job is to be opinionated about...")
+- Key files to understand
+- Constraints and patterns
+- Review checklist
+
+### Parallel Execution
 
 When packages don't depend on each other's changes, spawn multiple Task agents in a SINGLE message:
 
 ```
-# These can run in parallel:
-- Task 1: generator-procedural (add line methods)
-- Task 2: generator-object (add Line class)
-- Task 3: renderer-svg (add line rendering)
-- Task 4: renderer-canvas (add line rendering)
+# These can run in parallel (after spec changes):
+- Task 1: generator-procedural
+- Task 2: generator-object
+- Task 3: renderer-svg
+- Task 4: renderer-canvas
 
-# This must wait for spec changes:
-- Task 5: test-app (update examples after generators are done)
+# This must wait for generators:
+- Task 5: test-app (update examples)
 ```
 
-**Step 4: Verify after all agents complete**
+### Verification
 
-Run checks in the main conversation:
+After all agents complete, run checks in the main conversation:
 ```bash
 npm run typecheck && npm run lint && npm run format:check && npm run test
 ```
@@ -300,35 +288,10 @@ npm run typecheck && npm run lint && npm run format:check && npm run test
 
 | Action | Requirement |
 |--------|-------------|
-| **ANY file edit** | **MUST use Task agent with domain context** |
+| **ANY file edit** | **MUST use Task agent** |
 | Exploring a package | Task with Explore subagent_type |
 | Multi-package feature | One Task agent PER package |
 | Verification | Main conversation (run tests, visual check) |
-
-### Available Agents
-
-| Agent | Package | File Pattern | Focus |
-|-------|---------|--------------|-------|
-| `spec` | `packages/spec` | `packages/spec/**` | Data exchange types |
-| `generator-procedural` | `packages/generators/procedural` | `packages/generators/procedural/**` | p5.js patterns |
-| `generator-object` | `packages/generators/object` | `packages/generators/object/**` | three.js patterns |
-| `renderer-common` | `packages/renderers/common` | `packages/renderers/common/**` | Shared loop logic |
-| `renderer-svg` | `packages/renderers/svg` | `packages/renderers/svg/**` | SVG DOM rendering |
-| `renderer-canvas` | `packages/renderers/canvas` | `packages/renderers/canvas/**` | Canvas 2D rendering |
-| `test-app` | `packages/test-app` | `packages/test-app/**` | Visual verification |
-
-### Example: Adding a New Primitive
-
-For a feature touching 6 packages, spawn **at least 6 Task agents**:
-
-1. **spec agent**: Add type to Frame
-2. **generator-procedural agent**: Add sketch method
-3. **generator-object agent**: Add scene object class
-4. **renderer-svg agent**: Add SVG rendering
-5. **renderer-canvas agent**: Add Canvas rendering
-6. **test-app agent**: Update examples
-
-Agents 2-5 can run in parallel after agent 1 completes (they depend on spec types).
 
 ---
 

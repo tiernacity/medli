@@ -1517,6 +1517,17 @@
       "created_at": "2026-01-08T14:13:24.334722+00:00",
       "updated_at": "2026-01-08T14:13:24.334722+00:00",
       "metadata_json": "{\"branch\":\"feat/lines-color-and-fill\",\"confidence\":98}"
+    },
+    {
+      "id": 139,
+      "change_id": "3cca07b5-a0ff-4df7-8b1e-3e5826df45c4",
+      "node_type": "action",
+      "title": "Committed and pushed material system completion",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T14:15:25.867552+00:00",
+      "updated_at": "2026-01-08T14:15:25.867552+00:00",
+      "metadata_json": "{\"branch\":\"feat/lines-color-and-fill\",\"commit\":\"1c76992\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -2971,6 +2982,17 @@
       "weight": 1.0,
       "rationale": "Visual confirmation of API fix",
       "created_at": "2026-01-08T14:13:24.432968+00:00"
+    },
+    {
+      "id": 133,
+      "from_node_id": 121,
+      "to_node_id": 139,
+      "from_change_id": "7e06f7e4-9f2c-4e0f-88c2-8b970d1f66c5",
+      "to_change_id": "3cca07b5-a0ff-4df7-8b1e-3e5826df45c4",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Goal completed",
+      "created_at": "2026-01-08T14:15:25.939856+00:00"
     }
   ]
 }
