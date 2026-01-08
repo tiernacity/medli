@@ -1891,6 +1891,83 @@
       "created_at": "2026-01-08T16:16:28.513701+00:00",
       "updated_at": "2026-01-08T16:16:28.513701+00:00",
       "metadata_json": "{\"branch\":\"feat/transforms\",\"commit\":\"e2456eb\",\"confidence\":95}"
+    },
+    {
+      "id": 173,
+      "change_id": "2e262d4b-6ad1-4d8b-b517-119acb3c2564",
+      "node_type": "observation",
+      "title": "User noticed: in object generator, Group is only way to transform. Shapes should likely have own transform properties like three.js Object3D",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T16:33:30.617546+00:00",
+      "updated_at": "2026-01-08T16:33:30.617546+00:00",
+      "metadata_json": "{\"branch\":\"feat/transforms\",\"confidence\":85}"
+    },
+    {
+      "id": 174,
+      "change_id": "a90167f5-8c1a-4fdc-9898-09dbe35b3ec8",
+      "node_type": "decision",
+      "title": "SceneObject base class design: what properties should it have?",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T16:42:57.135187+00:00",
+      "updated_at": "2026-01-08T16:42:57.135187+00:00",
+      "metadata_json": "{\"branch\":\"feat/transforms\",\"confidence\":80}"
+    },
+    {
+      "id": 175,
+      "change_id": "375907bf-156c-496a-8893-da9181980492",
+      "node_type": "option",
+      "title": "SceneObject has transforms only, shapes reference Materials, Groups have NO material",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T16:54:17.195559+00:00",
+      "updated_at": "2026-01-08T16:54:17.195559+00:00",
+      "metadata_json": "{\"branch\":\"feat/transforms\",\"confidence\":90}"
+    },
+    {
+      "id": 176,
+      "change_id": "347a425f-3128-4d13-be1d-7b859c6af37d",
+      "node_type": "option",
+      "title": "SceneObject has both transform and inline material properties",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T16:54:18.630996+00:00",
+      "updated_at": "2026-01-08T16:54:18.630996+00:00",
+      "metadata_json": "{\"branch\":\"feat/transforms\",\"confidence\":30}"
+    },
+    {
+      "id": 177,
+      "change_id": "7e19ba21-3456-445b-9015-a62cb91fd5d6",
+      "node_type": "outcome",
+      "title": "Selected: SceneObject base with transforms, shapes reference Materials, Groups have no material, shapes without material use Scene defaults",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T16:54:20.025204+00:00",
+      "updated_at": "2026-01-08T16:54:20.025204+00:00",
+      "metadata_json": "{\"branch\":\"feat/transforms\",\"confidence\":95}"
+    },
+    {
+      "id": 178,
+      "change_id": "24367842-4ffb-41f7-9071-585023db19ee",
+      "node_type": "outcome",
+      "title": "SceneObject refactor complete - shapes have transforms, Groups have no material, 163 tests pass, visual parity verified",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T17:04:45.199880+00:00",
+      "updated_at": "2026-01-08T17:04:45.199880+00:00",
+      "metadata_json": "{\"branch\":\"feat/transforms\",\"confidence\":95}"
+    },
+    {
+      "id": 179,
+      "change_id": "68693e63-7748-44ed-9f90-76a30e1f8f87",
+      "node_type": "action",
+      "title": "Committed SceneObject refactor",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T17:05:11.130600+00:00",
+      "updated_at": "2026-01-08T17:05:11.130600+00:00",
+      "metadata_json": "{\"branch\":\"feat/transforms\",\"commit\":\"1489a94\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -3763,6 +3840,72 @@
       "weight": 1.0,
       "rationale": "Deployment",
       "created_at": "2026-01-08T16:16:28.558324+00:00"
+    },
+    {
+      "id": 171,
+      "from_node_id": 173,
+      "to_node_id": 174,
+      "from_change_id": "2e262d4b-6ad1-4d8b-b517-119acb3c2564",
+      "to_change_id": "a90167f5-8c1a-4fdc-9898-09dbe35b3ec8",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Design question",
+      "created_at": "2026-01-08T16:42:57.183293+00:00"
+    },
+    {
+      "id": 172,
+      "from_node_id": 174,
+      "to_node_id": 175,
+      "from_change_id": "a90167f5-8c1a-4fdc-9898-09dbe35b3ec8",
+      "to_change_id": "375907bf-156c-496a-8893-da9181980492",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Recommended option",
+      "created_at": "2026-01-08T16:54:17.240364+00:00"
+    },
+    {
+      "id": 173,
+      "from_node_id": 174,
+      "to_node_id": 176,
+      "from_change_id": "a90167f5-8c1a-4fdc-9898-09dbe35b3ec8",
+      "to_change_id": "347a425f-3128-4d13-be1d-7b859c6af37d",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Rejected - departs from three.js",
+      "created_at": "2026-01-08T16:54:18.679648+00:00"
+    },
+    {
+      "id": 174,
+      "from_node_id": 175,
+      "to_node_id": 177,
+      "from_change_id": "375907bf-156c-496a-8893-da9181980492",
+      "to_change_id": "7e19ba21-3456-445b-9015-a62cb91fd5d6",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Selected design",
+      "created_at": "2026-01-08T16:54:20.072188+00:00"
+    },
+    {
+      "id": 175,
+      "from_node_id": 177,
+      "to_node_id": 178,
+      "from_change_id": "7e19ba21-3456-445b-9015-a62cb91fd5d6",
+      "to_change_id": "24367842-4ffb-41f7-9071-585023db19ee",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation complete",
+      "created_at": "2026-01-08T17:04:45.245209+00:00"
+    },
+    {
+      "id": 176,
+      "from_node_id": 178,
+      "to_node_id": 179,
+      "from_change_id": "24367842-4ffb-41f7-9071-585023db19ee",
+      "to_change_id": "68693e63-7748-44ed-9f90-76a30e1f8f87",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Deployment",
+      "created_at": "2026-01-08T17:05:11.176437+00:00"
     }
   ]
 }

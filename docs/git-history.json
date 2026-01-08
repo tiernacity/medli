@@ -1,5 +1,13 @@
 [
   {
+    "hash": "1489a945ac708f0877044953c05956daac26004e",
+    "short_hash": "1489a94",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T17:05:02Z",
+    "message": "refactor: SceneObject base class with transforms for all scene objects\n\nDesign changes (three.js-inspired):\n- SceneObject abstract base class provides position, rotation, scale\n- Shapes (Circle, Line) extend SceneObject - have transforms directly\n- Group extends SceneObject - has transforms, NO material property\n- Shapes without material use Scene's default styles\n\nThis matches three.js patterns where:\n- Object3D provides transforms for all objects\n- Mesh has both transforms and material\n- Group is purely organizational (no material)\n\nAPI improvement - shapes can now be transformed directly:\n```typescript\nconst circle = new Circle(0, 0, 10);\ncircle.position = { x: 50, y: 50 };\ncircle.material = redMaterial;\nscene.add(circle);\n```\n\nInstead of requiring a Group wrapper for every transform.\n\n- Updated AGENT.md with design decisions and class hierarchy\n- Updated ARCHITECTURE.md with object generator patterns\n- 163 tests passing, visual parity verified\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 5
+  },
+  {
     "hash": "e2456eb1fe72ee8a7fbce15b2c593a801ce9a6e1",
     "short_hash": "e2456eb",
     "author": "Chris Tierney",
