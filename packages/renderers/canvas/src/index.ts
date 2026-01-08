@@ -48,16 +48,9 @@ export class CanvasRenderer extends BaseRenderer {
 
     // Extract and load resources
     const urls = extractResourceUrls(frame);
-    this.resourceManager.markNeeded(urls);
-
-    const resourceMap = new Map<string, ImageBitmap>();
+    let resourceMap: Map<string, ImageBitmap>;
     try {
-      await Promise.all(
-        Array.from(urls).map(async (url) => {
-          const resource = await this.resourceManager.getResource(url);
-          resourceMap.set(url, resource);
-        })
-      );
+      resourceMap = await this.resourceManager.resolveResources(urls);
     } catch (error) {
       console.error("Failed to load resources:", error);
       return;
@@ -95,9 +88,6 @@ export class CanvasRenderer extends BaseRenderer {
     this.renderNode(frame.root, [frame.root], resourceMap);
 
     this.context.restore();
-
-    // Cleanup unused resources
-    this.resourceManager.pruneUnused();
   }
 
   destroy(): void {

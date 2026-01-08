@@ -29,17 +29,45 @@ type ResourceState<T> =
 export class ResourceManager<T> {
   private postProcessor: ResourcePostProcessor<T>;
   private resources = new Map<string, ResourceState<T>>();
-  private neededUrls = new Set<string>();
 
   constructor(postProcessor: ResourcePostProcessor<T>) {
     this.postProcessor = postProcessor;
   }
 
   /**
-   * Get a resource by URL, fetching and processing if needed.
-   * Throws if the fetch or processing fails.
+   * Resolve all requested resources.
+   *
+   * This is the single method renderers should call:
+   * 1. Fetches any URLs not already cached
+   * 2. Returns Map of URL -> processed resource for all requested URLs
+   * 3. Prunes resources no longer needed (cached but not in the requested set)
+   *
+   * @param urls - Set of URLs needed
+   * @returns Map of URL to processed resource for all requested URLs
+   * @throws If any fetch or processing fails
    */
-  async getResource(url: string): Promise<T> {
+  async resolveResources(urls: Set<string>): Promise<Map<string, T>> {
+    // Fetch and process all requested URLs
+    const result = new Map<string, T>();
+
+    await Promise.all(
+      Array.from(urls).map(async (url) => {
+        const resource = await this.getResource(url);
+        result.set(url, resource);
+      })
+    );
+
+    // Prune resources no longer needed
+    this.pruneUnused(urls);
+
+    return result;
+  }
+
+  /**
+   * Get a resource by URL, fetching and processing if needed.
+   * Internal method - renderers should use resolveResources() instead.
+   */
+  private async getResource(url: string): Promise<T> {
     let state = this.resources.get(url);
 
     if (!state) {
@@ -80,20 +108,12 @@ export class ResourceManager<T> {
   }
 
   /**
-   * Mark which URLs are needed for the current frame.
-   * Call before rendering, then call pruneUnused() after.
-   */
-  markNeeded(urls: Set<string>): void {
-    this.neededUrls = urls;
-  }
-
-  /**
    * Dispose resources that are no longer needed.
-   * Call after rendering completes.
+   * Internal method - called automatically by resolveResources().
    */
-  pruneUnused(): void {
+  private pruneUnused(neededUrls: Set<string>): void {
     for (const [url, state] of this.resources.entries()) {
-      if (!this.neededUrls.has(url) && state.status === "ready") {
+      if (!neededUrls.has(url) && state.status === "ready") {
         this.postProcessor.dispose(state.processed);
         this.resources.delete(url);
       }
@@ -110,7 +130,6 @@ export class ResourceManager<T> {
       }
     }
     this.resources.clear();
-    this.neededUrls.clear();
   }
 }
 

@@ -88,16 +88,9 @@ export class SvgRenderer extends BaseRenderer {
 
     // Extract and load resources
     const urls = extractResourceUrls(frame);
-    this.resourceManager.markNeeded(urls);
-
-    const resourceMap = new Map<string, ImageResource>();
+    let resourceMap: Map<string, ImageResource>;
     try {
-      await Promise.all(
-        Array.from(urls).map(async (url) => {
-          const resource = await this.resourceManager.getResource(url);
-          resourceMap.set(url, resource);
-        })
-      );
+      resourceMap = await this.resourceManager.resolveResources(urls);
     } catch (error) {
       console.error("Failed to load resources:", error);
       return;
@@ -148,9 +141,6 @@ export class SvgRenderer extends BaseRenderer {
 
     // Traverse material tree and render shapes
     this.renderNode(frame.root, [frame.root], this.rootGroup, resourceMap);
-
-    // Cleanup unused resources
-    this.resourceManager.pruneUnused();
   }
 
   destroy(): void {

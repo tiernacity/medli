@@ -1,5 +1,13 @@
 [
   {
+    "hash": "2d18e3c6597b1de6319325999d5c5757552f42e3",
+    "short_hash": "2d18e3c",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T22:11:25Z",
+    "message": "feat: add image cropping support\n\nAdd optional crop property to Image shape for rendering partial images.\nUseful for sprite sheets and image atlases.\n\n- Add ImageCrop type and optional crop property to spec\n- Extend image() in ProceduralGenerator with crop parameters\n- Extend Image class in ObjectGenerator with crop parameters\n- Canvas renderer uses 9-param drawImage() for cropping\n- SVG renderer uses clipPath with scaled image positioning\n- Add image-crop test scene for visual verification\n- 187 tests pass, all 4 renderers produce identical output\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 10
+  },
+  {
     "hash": "1de3de8209f3f059b028bf1f8b0cb42be9ca59f3",
     "short_hash": "1de3de8",
     "author": "Chris Tierney",

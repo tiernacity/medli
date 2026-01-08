@@ -2540,6 +2540,149 @@
       "created_at": "2026-01-08T22:09:55.595074+00:00",
       "updated_at": "2026-01-08T22:09:55.595074+00:00",
       "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":95}"
+    },
+    {
+      "id": 232,
+      "change_id": "03a145a1-3197-4d16-a875-5457e274a1d4",
+      "node_type": "action",
+      "title": "Committed and pushed image cropping feature",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T22:11:41.312554+00:00",
+      "updated_at": "2026-01-08T22:11:41.312554+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"commit\":\"2d18e3c\",\"confidence\":95}"
+    },
+    {
+      "id": 233,
+      "change_id": "5ff4c5ab-eb43-4f58-b380-152ebc72761e",
+      "node_type": "action",
+      "title": "Examining resource deduplication for multiple image nodes",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T22:13:31.813016+00:00",
+      "updated_at": "2026-01-08T22:13:31.813016+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":85}"
+    },
+    {
+      "id": 234,
+      "change_id": "7bf04165-fb9c-408b-9838-83496054d5ad",
+      "node_type": "observation",
+      "title": "Deduplication working correctly: URL-keyed Map in ResourceManager means same URL fetched once, cached, reused across frames and across multiple Image nodes in same Frame",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T22:14:06.821260+00:00",
+      "updated_at": "2026-01-08T22:14:06.821260+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":95}"
+    },
+    {
+      "id": 235,
+      "change_id": "c2039de2-8fa6-44d2-a4f8-bd46180770aa",
+      "node_type": "observation",
+      "title": "Dedup mechanism: extractResourceUrls() returns Set (unique URLs), getResource() caches by URL key, multiple Image nodes share same fetched resource",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T22:14:12.502349+00:00",
+      "updated_at": "2026-01-08T22:14:12.502349+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":95}"
+    },
+    {
+      "id": 236,
+      "change_id": "ad40e46b-c20e-4fe7-8a50-53257dd82f33",
+      "node_type": "observation",
+      "title": "No cross-renderer dedup: each renderer owns its ResourceManager. In test-app with 4 renderers, same image fetched 4x. Acceptable for V1 - browser HTTP cache mitigates.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T22:14:18.037182+00:00",
+      "updated_at": "2026-01-08T22:14:18.037182+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":90}"
+    },
+    {
+      "id": 237,
+      "change_id": "59c99787-70bf-4d3d-9e52-3ee2edfb6daa",
+      "node_type": "observation",
+      "title": "In-flight dedup: ResourceState tracks 'loading' with shared Promise. Concurrent getResource() calls for same URL await same fetch, no race conditions.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T22:14:24.925442+00:00",
+      "updated_at": "2026-01-08T22:14:24.925442+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":95}"
+    },
+    {
+      "id": 238,
+      "change_id": "0fdaa009-3109-486f-b211-f2c5180f0227",
+      "node_type": "outcome",
+      "title": "Resource deduplication review complete: V1 implementation correct. URL-keyed cache provides per-renderer dedup. Cross-renderer sharing deferred (browser cache sufficient).",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T22:14:30.484628+00:00",
+      "updated_at": "2026-01-08T22:14:30.484628+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":95}"
+    },
+    {
+      "id": 239,
+      "change_id": "59999ce4-2eab-466c-8253-2579ee4171c6",
+      "node_type": "observation",
+      "title": "API design wrong: current design has renderer call markNeeded(), then getResource() per URL, then pruneUnused(). Too many touchpoints, leaky abstraction.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T22:22:10.533+00:00",
+      "updated_at": "2026-01-08T22:22:10.533+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":95}"
+    },
+    {
+      "id": 240,
+      "change_id": "2c24f556-5dce-41f3-ab03-9b778a1c485e",
+      "node_type": "observation",
+      "title": "Correct API: renderer generates single resource requirements spec from Frame, hands to ResourceManager ONCE, awaits response with all processed resources. Prune happens internally before return.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T22:22:15.685996+00:00",
+      "updated_at": "2026-01-08T22:22:15.685996+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":95}"
+    },
+    {
+      "id": 241,
+      "change_id": "0a073990-791d-4a0d-995f-76f911b949b9",
+      "node_type": "goal",
+      "title": "Fix ResourceManager API: single method, single call per frame",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T22:22:36.936309+00:00",
+      "updated_at": "2026-01-08T22:22:36.936309+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":90,\"prompt\":\"I'm looking at the resource manager API. It's not what I was hoping for and not what I described. I'd like the renderer to generate a *single* object with the spec for the image resources it need. I hands this *once per frame* to the resource manager. Then awaits the response. The response has all the required/processed resources. Before returning, this method will perform the \\\"prune\\\" step.\\n\\nThe renderer will therefore only use a single API in the resource manager - to get all its resources - and only once per frame.\"}"
+    },
+    {
+      "id": 242,
+      "change_id": "ddbff037-3bd5-4934-a364-f9bb2431a4a6",
+      "node_type": "action",
+      "title": "Implementing single-method ResourceManager API",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T22:22:41.445103+00:00",
+      "updated_at": "2026-01-08T22:22:41.445103+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":85}"
+    },
+    {
+      "id": 243,
+      "change_id": "514aee7a-a672-430d-85f5-61ccf2476e26",
+      "node_type": "outcome",
+      "title": "ResourceManager API refactored: single resolveFrame(urls) method. Renderers use one call per frame. 187 tests pass, all checks pass.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T22:26:11.545343+00:00",
+      "updated_at": "2026-01-08T22:26:11.545343+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":95}"
+    },
+    {
+      "id": 244,
+      "change_id": "4368afae-a7a3-4806-ae23-bcbb1d1c18d3",
+      "node_type": "outcome",
+      "title": "Visual verification passed: Image Transforms and Image Crop scenes render identically across all 4 renderers",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-08T22:37:51.690708+00:00",
+      "updated_at": "2026-01-08T22:37:51.690708+00:00",
+      "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":100}"
     }
   ],
   "edges": [
@@ -5083,6 +5226,171 @@
       "weight": 1.0,
       "rationale": "Goal achieved",
       "created_at": "2026-01-08T22:10:01.146756+00:00"
+    },
+    {
+      "id": 232,
+      "from_node_id": 231,
+      "to_node_id": 232,
+      "from_change_id": "94209561-20c5-42aa-9336-8e34b6426f86",
+      "to_change_id": "03a145a1-3197-4d16-a875-5457e274a1d4",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Deployment",
+      "created_at": "2026-01-08T22:11:41.333594+00:00"
+    },
+    {
+      "id": 233,
+      "from_node_id": 220,
+      "to_node_id": 233,
+      "from_change_id": "cb93b402-9b17-47fe-b6a9-0664edf2530e",
+      "to_change_id": "5ff4c5ab-eb43-4f58-b380-152ebc72761e",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation of goal",
+      "created_at": "2026-01-08T22:13:35.661383+00:00"
+    },
+    {
+      "id": 234,
+      "from_node_id": 233,
+      "to_node_id": 234,
+      "from_change_id": "5ff4c5ab-eb43-4f58-b380-152ebc72761e",
+      "to_change_id": "7bf04165-fb9c-408b-9838-83496054d5ad",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Investigation finding",
+      "created_at": "2026-01-08T22:14:12.437746+00:00"
+    },
+    {
+      "id": 235,
+      "from_node_id": 233,
+      "to_node_id": 235,
+      "from_change_id": "5ff4c5ab-eb43-4f58-b380-152ebc72761e",
+      "to_change_id": "c2039de2-8fa6-44d2-a4f8-bd46180770aa",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation detail",
+      "created_at": "2026-01-08T22:14:17.975552+00:00"
+    },
+    {
+      "id": 236,
+      "from_node_id": 233,
+      "to_node_id": 236,
+      "from_change_id": "5ff4c5ab-eb43-4f58-b380-152ebc72761e",
+      "to_change_id": "ad40e46b-c20e-4fe7-8a50-53257dd82f33",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Cross-renderer consideration",
+      "created_at": "2026-01-08T22:14:24.854296+00:00"
+    },
+    {
+      "id": 237,
+      "from_node_id": 233,
+      "to_node_id": 237,
+      "from_change_id": "5ff4c5ab-eb43-4f58-b380-152ebc72761e",
+      "to_change_id": "59c99787-70bf-4d3d-9e52-3ee2edfb6daa",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Concurrency behavior",
+      "created_at": "2026-01-08T22:14:30.423593+00:00"
+    },
+    {
+      "id": 238,
+      "from_node_id": 233,
+      "to_node_id": 238,
+      "from_change_id": "5ff4c5ab-eb43-4f58-b380-152ebc72761e",
+      "to_change_id": "0fdaa009-3109-486f-b211-f2c5180f0227",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Investigation outcome",
+      "created_at": "2026-01-08T22:14:34.646922+00:00"
+    },
+    {
+      "id": 239,
+      "from_node_id": 220,
+      "to_node_id": 238,
+      "from_change_id": "cb93b402-9b17-47fe-b6a9-0664edf2530e",
+      "to_change_id": "0fdaa009-3109-486f-b211-f2c5180f0227",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Goal achieved",
+      "created_at": "2026-01-08T22:14:34.708046+00:00"
+    },
+    {
+      "id": 240,
+      "from_node_id": 238,
+      "to_node_id": 239,
+      "from_change_id": "0fdaa009-3109-486f-b211-f2c5180f0227",
+      "to_change_id": "59999ce4-2eab-466c-8253-2579ee4171c6",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Design correction discovered",
+      "created_at": "2026-01-08T22:22:15.752958+00:00"
+    },
+    {
+      "id": 241,
+      "from_node_id": 239,
+      "to_node_id": 240,
+      "from_change_id": "59999ce4-2eab-466c-8253-2579ee4171c6",
+      "to_change_id": "2c24f556-5dce-41f3-ab03-9b778a1c485e",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Correct design",
+      "created_at": "2026-01-08T22:22:26.184664+00:00"
+    },
+    {
+      "id": 242,
+      "from_node_id": 240,
+      "to_node_id": 241,
+      "from_change_id": "2c24f556-5dce-41f3-ab03-9b778a1c485e",
+      "to_change_id": "0a073990-791d-4a0d-995f-76f911b949b9",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Goal to fix design",
+      "created_at": "2026-01-08T22:22:41.381928+00:00"
+    },
+    {
+      "id": 243,
+      "from_node_id": 241,
+      "to_node_id": 242,
+      "from_change_id": "0a073990-791d-4a0d-995f-76f911b949b9",
+      "to_change_id": "ddbff037-3bd5-4934-a364-f9bb2431a4a6",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation",
+      "created_at": "2026-01-08T22:22:48.114180+00:00"
+    },
+    {
+      "id": 244,
+      "from_node_id": 242,
+      "to_node_id": 243,
+      "from_change_id": "ddbff037-3bd5-4934-a364-f9bb2431a4a6",
+      "to_change_id": "514aee7a-a672-430d-85f5-61ccf2476e26",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation complete",
+      "created_at": "2026-01-08T22:26:16.204985+00:00"
+    },
+    {
+      "id": 245,
+      "from_node_id": 241,
+      "to_node_id": 243,
+      "from_change_id": "0a073990-791d-4a0d-995f-76f911b949b9",
+      "to_change_id": "514aee7a-a672-430d-85f5-61ccf2476e26",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Goal achieved",
+      "created_at": "2026-01-08T22:26:16.268439+00:00"
+    },
+    {
+      "id": 246,
+      "from_node_id": 243,
+      "to_node_id": 244,
+      "from_change_id": "514aee7a-a672-430d-85f5-61ccf2476e26",
+      "to_change_id": "4368afae-a7a3-4806-ae23-bcbb1d1c18d3",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Visual verification",
+      "created_at": "2026-01-08T22:37:56.570247+00:00"
     }
   ]
 }
