@@ -143,8 +143,22 @@ export interface Sketch {
   /** Draw a line from (x, y) with offset (dx, dy) */
   lineOffset(x: number, y: number, dx: number, dy: number): void;
 
-  /** Draw an image at position (x, y) with given dimensions */
-  image(url: string, x: number, y: number, width: number, height: number): void;
+  /**
+   * Draw an image at position (x, y) with given dimensions.
+   * Optionally crop the source image by specifying cropX, cropY, cropWidth, cropHeight.
+   * Crop coordinates are in source image pixels.
+   */
+  image(
+    url: string,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    cropX?: number,
+    cropY?: number,
+    cropWidth?: number,
+    cropHeight?: number
+  ): void;
 
   /** Save current style and transform state, start a new nested context */
   push(): void;
@@ -450,13 +464,30 @@ export class ProceduralGenerator implements Generator {
         };
         addShape(lineShape);
       },
-      image(url: string, x: number, y: number, width: number, height: number) {
+      image(
+        url: string,
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+        cropX?: number,
+        cropY?: number,
+        cropWidth?: number,
+        cropHeight?: number
+      ) {
         const imageShape: Image = {
           type: "image",
           url,
           position: { x, y },
           width,
           height,
+          crop:
+            cropX !== undefined &&
+            cropY !== undefined &&
+            cropWidth !== undefined &&
+            cropHeight !== undefined
+              ? { x: cropX, y: cropY, width: cropWidth, height: cropHeight }
+              : undefined,
         };
         addShape(imageShape);
       },

@@ -23,6 +23,7 @@ describe("SvgRenderer", () => {
     mockElement = {
       setAttribute: jest.fn(),
       appendChild: jest.fn(),
+      querySelector: jest.fn().mockReturnValue(null),
     } as unknown as SVGSVGElement;
 
     // Mock document.createElementNS to return appropriate element types

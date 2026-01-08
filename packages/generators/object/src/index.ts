@@ -297,13 +297,21 @@ export class Image extends Shape {
   y: number;
   width: number;
   height: number;
+  cropX?: number;
+  cropY?: number;
+  cropWidth?: number;
+  cropHeight?: number;
 
   constructor(
     url: string,
     x: number,
     y: number,
     width: number,
-    height: number
+    height: number,
+    cropX?: number,
+    cropY?: number,
+    cropWidth?: number,
+    cropHeight?: number
   ) {
     super();
     this.url = url;
@@ -311,6 +319,10 @@ export class Image extends Shape {
     this.y = y;
     this.width = width;
     this.height = height;
+    this.cropX = cropX;
+    this.cropY = cropY;
+    this.cropWidth = cropWidth;
+    this.cropHeight = cropHeight;
   }
 
   protected geometry(_time: number): FrameNode[] {
@@ -321,6 +333,19 @@ export class Image extends Shape {
       width: this.width,
       height: this.height,
     };
+    if (
+      this.cropX !== undefined &&
+      this.cropY !== undefined &&
+      this.cropWidth !== undefined &&
+      this.cropHeight !== undefined
+    ) {
+      shape.crop = {
+        x: this.cropX,
+        y: this.cropY,
+        width: this.cropWidth,
+        height: this.cropHeight,
+      };
+    }
     return [shape];
   }
 }

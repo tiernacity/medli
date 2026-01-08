@@ -188,15 +188,29 @@ export class CanvasRenderer extends BaseRenderer {
         const img = shape as Image;
         const bitmap = resourceMap.get(img.url);
         if (bitmap) {
-          // Draw image at position, with width and height
-          // Note: Y is flipped by the viewport transform, so we draw at -height
-          this.context.drawImage(
-            bitmap,
-            img.position.x,
-            img.position.y - img.height,
-            img.width,
-            img.height
-          );
+          if (img.crop) {
+            // 9-param: drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+            this.context.drawImage(
+              bitmap,
+              img.crop.x,
+              img.crop.y,
+              img.crop.width,
+              img.crop.height,
+              img.position.x,
+              img.position.y - img.height,
+              img.width,
+              img.height
+            );
+          } else {
+            // 5-param: drawImage(image, dx, dy, dWidth, dHeight)
+            this.context.drawImage(
+              bitmap,
+              img.position.x,
+              img.position.y - img.height,
+              img.width,
+              img.height
+            );
+          }
         }
         break;
       }

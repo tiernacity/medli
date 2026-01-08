@@ -708,3 +708,116 @@ describe("Transform output", () => {
     });
   });
 });
+
+describe("Image output", () => {
+  describe("image() without crop", () => {
+    it("should create image shape without crop property", () => {
+      const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
+        p.image("https://example.com/test.png", 10, 20, 100, 50);
+      });
+      const frame = generator.frame(0);
+
+      const childMaterial = frame.root.children[0] as ChildMaterial;
+      const imageShape = childMaterial.children[0] as {
+        type: string;
+        url: string;
+        position: { x: number; y: number };
+        width: number;
+        height: number;
+        crop?: { x: number; y: number; width: number; height: number };
+      };
+
+      expect(imageShape.type).toBe("image");
+      expect(imageShape.url).toBe("https://example.com/test.png");
+      expect(imageShape.position).toEqual({ x: 10, y: 20 });
+      expect(imageShape.width).toBe(100);
+      expect(imageShape.height).toBe(50);
+      expect(imageShape.crop).toBeUndefined();
+    });
+  });
+
+  describe("image() with crop parameters", () => {
+    it("should create image shape with crop property when all crop params provided", () => {
+      const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
+        p.image(
+          "https://example.com/sprite.png",
+          0,
+          0,
+          32,
+          32,
+          64,
+          128,
+          32,
+          32
+        );
+      });
+      const frame = generator.frame(0);
+
+      const childMaterial = frame.root.children[0] as ChildMaterial;
+      const imageShape = childMaterial.children[0] as {
+        type: string;
+        url: string;
+        position: { x: number; y: number };
+        width: number;
+        height: number;
+        crop?: { x: number; y: number; width: number; height: number };
+      };
+
+      expect(imageShape.type).toBe("image");
+      expect(imageShape.url).toBe("https://example.com/sprite.png");
+      expect(imageShape.position).toEqual({ x: 0, y: 0 });
+      expect(imageShape.width).toBe(32);
+      expect(imageShape.height).toBe(32);
+      expect(imageShape.crop).toEqual({ x: 64, y: 128, width: 32, height: 32 });
+    });
+
+    it("should not include crop when only some crop params provided", () => {
+      const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
+        // Only providing cropX and cropY, not cropWidth and cropHeight
+        p.image("https://example.com/test.png", 10, 20, 100, 50, 0, 0);
+      });
+      const frame = generator.frame(0);
+
+      const childMaterial = frame.root.children[0] as ChildMaterial;
+      const imageShape = childMaterial.children[0] as {
+        type: string;
+        crop?: { x: number; y: number; width: number; height: number };
+      };
+
+      expect(imageShape.type).toBe("image");
+      expect(imageShape.crop).toBeUndefined();
+    });
+
+    it("should handle zero values for crop parameters correctly", () => {
+      const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
+        // All crop params are 0 (which is valid - top-left corner with 0x0 region)
+        p.image("https://example.com/test.png", 10, 20, 100, 50, 0, 0, 0, 0);
+      });
+      const frame = generator.frame(0);
+
+      const childMaterial = frame.root.children[0] as ChildMaterial;
+      const imageShape = childMaterial.children[0] as {
+        type: string;
+        crop?: { x: number; y: number; width: number; height: number };
+      };
+
+      expect(imageShape.type).toBe("image");
+      // Zero is a valid value (not undefined), so crop should be included
+      expect(imageShape.crop).toEqual({ x: 0, y: 0, width: 0, height: 0 });
+    });
+  });
+
+  describe("Sketch interface for image", () => {
+    it("should provide image function", () => {
+      const generator = new ProceduralGenerator((p: Sketch) => {
+        p.viewport(50, 50);
+        expect(typeof p.image).toBe("function");
+      });
+      generator.frame(0);
+    });
+  });
+});

@@ -31,6 +31,21 @@ export type Line = {
 };
 
 /**
+ * Defines a rectangular region within the source image for cropping.
+ * Coordinates and dimensions are in source image pixels.
+ */
+export type ImageCrop = {
+  /** Source x position in pixels (must be >= 0) */
+  x: number;
+  /** Source y position in pixels (must be >= 0) */
+  y: number;
+  /** Source width in pixels (must be > 0) */
+  width: number;
+  /** Source height in pixels (must be > 0) */
+  height: number;
+};
+
+/**
  * An image shape positioned in viewport coordinates.
  * URL references an external image resource loaded by the renderer.
  */
@@ -40,6 +55,8 @@ export type Image = {
   position: Position;
   width: number;
   height: number;
+  /** Optional source rectangle for cropping. When present, only this region of the source image is rendered. */
+  crop?: ImageCrop;
 };
 
 /**
@@ -297,6 +314,53 @@ export function validateFrame(frame: Frame): ValidationResult {
           valid: false,
           error: "Image height must be a positive finite number",
         };
+      }
+      // Validate crop properties if present
+      if (node.crop !== undefined) {
+        // crop.x must be a finite number >= 0
+        if (
+          typeof node.crop.x !== "number" ||
+          node.crop.x < 0 ||
+          !isFinite(node.crop.x)
+        ) {
+          return {
+            valid: false,
+            error: "Image crop.x must be a non-negative finite number",
+          };
+        }
+        // crop.y must be a finite number >= 0
+        if (
+          typeof node.crop.y !== "number" ||
+          node.crop.y < 0 ||
+          !isFinite(node.crop.y)
+        ) {
+          return {
+            valid: false,
+            error: "Image crop.y must be a non-negative finite number",
+          };
+        }
+        // crop.width must be a positive finite number
+        if (
+          typeof node.crop.width !== "number" ||
+          node.crop.width <= 0 ||
+          !isFinite(node.crop.width)
+        ) {
+          return {
+            valid: false,
+            error: "Image crop.width must be a positive finite number",
+          };
+        }
+        // crop.height must be a positive finite number
+        if (
+          typeof node.crop.height !== "number" ||
+          node.crop.height <= 0 ||
+          !isFinite(node.crop.height)
+        ) {
+          return {
+            valid: false,
+            error: "Image crop.height must be a positive finite number",
+          };
+        }
       }
     }
     // Other shapes (circle, line) are leaves - no additional validation needed
