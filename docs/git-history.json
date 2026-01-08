@@ -1,5 +1,13 @@
 [
   {
+    "hash": "3a4d3ddb4b119dc8072408e859bbef57987a76c9",
+    "short_hash": "3a4d3dd",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T22:38:09Z",
+    "message": "refactor: simplify ResourceManager to single resolveResources() API\n\n- Replace markNeeded(), getResource(), pruneUnused() with single resolveResources()\n- Renderers now make one call per frame, receive Map of all processed resources\n- Pruning happens internally before returning\n- All 187 tests pass, visual verification confirms identical output\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 5
+  },
+  {
     "hash": "2d18e3c6597b1de6319325999d5c5757552f42e3",
     "short_hash": "2d18e3c",
     "author": "Chris Tierney",
