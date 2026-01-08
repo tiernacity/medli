@@ -21,12 +21,23 @@ You maintain **shared renderer functionality** - code that is identical across a
 - requestAnimationFrame management
 - Any behavior identical across ALL renderers
 
-## What Does NOT Belong Here
+## What Does NOT Belong Here (For Now)
 
 - DOM element handling (renderers differ: SVG vs Canvas)
 - Actual rendering logic
 - Frame validation (done in each renderer)
 - Platform-specific code
+
+## Future Candidates
+
+These could move here if patterns stabilize:
+
+| Candidate | Status | Notes |
+|-----------|--------|-------|
+| Tree traversal | Per-renderer | Each renderer handles Material/Transform differently |
+| Matrix utilities | Not needed | Renderers use native APIs (ctx.transform, SVG matrix()) |
+
+**Transform handling:** Each renderer applies transforms via its native API (Canvas `ctx.transform()`, SVG `transform` attribute). No shared matrix math needed - the IR stores final matrices.
 
 ## Constraints
 
