@@ -3,13 +3,21 @@ import type { ChildMaterial, RootMaterial, Transform } from "@medli/spec";
 
 describe("ProceduralGenerator", () => {
   it("should return default black background when draw does nothing", () => {
-    const generator = new ProceduralGenerator(() => {});
+    const generator = new ProceduralGenerator((p) => {
+      p.viewport(50, 50);
+    });
     const frame = generator.frame(0);
     expect(frame.backgroundColor).toBe("#000000");
+    expect(frame.viewport).toEqual({
+      halfWidth: 50,
+      halfHeight: 50,
+      scaleMode: "fit",
+    });
   });
 
   it("should return background color set in draw function", () => {
     const generator = new ProceduralGenerator((p) => {
+      p.viewport(50, 50);
       p.background("#ff0000");
     });
     const frame = generator.frame(0);
@@ -18,6 +26,7 @@ describe("ProceduralGenerator", () => {
 
   it("should use last background() call if called multiple times", () => {
     const generator = new ProceduralGenerator((p) => {
+      p.viewport(50, 50);
       p.background("#ff0000");
       p.background("#00ff00");
     });
@@ -28,6 +37,7 @@ describe("ProceduralGenerator", () => {
   it("should pass time to draw function via sketch.time", () => {
     let capturedTime = -1;
     const generator = new ProceduralGenerator((p) => {
+      p.viewport(50, 50);
       capturedTime = p.time;
     });
     generator.frame(12345);
@@ -37,6 +47,7 @@ describe("ProceduralGenerator", () => {
   it("should reset frame state between frames", () => {
     let callCount = 0;
     const generator = new ProceduralGenerator((p) => {
+      p.viewport(50, 50);
       callCount++;
       if (callCount === 1) {
         p.background("#ff0000");
@@ -55,6 +66,7 @@ describe("ProceduralGenerator", () => {
 describe("Sketch interface", () => {
   it("should provide background function", () => {
     const generator = new ProceduralGenerator((p: Sketch) => {
+      p.viewport(50, 50);
       expect(typeof p.background).toBe("function");
     });
     generator.frame(0);
@@ -62,6 +74,7 @@ describe("Sketch interface", () => {
 
   it("should provide readonly time property", () => {
     const generator = new ProceduralGenerator((p: Sketch) => {
+      p.viewport(50, 50);
       expect(typeof p.time).toBe("number");
     });
     generator.frame(100);
@@ -72,6 +85,7 @@ describe("Material output", () => {
   describe("Root material properties", () => {
     it("should have default root material properties when no style methods called", () => {
       const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
         p.circle(50, 50, 10);
       });
       const frame = generator.frame(0);
@@ -83,6 +97,7 @@ describe("Material output", () => {
 
     it("should set root fill from fill() call before shapes", () => {
       const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
         p.fill("#ff0000");
         p.circle(50, 50, 10);
       });
@@ -93,6 +108,7 @@ describe("Material output", () => {
 
     it("should set root stroke from stroke() call before shapes", () => {
       const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
         p.stroke("#00ff00");
         p.circle(50, 50, 10);
       });
@@ -103,6 +119,7 @@ describe("Material output", () => {
 
     it("should set root strokeWidth from strokeWidth() call before shapes", () => {
       const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
         p.strokeWidth(5);
         p.circle(50, 50, 10);
       });
@@ -113,6 +130,7 @@ describe("Material output", () => {
 
     it("should use last style call if called multiple times before shapes", () => {
       const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
         p.fill("#ff0000");
         p.fill("#00ff00");
         p.fill("#0000ff");
@@ -125,6 +143,7 @@ describe("Material output", () => {
 
     it("should set all root material properties from multiple style calls", () => {
       const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
         p.fill("#ff0000");
         p.stroke("#00ff00");
         p.strokeWidth(3);
@@ -141,6 +160,7 @@ describe("Material output", () => {
   describe("Different materials for different shapes", () => {
     it("should wrap shapes in ChildMaterial when fill changes between shapes", () => {
       const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
         p.fill("red");
         p.circle(10, 10, 5);
         p.fill("blue");
@@ -168,6 +188,7 @@ describe("Material output", () => {
 
     it("should group consecutive shapes with same style in one ChildMaterial", () => {
       const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
         p.fill("red");
         p.circle(10, 10, 5);
         p.circle(20, 20, 5);
@@ -190,6 +211,7 @@ describe("Material output", () => {
 
     it("should create new ChildMaterial when stroke changes", () => {
       const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
         p.stroke("red");
         p.line(0, 0, 10, 10);
         p.stroke("blue");
@@ -208,6 +230,7 @@ describe("Material output", () => {
 
     it("should create new ChildMaterial when strokeWidth changes", () => {
       const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
         p.strokeWidth(2);
         p.line(0, 0, 10, 10);
         p.strokeWidth(5);
@@ -226,6 +249,7 @@ describe("Material output", () => {
 
     it("should have unique IDs for each ChildMaterial", () => {
       const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
         p.fill("red");
         p.circle(10, 10, 5);
         p.fill("blue");
@@ -244,6 +268,7 @@ describe("Material output", () => {
   describe("Nesting with push/pop", () => {
     it("should start a new nested material context with push()", () => {
       const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
         p.fill("red");
         p.push();
         p.fill("blue");
@@ -267,6 +292,7 @@ describe("Material output", () => {
 
     it("should return to parent context after pop()", () => {
       const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
         p.fill("red");
         p.push();
         p.fill("blue");
@@ -300,6 +326,7 @@ describe("Material output", () => {
 
     it("should restore style state after pop()", () => {
       const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
         p.fill("red");
         p.stroke("green");
         p.strokeWidth(2);
@@ -330,6 +357,7 @@ describe("Material output", () => {
   describe("Deep nesting", () => {
     it("should support multiple levels of push()", () => {
       const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
         p.fill("red");
         p.push();
         p.fill("blue");
@@ -358,6 +386,7 @@ describe("Material output", () => {
 
     it("should correctly unwind multiple pops", () => {
       const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
         p.fill("red");
         p.circle(5, 5, 2); // red circle at root level
         p.push();
@@ -381,6 +410,7 @@ describe("Material output", () => {
   describe("Style inheritance via refs", () => {
     it("should have ref pointing to parent material ID", () => {
       const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
         p.fill("red");
         p.push();
         p.fill("blue");
@@ -395,6 +425,7 @@ describe("Material output", () => {
 
     it("should have deeply nested refs pointing to immediate parent", () => {
       const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
         p.push();
         p.push();
         p.push();
@@ -421,6 +452,7 @@ describe("Material output", () => {
 
     it("should only include changed properties in ChildMaterial", () => {
       const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
         p.fill("red");
         p.stroke("green");
         p.strokeWidth(2);
@@ -442,6 +474,7 @@ describe("Material output", () => {
   describe("Sketch interface for push/pop", () => {
     it("should provide push function", () => {
       const generator = new ProceduralGenerator((p: Sketch) => {
+        p.viewport(50, 50);
         expect(typeof (p as unknown as { push: unknown }).push).toBe(
           "function"
         );
@@ -451,6 +484,7 @@ describe("Material output", () => {
 
     it("should provide pop function", () => {
       const generator = new ProceduralGenerator((p: Sketch) => {
+        p.viewport(50, 50);
         expect(typeof (p as unknown as { pop: unknown }).pop).toBe("function");
       });
       generator.frame(0);
@@ -462,6 +496,7 @@ describe("Transform output", () => {
   describe("translate()", () => {
     it("should wrap shape in Transform node with translation matrix", () => {
       const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
         p.translate(10, 20);
         p.circle(0, 0, 5);
       });
@@ -479,6 +514,7 @@ describe("Transform output", () => {
 
     it("should not create Transform node when no transforms applied", () => {
       const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
         p.circle(10, 10, 5);
       });
       const frame = generator.frame(0);
@@ -490,6 +526,7 @@ describe("Transform output", () => {
 
     it("should accumulate multiple translate() calls", () => {
       const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
         p.translate(10, 20);
         p.translate(5, 10);
         p.circle(0, 0, 5);
@@ -507,6 +544,7 @@ describe("Transform output", () => {
   describe("rotate()", () => {
     it("should wrap shape in Transform node with rotation matrix", () => {
       const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
         p.rotate(Math.PI / 2); // 90 degrees
         p.circle(0, 0, 5);
       });
@@ -530,6 +568,7 @@ describe("Transform output", () => {
   describe("scale()", () => {
     it("should wrap shape in Transform node with uniform scale matrix", () => {
       const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
         p.scale(2);
         p.circle(0, 0, 5);
       });
@@ -545,6 +584,7 @@ describe("Transform output", () => {
 
     it("should wrap shape in Transform node with non-uniform scale matrix", () => {
       const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
         p.scale(2, 3);
         p.circle(0, 0, 5);
       });
@@ -561,6 +601,7 @@ describe("Transform output", () => {
   describe("Combined transforms", () => {
     it("should compose translate then scale correctly", () => {
       const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
         p.translate(10, 20);
         p.scale(2);
         p.circle(0, 0, 5);
@@ -577,6 +618,7 @@ describe("Transform output", () => {
 
     it("should compose scale then translate correctly", () => {
       const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
         p.scale(2);
         p.translate(10, 20);
         p.circle(0, 0, 5);
@@ -595,6 +637,7 @@ describe("Transform output", () => {
   describe("Transform with push/pop", () => {
     it("should save and restore transform state with push/pop", () => {
       const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
         p.translate(10, 0);
         p.push();
         p.translate(5, 0);
@@ -619,6 +662,7 @@ describe("Transform output", () => {
 
     it("should allow independent transforms in nested push/pop", () => {
       const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
         p.push();
         p.translate(100, 0);
         p.circle(0, 0, 5);
@@ -641,6 +685,7 @@ describe("Transform output", () => {
   describe("Sketch interface for transforms", () => {
     it("should provide translate function", () => {
       const generator = new ProceduralGenerator((p: Sketch) => {
+        p.viewport(50, 50);
         expect(typeof p.translate).toBe("function");
       });
       generator.frame(0);
@@ -648,6 +693,7 @@ describe("Transform output", () => {
 
     it("should provide rotate function", () => {
       const generator = new ProceduralGenerator((p: Sketch) => {
+        p.viewport(50, 50);
         expect(typeof p.rotate).toBe("function");
       });
       generator.frame(0);
@@ -655,6 +701,7 @@ describe("Transform output", () => {
 
     it("should provide scale function", () => {
       const generator = new ProceduralGenerator((p: Sketch) => {
+        p.viewport(50, 50);
         expect(typeof p.scale).toBe("function");
       });
       generator.frame(0);

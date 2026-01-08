@@ -7,7 +7,7 @@ import type {
   Transform,
 } from "@medli/spec";
 import { validateFrame, resolveMaterial } from "@medli/spec";
-import { BaseRenderer } from "@medli/renderer-common";
+import { BaseRenderer, computeViewportTransform } from "@medli/renderer-common";
 
 export class CanvasRenderer extends BaseRenderer {
   private element: HTMLCanvasElement;
@@ -16,10 +16,6 @@ export class CanvasRenderer extends BaseRenderer {
   constructor(element: HTMLCanvasElement, generator: Generator) {
     super(generator);
     this.element = element;
-
-    // Set up 100x100 canvas
-    this.element.width = 100;
-    this.element.height = 100;
 
     const ctx = this.element.getContext("2d");
     if (!ctx) {
@@ -38,12 +34,38 @@ export class CanvasRenderer extends BaseRenderer {
       return;
     }
 
-    // Draw background
-    this.context.fillStyle = frame.backgroundColor ?? "#ffffff";
-    this.context.fillRect(0, 0, 100, 100);
+    // Query element size
+    const elementWidth = this.element.width;
+    const elementHeight = this.element.height;
 
-    // Traverse material tree and render shapes
+    // Clear canvas to transparent (for letterbox transparency)
+    this.context.clearRect(0, 0, elementWidth, elementHeight);
+
+    // Compute viewport transform
+    const vp = frame.viewport;
+    const transform = computeViewportTransform(vp, elementWidth, elementHeight);
+
+    this.context.save();
+
+    // Translate to center of element
+    this.context.translate(transform.translateX, transform.translateY);
+
+    // Scale with Y-flip (negative scaleY flips Y axis)
+    this.context.scale(transform.scaleX, -transform.scaleY);
+
+    // Draw background in viewport coordinates
+    this.context.fillStyle = frame.backgroundColor ?? "transparent";
+    this.context.fillRect(
+      -vp.halfWidth,
+      -vp.halfHeight,
+      vp.halfWidth * 2,
+      vp.halfHeight * 2
+    );
+
+    // Render all shapes (they're now in viewport coords)
     this.renderNode(frame.root, [frame.root]);
+
+    this.context.restore();
   }
 
   private renderNode(node: FrameNode, ancestors: Material[]): void {

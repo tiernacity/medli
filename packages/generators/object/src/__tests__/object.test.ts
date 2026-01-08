@@ -1,22 +1,28 @@
 import { Scene, Background, Circle, Material, Line } from "../index";
 import type { ChildMaterial, RootMaterial } from "@medli/spec";
 
+const defaultViewport = {
+  halfWidth: 50,
+  halfHeight: 50,
+  scaleMode: "fit" as const,
+};
+
 describe("Scene", () => {
   it("should return empty frame with no background", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const frame = scene.frame(0);
     expect(frame.backgroundColor).toBeUndefined();
   });
 
   it("should return background color when background is set", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     scene.setBackground(new Background("#ff0000"));
     const frame = scene.frame(0);
     expect(frame.backgroundColor).toBe("#ff0000");
   });
 
   it("should allow adding background via add()", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const bg = new Background("#00ff00");
     scene.add(bg);
     expect(scene.background).toBe(bg);
@@ -24,7 +30,7 @@ describe("Scene", () => {
   });
 
   it("should allow removing background", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const bg = new Background("#ff0000");
     scene.setBackground(bg);
     scene.remove(bg);
@@ -33,21 +39,27 @@ describe("Scene", () => {
   });
 
   it("should allow setting background to null", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     scene.setBackground(new Background("#ff0000"));
     scene.setBackground(null);
     expect(scene.background).toBeNull();
   });
 
   it("should support method chaining", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const result = scene.setBackground(new Background("#ff0000"));
     expect(result).toBe(scene);
   });
 
   it("should implement Generator interface", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     expect(typeof scene.frame).toBe("function");
+  });
+
+  it("should include viewport in frame output", () => {
+    const scene = new Scene(defaultViewport);
+    const frame = scene.frame(0);
+    expect(frame.viewport).toEqual(defaultViewport);
   });
 });
 
@@ -72,7 +84,7 @@ describe("Background", () => {
 
 describe("SceneObject integration", () => {
   it("should collect shapes from children", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     scene.add(new Circle(50, 50, 10));
 
     const frame = scene.frame(0);
@@ -86,7 +98,7 @@ describe("SceneObject integration", () => {
   });
 
   it("should collect shapes from multiple children in order", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     scene.add(new Circle(10, 10, 5));
     scene.add(new Circle(90, 90, 5));
 
@@ -103,7 +115,7 @@ describe("SceneObject integration", () => {
 
 describe("Scene material properties", () => {
   it("should use default fill/stroke/strokeWidth in root material", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const frame = scene.frame(0);
 
     expect(frame.root.fill).toBe("#000000");
@@ -112,7 +124,7 @@ describe("Scene material properties", () => {
   });
 
   it("should use custom fill when set on scene", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     scene.fill = "#ff0000";
 
     const frame = scene.frame(0);
@@ -120,7 +132,7 @@ describe("Scene material properties", () => {
   });
 
   it("should use custom stroke when set on scene", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     scene.stroke = "#00ff00";
 
     const frame = scene.frame(0);
@@ -128,7 +140,7 @@ describe("Scene material properties", () => {
   });
 
   it("should use custom strokeWidth when set on scene", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     scene.strokeWidth = 5;
 
     const frame = scene.frame(0);
@@ -136,7 +148,7 @@ describe("Scene material properties", () => {
   });
 
   it("should reflect all material property changes in root material", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     scene.fill = "#ff0000";
     scene.stroke = "#00ff00";
     scene.strokeWidth = 3;
@@ -150,7 +162,7 @@ describe("Scene material properties", () => {
 
 describe("Editing Scene material properties", () => {
   it("should update root material fill when scene.fill changes between frames", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     scene.fill = "#ff0000";
 
     const frame1 = scene.frame(0);
@@ -162,7 +174,7 @@ describe("Editing Scene material properties", () => {
   });
 
   it("should update root material stroke when scene.stroke changes between frames", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     scene.stroke = "#ff0000";
 
     const frame1 = scene.frame(0);
@@ -174,7 +186,7 @@ describe("Editing Scene material properties", () => {
   });
 
   it("should update root material strokeWidth when scene.strokeWidth changes between frames", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     scene.strokeWidth = 2;
 
     const frame1 = scene.frame(0);
@@ -267,7 +279,7 @@ describe("Shape.material property (three.js-style API)", () => {
 
 describe("Material as ChildMaterial in frame", () => {
   it("should become a ChildMaterial node when added to scene", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const material = new Material({ fill: "#ff0000" });
     scene.add(material);
 
@@ -280,7 +292,7 @@ describe("Material as ChildMaterial in frame", () => {
   });
 
   it("should have ref pointing to root material", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const material = new Material({ fill: "#ff0000" });
     scene.add(material);
 
@@ -291,7 +303,7 @@ describe("Material as ChildMaterial in frame", () => {
   });
 
   it("should have unique id for each material", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const material1 = new Material({ fill: "#ff0000" });
     const material2 = new Material({ fill: "#00ff00" });
     scene.add(material1);
@@ -307,7 +319,7 @@ describe("Material as ChildMaterial in frame", () => {
   });
 
   it("should only include defined style properties in ChildMaterial", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const material = new Material({ fill: "#ff0000" }); // Only fill set
     scene.add(material);
 
@@ -322,7 +334,7 @@ describe("Material as ChildMaterial in frame", () => {
 
 describe("Material edits take effect next frame", () => {
   it("should reflect fill changes in subsequent frame() calls", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const material = new Material({ fill: "#ff0000" });
     scene.add(material);
 
@@ -338,7 +350,7 @@ describe("Material edits take effect next frame", () => {
   });
 
   it("should reflect stroke changes in subsequent frame() calls", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const material = new Material({ stroke: "#ff0000" });
     scene.add(material);
 
@@ -354,7 +366,7 @@ describe("Material edits take effect next frame", () => {
   });
 
   it("should reflect strokeWidth changes in subsequent frame() calls", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const material = new Material({ strokeWidth: 2 });
     scene.add(material);
 
@@ -370,7 +382,7 @@ describe("Material edits take effect next frame", () => {
   });
 
   it("should allow adding new style properties after creation", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const material = new Material(); // No styles initially
     scene.add(material);
 
@@ -388,7 +400,7 @@ describe("Material edits take effect next frame", () => {
 
 describe("Shapes referencing materials (three.js-style)", () => {
   it("should place shapes with material reference in that Material's children array", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const material = new Material({ fill: "#ff0000" });
     const circle = new Circle(50, 50, 10);
     circle.material = material;
@@ -408,7 +420,7 @@ describe("Shapes referencing materials (three.js-style)", () => {
   });
 
   it("should collect multiple shapes referencing the same Material", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const material = new Material({ fill: "#ff0000" });
 
     const circle1 = new Circle(10, 10, 5);
@@ -427,7 +439,7 @@ describe("Shapes referencing materials (three.js-style)", () => {
   });
 
   it("should place Line shapes in Material children array", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const material = new Material({ stroke: "#ff0000", strokeWidth: 2 });
     const line = new Line(0, 0, 100, 100);
     line.material = material;
@@ -447,7 +459,7 @@ describe("Shapes referencing materials (three.js-style)", () => {
   });
 
   it("should keep shapes without material in root material children", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const circle1 = new Circle(50, 50, 10); // No material - goes to root
 
     const material = new Material({ fill: "#ff0000" });
@@ -480,7 +492,7 @@ describe("Shapes referencing materials (three.js-style)", () => {
 
 describe("Nested Materials via parent property", () => {
   it("should allow Material to have a parent Material", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const outerMaterial = new Material({ fill: "#ff0000" });
     const innerMaterial = new Material({ stroke: "#00ff00" });
     innerMaterial.parent = outerMaterial;
@@ -501,7 +513,7 @@ describe("Nested Materials via parent property", () => {
   });
 
   it("should have nested Material ref pointing to parent Material id", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const outerMaterial = new Material({ fill: "#ff0000" });
     const innerMaterial = new Material({ stroke: "#00ff00" });
     innerMaterial.parent = outerMaterial;
@@ -519,7 +531,7 @@ describe("Nested Materials via parent property", () => {
   });
 
   it("should support deeply nested Materials (3+ levels)", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const level1 = new Material({ fill: "#ff0000" });
     const level2 = new Material({ stroke: "#00ff00" });
     const level3 = new Material({ strokeWidth: 5 });
@@ -556,7 +568,7 @@ describe("Nested Materials via parent property", () => {
   });
 
   it("should collect shapes from nested Material's children", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const outerMaterial = new Material({ fill: "#ff0000" });
     const innerMaterial = new Material({ stroke: "#00ff00" });
     innerMaterial.parent = outerMaterial;
@@ -583,7 +595,7 @@ describe("Nested Materials via parent property", () => {
 
 describe("Multiple Materials as siblings", () => {
   it("should create sibling ChildMaterial nodes when multiple Materials added to Scene", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const material1 = new Material({ fill: "#ff0000" });
     const material2 = new Material({ fill: "#00ff00" });
     scene.add(material1);
@@ -601,7 +613,7 @@ describe("Multiple Materials as siblings", () => {
   });
 
   it("should give sibling Materials the same parent ref", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const material1 = new Material({ fill: "#ff0000" });
     const material2 = new Material({ fill: "#00ff00" });
     scene.add(material1);
@@ -616,7 +628,7 @@ describe("Multiple Materials as siblings", () => {
   });
 
   it("should preserve order of sibling Materials", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const material1 = new Material({ fill: "#ff0000" });
     const material2 = new Material({ fill: "#00ff00" });
     const material3 = new Material({ fill: "#0000ff" });
@@ -633,7 +645,7 @@ describe("Multiple Materials as siblings", () => {
   });
 
   it("should mix shapes and Materials as siblings", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const material1 = new Material({ fill: "#ff0000" });
     const material2 = new Material({ stroke: "#00ff00" });
 
@@ -662,7 +674,7 @@ describe("Multiple Materials as siblings", () => {
   });
 
   it("should create nested sibling Materials within a parent Material", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const parentMaterial = new Material({ fill: "#ff0000" });
     const childMaterial1 = new Material({ stroke: "#00ff00" });
     const childMaterial2 = new Material({ strokeWidth: 5 });
@@ -689,7 +701,7 @@ describe("Multiple Materials as siblings", () => {
 
 describe("Materials and shapes both added to scene independently", () => {
   it("should group shapes by material even when added in mixed order", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const redMaterial = new Material({ fill: "#ff0000" });
     const blueMaterial = new Material({ fill: "#0000ff" });
 
@@ -725,7 +737,7 @@ describe("Materials and shapes both added to scene independently", () => {
   });
 
   it("should include material in frame even if shape references it but material not explicitly added", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const material = new Material({ fill: "#ff0000" });
     const circle = new Circle(50, 50, 10);
     circle.material = material;
@@ -1115,7 +1127,7 @@ describe("Group", () => {
 
 describe("Group in Scene", () => {
   it("should add Group to scene and emit Transform node", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const group = new Group();
     group.position = { x: 50, y: 50 };
     group.add(new Circle(0, 0, 10));
@@ -1135,7 +1147,7 @@ describe("Group in Scene", () => {
   });
 
   it("should not emit Transform node when group has no transform", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const group = new Group();
     group.add(new Circle(50, 50, 10));
     scene.add(group);
@@ -1151,7 +1163,7 @@ describe("Group in Scene", () => {
   });
 
   it("should support Group containing shapes (shapes use Scene defaults)", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const group = new Group();
     group.position = { x: 50, y: 50 };
 
@@ -1176,15 +1188,14 @@ describe("Group in Scene", () => {
     });
   });
 
-  it("should emit empty material when added but not referenced by any direct children", () => {
-    const scene = new Scene();
+  it("should wrap shapes inside group with inline ChildMaterial when shape has material", () => {
+    const scene = new Scene(defaultViewport);
     const material = new Material({ fill: "#ff0000" });
     const group = new Group();
     group.position = { x: 50, y: 50 };
 
     // Circle inside the group with material set
-    // Note: Scene doesn't traverse into Group to find shape materials
-    // so the material will be empty (not referencing the grouped circle)
+    // Group.frame() wraps this shape in an inline ChildMaterial node
     const circle = new Circle(0, 0, 10);
     circle.material = material;
     group.add(circle);
@@ -1194,26 +1205,34 @@ describe("Group in Scene", () => {
 
     const frame = scene.frame(0);
 
-    // Material is first (added first)
+    // Material is first (added first) - empty since circle is inside Group
     const childMaterial = frame.root.children[0] as ChildMaterial;
     expect(childMaterial.type).toBe("material");
     expect(childMaterial.fill).toBe("#ff0000");
-    // Material has no children since the circle is inside a Group
     expect(childMaterial.children.length).toBe(0);
 
-    // Group emits Transform
+    // Group emits Transform containing inline ChildMaterial
     const transform = frame.root.children[1] as Transform;
     expect(transform.type).toBe("transform");
     expect(transform.matrix).toEqual([1, 0, 0, 1, 50, 50]);
-    expect(transform.children[0]).toEqual({
-      type: "circle",
-      center: { x: 0, y: 0 },
-      radius: 10,
-    });
+
+    // The shape is wrapped in an inline ChildMaterial with the material's properties
+    const inlineMaterial = transform.children[0] as ChildMaterial;
+    expect(inlineMaterial.type).toBe("material");
+    expect(inlineMaterial.fill).toBe("#ff0000");
+    expect(inlineMaterial.ref).toBe("root");
+    expect(inlineMaterial.id).toMatch(/^m\d+_inline_\d+$/);
+    expect(inlineMaterial.children).toEqual([
+      {
+        type: "circle",
+        center: { x: 0, y: 0 },
+        radius: 10,
+      },
+    ]);
   });
 
   it("should handle rotation with PI/4", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const group = new Group();
     group.rotation = Math.PI / 4;
     group.add(new Circle(10, 0, 5));
@@ -1233,7 +1252,7 @@ describe("Group in Scene", () => {
   });
 
   it("should handle non-uniform scale", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const group = new Group();
     group.scale = { x: 2, y: 3 };
     group.add(new Circle(10, 10, 5));
@@ -1247,7 +1266,7 @@ describe("Group in Scene", () => {
   });
 
   it("should work with shapes having transforms and materials", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const material = new Material({ fill: "#0000ff" });
 
     // Shape with both transform and material - no Group needed!
@@ -1280,7 +1299,7 @@ describe("Group in Scene", () => {
 
 describe("Shape transforms", () => {
   it("should allow Circle to have position transform", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const circle = new Circle(0, 0, 10);
     circle.position = { x: 50, y: 50 };
     scene.add(circle);
@@ -1297,7 +1316,7 @@ describe("Shape transforms", () => {
   });
 
   it("should allow Circle to have rotation transform", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const circle = new Circle(10, 0, 5);
     circle.rotation = Math.PI / 2;
     scene.add(circle);
@@ -1310,7 +1329,7 @@ describe("Shape transforms", () => {
   });
 
   it("should allow Circle to have scale transform", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const circle = new Circle(0, 0, 10);
     circle.scale = 2;
     scene.add(circle);
@@ -1322,7 +1341,7 @@ describe("Shape transforms", () => {
   });
 
   it("should allow Line to have position transform", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const line = new Line(0, 0, 10, 10);
     line.position = { x: 25, y: 25 };
     scene.add(line);
@@ -1339,7 +1358,7 @@ describe("Shape transforms", () => {
   });
 
   it("should not wrap shape in Transform if no transform applied", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const circle = new Circle(50, 50, 10);
     // No position/rotation/scale set
     scene.add(circle);
@@ -1354,7 +1373,7 @@ describe("Shape transforms", () => {
   });
 
   it("should combine transform and material on shapes", () => {
-    const scene = new Scene();
+    const scene = new Scene(defaultViewport);
     const material = new Material({ fill: "#ff0000" });
     const circle = new Circle(0, 0, 10);
     circle.position = { x: 50, y: 50 };

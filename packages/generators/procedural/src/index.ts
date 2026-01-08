@@ -8,6 +8,7 @@ import type {
   FrameNode,
   Matrix2D,
   Transform,
+  ScaleMode,
 } from "@medli/spec";
 
 // ============================================================================
@@ -104,6 +105,22 @@ interface StyleState {
  * Call methods like background() to affect the current frame.
  */
 export interface Sketch {
+  /**
+   * Set the viewport dimensions. Required - must be called before drawing.
+   * Defines a coordinate space with origin at center (0,0) and Y-up.
+   * X ranges from -halfWidth to +halfWidth.
+   * Y ranges from -halfHeight to +halfHeight.
+   */
+  viewport(halfWidth: number, halfHeight: number): void;
+
+  /**
+   * Set the scale mode for mapping viewport to element.
+   * - 'fit': Uniform scale to fit, letterbox/pillarbox empty space (default)
+   * - 'fill': Uniform scale to fill, may crop content
+   * - 'stretch': Non-uniform scale to exactly fill (distorts aspect ratio)
+   */
+  scaleMode(mode: ScaleMode): void;
+
   /** Set the background color for this frame */
   background(color: string): void;
 
@@ -172,6 +189,11 @@ export class ProceduralGenerator implements Generator {
   }
 
   frame(time: number = 0): Frame {
+    // Viewport state (must be set by draw function)
+    let viewportHalfWidth: number | null = null;
+    let viewportHalfHeight: number | null = null;
+    let viewportScaleMode: ScaleMode = "fit";
+
     // Default style state
     let backgroundColor = "#000000";
     const defaultStyle: StyleState = {
@@ -375,6 +397,13 @@ export class ProceduralGenerator implements Generator {
 
     // Create sketch context for this frame
     const sketch: Sketch = {
+      viewport(halfWidth: number, halfHeight: number) {
+        viewportHalfWidth = halfWidth;
+        viewportHalfHeight = halfHeight;
+      },
+      scaleMode(mode: ScaleMode) {
+        viewportScaleMode = mode;
+      },
       background(color: string) {
         backgroundColor = color;
       },
@@ -517,6 +546,13 @@ export class ProceduralGenerator implements Generator {
     // Run user's draw function
     this.drawFn(sketch);
 
+    // Validate viewport was set
+    if (viewportHalfWidth === null || viewportHalfHeight === null) {
+      throw new Error(
+        "Viewport must be set using p.viewport(halfWidth, halfHeight)"
+      );
+    }
+
     // Build root material
     const root: RootMaterial = {
       type: "material",
@@ -527,6 +563,14 @@ export class ProceduralGenerator implements Generator {
       children: rootChildren,
     };
 
-    return { backgroundColor, root };
+    return {
+      viewport: {
+        halfWidth: viewportHalfWidth,
+        halfHeight: viewportHalfHeight,
+        scaleMode: viewportScaleMode,
+      },
+      backgroundColor,
+      root,
+    };
   }
 }

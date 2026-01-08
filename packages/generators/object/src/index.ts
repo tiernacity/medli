@@ -8,6 +8,7 @@ import type {
   FrameNode,
   Matrix2D,
   Transform,
+  Viewport,
 } from "@medli/spec";
 
 // ============================================================================
@@ -89,6 +90,9 @@ export function isIdentityMatrix(m: Matrix2D): boolean {
 
 // Global counter for unique material IDs
 let materialIdCounter = 0;
+
+// Global counter for inline material IDs (used in Group.frame())
+let inlineMaterialCounter = 0;
 
 /**
  * Position in 2D space.
@@ -320,10 +324,37 @@ export class Group extends SceneObject {
   }
 
   frame(time: number): FrameNode[] {
-    // Collect children frame data
+    // Collect children frame data, wrapping shapes with materials in inline ChildMaterial nodes
     const childNodes: FrameNode[] = [];
     for (const child of this.children) {
-      childNodes.push(...child.frame(time));
+      const childFrameNodes = child.frame(time);
+
+      // Check if this child is a Shape with a material
+      if (isShape(child) && child.material) {
+        // Wrap in inline ChildMaterial node
+        const inlineMaterial: ChildMaterial = {
+          type: "material",
+          id: `${child.material.id}_inline_${inlineMaterialCounter++}`,
+          ref: "root", // Safe default - inline material carries all needed properties
+          children: childFrameNodes,
+        };
+
+        // Copy material properties (only if defined)
+        if (child.material.fill !== undefined) {
+          inlineMaterial.fill = child.material.fill;
+        }
+        if (child.material.stroke !== undefined) {
+          inlineMaterial.stroke = child.material.stroke;
+        }
+        if (child.material.strokeWidth !== undefined) {
+          inlineMaterial.strokeWidth = child.material.strokeWidth;
+        }
+
+        childNodes.push(inlineMaterial);
+      } else {
+        // Groups and shapes without materials pass through directly
+        childNodes.push(...childFrameNodes);
+      }
     }
 
     // If no transform, just return children
@@ -410,10 +441,17 @@ export class Scene implements Generator {
   private _background: Background | null = null;
   private children: SceneObject[] = [];
 
+  /** Viewport configuration (required). */
+  viewport: Viewport;
+
   // Default material properties (used for root material)
   fill = "#000000";
   stroke = "#000000";
   strokeWidth = 1;
+
+  constructor(viewport: Viewport) {
+    this.viewport = viewport;
+  }
 
   get background(): Background | null {
     return this._background;
@@ -600,6 +638,10 @@ export class Scene implements Generator {
     // Get background color
     const backgroundColor = this._background?.color;
 
-    return { backgroundColor, root };
+    return {
+      viewport: this.viewport,
+      backgroundColor,
+      root,
+    };
   }
 }

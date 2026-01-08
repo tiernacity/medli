@@ -4,6 +4,17 @@
  * three.js-style API where you create a Scene and add objects to it.
  * Scene implements Generator so it can be passed directly to renderers.
  *
+ * Coordinate System:
+ * - Origin at center (0, 0)
+ * - Y-up: positive Y goes up visually
+ * - Viewport: -50 to +50 on both axes (halfWidth: 50, halfHeight: 50)
+ *
+ * Quadrant reference (Y-up):
+ * - Top-left: x < 0, y > 0
+ * - Top-right: x > 0, y > 0
+ * - Bottom-left: x < 0, y < 0
+ * - Bottom-right: x > 0, y < 0
+ *
  * This test pattern exercises:
  * - Material system (fill, stroke, strokeWidth, parent references)
  * - Transform system (shapes have position, rotation, scale directly)
@@ -18,8 +29,12 @@ import {
   Group,
 } from "@medli/generator-object";
 
-// Create scene as the root generator
-export const generator = new Scene();
+// Create scene as the root generator with viewport settings
+export const generator = new Scene({
+  halfWidth: 50,
+  halfHeight: 50,
+  scaleMode: "fit",
+});
 
 // Set scene-level default material properties (root defaults)
 generator.fill = "#000000";
@@ -39,17 +54,17 @@ const material1 = new Material({
 });
 generator.add(material1);
 
-// Draw a red circle in top-left quadrant
-const circle1 = new Circle(25, 25, 15);
+// Draw a red circle in top-left quadrant (x < 0, y > 0)
+const circle1 = new Circle(-25, 25, 15);
 circle1.material = material1;
 generator.add(circle1);
 
 // Draw diagonal lines forming an X through the circle
-const line1a = new Line(10, 10, 40, 40);
+const line1a = new Line(-40, 40, -10, 10);
 line1a.material = material1;
 generator.add(line1a);
 
-const line1b = new Line(40, 10, 10, 40);
+const line1b = new Line(-10, 40, -40, 10);
 line1b.material = material1;
 generator.add(line1b);
 
@@ -62,17 +77,17 @@ const material2 = new Material({
 });
 generator.add(material2);
 
-// Draw a green circle in top-right quadrant
-const circle2 = new Circle(75, 25, 15);
+// Draw a green circle in top-right quadrant (x > 0, y > 0)
+const circle2 = new Circle(25, 25, 15);
 circle2.material = material2;
 generator.add(circle2);
 
 // Draw horizontal and vertical lines through the circle
-const line2a = new Line(60, 25, 90, 25);
+const line2a = new Line(10, 25, 40, 25);
 line2a.material = material2;
 generator.add(line2a);
 
-const line2b = new Line(75, 10, 75, 40);
+const line2b = new Line(25, 40, 25, 10);
 line2b.material = material2;
 generator.add(line2b);
 
@@ -86,21 +101,21 @@ const material3 = new Material({
 });
 generator.add(material3);
 
-// Draw blue circle in bottom-left quadrant
-const circle3 = new Circle(25, 75, 15);
+// Draw blue circle in bottom-left quadrant (x < 0, y < 0)
+const circle3 = new Circle(-25, -25, 15);
 circle3.material = material3;
 generator.add(circle3);
 
 // Draw a triangle around the circle using lines
-const line3a = new Line(10, 90, 40, 90); // Bottom edge
+const line3a = new Line(-40, -40, -10, -40); // Bottom edge
 line3a.material = material3;
 generator.add(line3a);
 
-const line3b = new Line(40, 90, 25, 60); // Right edge
+const line3b = new Line(-10, -40, -25, -10); // Right edge
 line3b.material = material3;
 generator.add(line3b);
 
-const line3c = new Line(25, 60, 10, 90); // Left edge
+const line3c = new Line(-25, -10, -40, -40); // Left edge
 line3c.material = material3;
 generator.add(line3c);
 
@@ -114,25 +129,25 @@ const material4 = new Material({
 });
 generator.add(material4);
 
-// Draw green circle in bottom-right quadrant
-const circle4 = new Circle(75, 75, 15);
+// Draw green circle in bottom-right quadrant (x > 0, y < 0)
+const circle4 = new Circle(25, -25, 15);
 circle4.material = material4;
 generator.add(circle4);
 
 // Draw a square around the circle using lineOffset
-const line4a = Line.fromOffset(60, 60, 30, 0); // Top edge
+const line4a = Line.fromOffset(10, -10, 30, 0); // Top edge
 line4a.material = material4;
 generator.add(line4a);
 
-const line4b = Line.fromOffset(90, 60, 0, 30); // Right edge
+const line4b = Line.fromOffset(40, -10, 0, -30); // Right edge
 line4b.material = material4;
 generator.add(line4b);
 
-const line4c = Line.fromOffset(90, 90, -30, 0); // Bottom edge
+const line4c = Line.fromOffset(40, -40, -30, 0); // Bottom edge
 line4c.material = material4;
 generator.add(line4c);
 
-const line4d = Line.fromOffset(60, 90, 0, -30); // Left edge
+const line4d = Line.fromOffset(10, -40, 0, 30); // Left edge
 line4d.material = material4;
 generator.add(line4d);
 
@@ -145,17 +160,17 @@ const material5 = new Material({
 });
 generator.add(material5);
 
-// Small circle in the center (no transform)
-const circle5 = new Circle(50, 50, 8);
+// Small circle at the center (no transform)
+const circle5 = new Circle(0, 0, 8);
 circle5.material = material5;
 generator.add(circle5);
 
 // Cross through center (no transform)
-const line5a = new Line(42, 50, 58, 50);
+const line5a = new Line(-8, 0, 8, 0);
 line5a.material = material5;
 generator.add(line5a);
 
-const line5b = new Line(50, 42, 50, 58);
+const line5b = new Line(0, 8, 0, -8);
 line5b.material = material5;
 generator.add(line5b);
 
@@ -168,10 +183,10 @@ const material6 = new Material({
 });
 generator.add(material6);
 
-// Circle at (0, 0) with position (15, 15)
-// Visual result: circle appears at (15, 15)
+// Circle at (0, 0) with position (-35, 35)
+// Visual result: circle appears in top-left area
 const circle6 = new Circle(0, 0, 5);
-circle6.position = { x: 15, y: 15 };
+circle6.position = { x: -35, y: 35 };
 circle6.material = material6;
 generator.add(circle6);
 
@@ -184,10 +199,10 @@ const material7 = new Material({
 });
 generator.add(material7);
 
-// Line from (-8,-8) to (8,8) in local space, positioned at (75, 25), rotated 45 degrees
+// Line from (-8,-8) to (8,8) in local space, positioned at (25, 25), rotated 45 degrees
 // After rotation: appears as different diagonal
 const line7 = new Line(-8, -8, 8, 8);
-line7.position = { x: 75, y: 25 };
+line7.position = { x: 25, y: 25 };
 line7.rotation = Math.PI / 4; // 45 degrees
 line7.material = material7;
 generator.add(line7);
@@ -201,10 +216,10 @@ const material8 = new Material({
 });
 generator.add(material8);
 
-// Circle of radius 10 at origin, positioned at (85, 85), scaled by 0.5
-// Visual result: circle appears with radius 5 at (85, 85)
+// Circle of radius 10 at origin, positioned at (35, -35), scaled by 0.5
+// Visual result: circle appears with radius 5 in bottom-right area
 const circle8 = new Circle(0, 0, 10);
-circle8.position = { x: 85, y: 85 };
+circle8.position = { x: 35, y: -35 };
 circle8.scale = 0.5;
 circle8.material = material8;
 generator.add(circle8);
@@ -218,11 +233,11 @@ const material9 = new Material({
 });
 generator.add(material9);
 
-// Group at (15, 85), rotated 30 degrees, containing a cross made of two lines
+// Group at (-35, -35) (bottom-left area), rotated 30 degrees, containing a cross made of two lines
 // This demonstrates using Group for collective transforms on multiple shapes
 // Groups don't have materials - shapes reference materials directly
 const group9 = new Group();
-group9.position = { x: 15, y: 85 };
+group9.position = { x: -35, y: -35 };
 group9.rotation = Math.PI / 6; // 30 degrees
 const line9a = new Line(-5, 0, 5, 0);
 line9a.material = material9;

@@ -134,7 +134,12 @@
       background: #fafafa;
       border-bottom: 1px solid #eee;
     }
-    svg, canvas { border: 1px solid #ccc; }
+    svg, canvas {
+      border: 1px solid #ccc;
+      width: 100%;
+      aspect-ratio: 1;
+      max-width: 400px;
+    }
 
     .renderer-code {
       display: none;

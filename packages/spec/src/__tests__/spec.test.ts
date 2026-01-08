@@ -12,6 +12,11 @@ describe("spec types", () => {
     };
     const frame: Frame = {
       backgroundColor: "#ff0000",
+      viewport: {
+        halfWidth: 50,
+        halfHeight: 50,
+        scaleMode: "fit" as const,
+      },
       root,
     };
     expect(frame.backgroundColor).toBe("#ff0000");
@@ -22,6 +27,11 @@ describe("spec types", () => {
     const generator: Generator = {
       frame: (time = 0) => ({
         backgroundColor: `hsl(${time}, 50%, 50%)`,
+        viewport: {
+          halfWidth: 50,
+          halfHeight: 50,
+          scaleMode: "fit" as const,
+        },
         root: {
           type: "material",
           id: "root",
