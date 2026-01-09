@@ -4685,6 +4685,28 @@
       "created_at": "2026-01-09T21:48:59.427109+00:00",
       "updated_at": "2026-01-09T21:48:59.427109+00:00",
       "metadata_json": "{\"branch\":\"feat/server\",\"confidence\":95}"
+    },
+    {
+      "id": 427,
+      "change_id": "8fcc9c09-e0cf-4dfb-9fb4-b1b1094ad728",
+      "node_type": "action",
+      "title": "Fixed typecheck to include test-app, fixed type errors, removed standalone remote.html, updated poll intervals to 100ms",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T22:02:00.801685+00:00",
+      "updated_at": "2026-01-09T22:02:00.801685+00:00",
+      "metadata_json": "{\"branch\":\"feat/server\",\"confidence\":95}"
+    },
+    {
+      "id": 428,
+      "change_id": "e8f9228b-a33a-4319-8818-cde8038acd33",
+      "node_type": "observation",
+      "title": "Pendulum animation is slow - needs investigation (tsx startup overhead?)",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T22:02:07.379318+00:00",
+      "updated_at": "2026-01-09T22:02:07.379318+00:00",
+      "metadata_json": "{\"branch\":\"feat/server\",\"confidence\":70}"
     }
   ],
   "edges": [
@@ -9417,6 +9439,28 @@
       "weight": 1.0,
       "rationale": "Integration complete",
       "created_at": "2026-01-09T21:49:04.208130+00:00"
+    },
+    {
+      "id": 431,
+      "from_node_id": 426,
+      "to_node_id": 427,
+      "from_change_id": "67cd49b7-a0f8-4ad4-b20b-e47380dbda7d",
+      "to_change_id": "8fcc9c09-e0cf-4dfb-9fb4-b1b1094ad728",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Follow-on fixes",
+      "created_at": "2026-01-09T22:02:07.354327+00:00"
+    },
+    {
+      "id": 432,
+      "from_node_id": 427,
+      "to_node_id": 428,
+      "from_change_id": "8fcc9c09-e0cf-4dfb-9fb4-b1b1094ad728",
+      "to_change_id": "e8f9228b-a33a-4319-8818-cde8038acd33",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Known issue",
+      "created_at": "2026-01-09T22:02:12.209899+00:00"
     }
   ]
 }
