@@ -3651,6 +3651,72 @@
       "created_at": "2026-01-09T13:19:49.728838+00:00",
       "updated_at": "2026-01-09T13:19:49.728838+00:00",
       "metadata_json": "{\"branch\":\"feat/interaction\",\"confidence\":95}"
+    },
+    {
+      "id": 333,
+      "change_id": "7e48817b-b6c0-476b-987b-b2f9846eea3d",
+      "node_type": "goal",
+      "title": "Recreate Particle Plotter sketch in medli",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T13:33:22.805240+00:00",
+      "updated_at": "2026-01-09T13:33:22.805240+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example\",\"confidence\":85,\"prompt\":\"Ok, we are going to have some fun. It will also be a good test of medli so far. I believe we have enough ingredients in place to recreate an example processing (very similar to p5.js) that I have chosen.\\n\\nThe example is here https://openprocessing.org/sketch/751983 but it may be difficult for you to inspect with playwright. Give it a try and let me know.\\n\\nThe sketch uses a particle system. When a user presses the mouse, new particles appear beneath it. The particles are rendered as small circles. The particles then move and change color according to an algorithm, before eventually disappearing. The sketch KEEPS the previous frame, but on each new frame it renders a transparent square over the entire frame. So the particles appear to have a trail, that fades away over time.\\n\\nThere is some help text when there are no particles, which we can completely ignore.\\n\\nI want to try this with the canvas renderer, which is more performant. And the procedural generator, which is more similar to the processing/p5.js API.\\n\\nOn the page I've linked, there is a button at the top to show the code of the sketch. But I have placed a copy of the code in this file, that we can refer to and them remove at the end packages/test-app/temp-processing-sketch\\n\\nWe will need a new type of test app page, that shows only a single sketch, full screen/page, using the procedural and canvas modules\"}"
+    },
+    {
+      "id": 334,
+      "change_id": "fe58e6ac-fe68-4f81-a3ed-6f95a5c2ad0e",
+      "node_type": "observation",
+      "title": "Medli API supports all needed features: line(), strokeWidth(), noBackground() for trails, rectangle() for overlay, p.time for animation",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T13:34:03.449910+00:00",
+      "updated_at": "2026-01-09T13:34:03.449910+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example\",\"confidence\":90}"
+    },
+    {
+      "id": 335,
+      "change_id": "2f141b48-47b8-4da6-bc20-db1c51d671d2",
+      "node_type": "action",
+      "title": "Implemented particle plotter sketch port",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T13:37:53.106894+00:00",
+      "updated_at": "2026-01-09T13:37:53.106894+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example\",\"confidence\":95,\"files\":[\"packages/test-app/particle.html\",\"packages/test-app/src/particle.ts\",\"packages/test-app/src/sketches/particle-plotter.ts\"]}"
+    },
+    {
+      "id": 336,
+      "change_id": "d907096b-f889-4237-b87f-844c7d1804c2",
+      "node_type": "outcome",
+      "title": "Particle plotter working - particles spawn on click/touch, flow according to 12 slope variations, trails fade via transparent overlay",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T13:37:53.173568+00:00",
+      "updated_at": "2026-01-09T13:37:53.173568+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example\",\"confidence\":95}"
+    },
+    {
+      "id": 337,
+      "change_id": "f5313d38-3311-4386-b9f2-bd0daf46e2e3",
+      "node_type": "action",
+      "title": "Adding demos dropdown to main test-app page",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T13:44:49.185035+00:00",
+      "updated_at": "2026-01-09T13:44:49.185035+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example\",\"confidence\":90}"
+    },
+    {
+      "id": 338,
+      "change_id": "59c7f150-c7d2-4f83-b65b-3c4989550c65",
+      "node_type": "outcome",
+      "title": "Added demos dropdown to main page - navigates to full-screen demos",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T13:49:29.623598+00:00",
+      "updated_at": "2026-01-09T13:49:29.623598+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -7404,6 +7470,61 @@
       "weight": 1.0,
       "rationale": "Goal complete",
       "created_at": "2026-01-09T13:19:55.904879+00:00"
+    },
+    {
+      "id": 342,
+      "from_node_id": 333,
+      "to_node_id": 334,
+      "from_change_id": "7e48817b-b6c0-476b-987b-b2f9846eea3d",
+      "to_change_id": "fe58e6ac-fe68-4f81-a3ed-6f95a5c2ad0e",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "API capabilities enable implementation",
+      "created_at": "2026-01-09T13:34:11.170761+00:00"
+    },
+    {
+      "id": 343,
+      "from_node_id": 333,
+      "to_node_id": 335,
+      "from_change_id": "7e48817b-b6c0-476b-987b-b2f9846eea3d",
+      "to_change_id": "2f141b48-47b8-4da6-bc20-db1c51d671d2",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation of goal",
+      "created_at": "2026-01-09T13:37:59.763300+00:00"
+    },
+    {
+      "id": 344,
+      "from_node_id": 335,
+      "to_node_id": 336,
+      "from_change_id": "2f141b48-47b8-4da6-bc20-db1c51d671d2",
+      "to_change_id": "d907096b-f889-4237-b87f-844c7d1804c2",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation successful",
+      "created_at": "2026-01-09T13:37:59.788501+00:00"
+    },
+    {
+      "id": 345,
+      "from_node_id": 337,
+      "to_node_id": 338,
+      "from_change_id": "f5313d38-3311-4386-b9f2-bd0daf46e2e3",
+      "to_change_id": "59c7f150-c7d2-4f83-b65b-3c4989550c65",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation complete",
+      "created_at": "2026-01-09T13:49:29.647563+00:00"
+    },
+    {
+      "id": 346,
+      "from_node_id": 333,
+      "to_node_id": 337,
+      "from_change_id": "7e48817b-b6c0-476b-987b-b2f9846eea3d",
+      "to_change_id": "f5313d38-3311-4386-b9f2-bd0daf46e2e3",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Related feature",
+      "created_at": "2026-01-09T13:49:35.987558+00:00"
     }
   ]
 }
