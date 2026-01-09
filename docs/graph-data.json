@@ -4091,6 +4091,61 @@
       "created_at": "2026-01-09T17:24:05.904007+00:00",
       "updated_at": "2026-01-09T17:24:05.904007+00:00",
       "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":95}"
+    },
+    {
+      "id": 373,
+      "change_id": "b662574e-15b2-43cc-a6f4-9500dd04a962",
+      "node_type": "action",
+      "title": "Fixed Vite HMR by adding resolve.alias to point workspace packages to source files",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T17:26:18.471660+00:00",
+      "updated_at": "2026-01-09T17:26:18.471660+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":90}"
+    },
+    {
+      "id": 374,
+      "change_id": "506afd2f-2271-4544-ad41-be0e9289bcef",
+      "node_type": "outcome",
+      "title": "Vite HMR fix verified - resolve.alias redirects workspace imports to source files",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T17:32:28.964029+00:00",
+      "updated_at": "2026-01-09T17:32:28.964029+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":95}"
+    },
+    {
+      "id": 375,
+      "change_id": "46eeec1a-0c35-467e-8f5b-862c4897a9b2",
+      "node_type": "action",
+      "title": "Added pointer-events:none to snapshot image so clicks pass through to SVG",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T17:33:03.369864+00:00",
+      "updated_at": "2026-01-09T17:33:03.369864+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":85}"
+    },
+    {
+      "id": 376,
+      "change_id": "912169fd-fca1-41bf-9a7e-5fea7f8a5b1a",
+      "node_type": "observation",
+      "title": "Reverted node 375 (pointer-events fix) - will investigate SVG click issue in fresh session",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T17:36:56.957548+00:00",
+      "updated_at": "2026-01-09T17:36:56.957548+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":100}"
+    },
+    {
+      "id": 377,
+      "change_id": "44cf9653-9d68-4653-b8c5-2e71a705963c",
+      "node_type": "outcome",
+      "title": "Vite HMR fix committed - SVG fix reverted for fresh investigation",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T17:37:23.761421+00:00",
+      "updated_at": "2026-01-09T17:37:23.761421+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"commit\":\"879968f\",\"confidence\":100}"
     }
   ],
   "edges": [
@@ -8218,6 +8273,61 @@
       "weight": 1.0,
       "rationale": "Detailed symptoms",
       "created_at": "2026-01-09T17:24:10.234316+00:00"
+    },
+    {
+      "id": 376,
+      "from_node_id": 372,
+      "to_node_id": 373,
+      "from_change_id": "339b6b11-f625-410f-9312-5cb43b284d95",
+      "to_change_id": "b662574e-15b2-43cc-a6f4-9500dd04a962",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Fix for Vite HMR issue",
+      "created_at": "2026-01-09T17:26:23.837299+00:00"
+    },
+    {
+      "id": 377,
+      "from_node_id": 373,
+      "to_node_id": 374,
+      "from_change_id": "b662574e-15b2-43cc-a6f4-9500dd04a962",
+      "to_change_id": "506afd2f-2271-4544-ad41-be0e9289bcef",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Fix verified working",
+      "created_at": "2026-01-09T17:32:34.398458+00:00"
+    },
+    {
+      "id": 378,
+      "from_node_id": 370,
+      "to_node_id": 375,
+      "from_change_id": "ffeec658-86bd-4104-a830-536b3287a998",
+      "to_change_id": "46eeec1a-0c35-467e-8f5b-862c4897a9b2",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Fix for snapshot image capturing clicks",
+      "created_at": "2026-01-09T17:33:08.675143+00:00"
+    },
+    {
+      "id": 379,
+      "from_node_id": 375,
+      "to_node_id": 376,
+      "from_change_id": "46eeec1a-0c35-467e-8f5b-862c4897a9b2",
+      "to_change_id": "912169fd-fca1-41bf-9a7e-5fea7f8a5b1a",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Reverted - premature implementation",
+      "created_at": "2026-01-09T17:36:57.023454+00:00"
+    },
+    {
+      "id": 380,
+      "from_node_id": 374,
+      "to_node_id": 377,
+      "from_change_id": "506afd2f-2271-4544-ad41-be0e9289bcef",
+      "to_change_id": "44cf9653-9d68-4653-b8c5-2e71a705963c",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Committed Vite fix only",
+      "created_at": "2026-01-09T17:37:23.814532+00:00"
     }
   ]
 }

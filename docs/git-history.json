@@ -1,5 +1,21 @@
 [
   {
+    "hash": "879968fc3efd8457978a5e60b24497ae8067c0c9",
+    "short_hash": "879968f",
+    "author": "Chris Tierney",
+    "date": "2026-01-09T17:37:15Z",
+    "message": "fix: add resolve.alias to Vite config for workspace package HMR\n\nDuring development, changes to workspace packages (renderers, generators,\nspec) were not being reflected in the browser. The optimizeDeps.exclude\nconfig wasn't sufficient - Vite needed explicit resolve.alias entries\npointing to source files for proper HMR.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 3
+  },
+  {
+    "hash": "b05ae640a9acd790617929578e0cc94c7aa85dd6",
+    "short_hash": "b05ae64",
+    "author": "Chris Tierney",
+    "date": "2026-01-09T15:25:21Z",
+    "message": "feat: add flexible full-screen demo page with sketch registry\n\n- Add full-screen.html and full-screen.ts for URL-driven sketch/renderer selection\n- Create sketches/index.ts registry for centralized sketch management\n- Update main page dropdown with links to 4 demo combinations\n- Refactor Trees sketch to handle canvas clearing internally\n- Remove standalone particle.html, trees.html and their entry files\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 10
+  },
+  {
     "hash": "a0c50c347ebe2d401528bb3d938a9663047fa8ba",
     "short_hash": "a0c50c3",
     "author": "Chris Tierney",
