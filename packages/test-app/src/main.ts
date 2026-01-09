@@ -44,6 +44,9 @@ const scene = scenes[sceneId];
 const sceneSelect = document.getElementById(
   "scene-select"
 ) as HTMLSelectElement;
+const demosSelect = document.getElementById(
+  "demos-select"
+) as HTMLSelectElement;
 const colorInput = document.getElementById("bg-color") as HTMLInputElement;
 const colorValue = document.getElementById("color-value") as HTMLSpanElement;
 
@@ -66,6 +69,14 @@ sceneSelect.addEventListener("change", () => {
     url.searchParams.set("scene", newSceneId);
   }
   window.location.href = url.toString();
+});
+
+// Handle demos dropdown - navigate to full-screen demo pages
+demosSelect.addEventListener("change", () => {
+  const demoPage = demosSelect.value;
+  if (demoPage) {
+    window.location.href = demoPage;
+  }
 });
 
 // Canvas elements need buffer size synced with CSS size for crisp rendering

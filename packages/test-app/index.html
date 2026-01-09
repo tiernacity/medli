@@ -158,10 +158,43 @@
       white-space: pre;
       font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
     }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .page-header h1 {
+      margin: 0;
+    }
+    .demos-dropdown {
+      position: relative;
+    }
+    .demos-dropdown select {
+      padding: 8px 12px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: white;
+      cursor: pointer;
+      min-width: 160px;
+    }
+    .demos-dropdown select:hover {
+      border-color: #999;
+    }
   </style>
 </head>
 <body>
-  <h1>Medli Renderer Test</h1>
+  <div class="page-header">
+    <h1>Medli Renderer Test</h1>
+    <div class="demos-dropdown">
+      <select id="demos-select">
+        <option value="" disabled selected>Full-Screen Demos</option>
+        <option value="particle.html">Particle Plotter</option>
+      </select>
+    </div>
+  </div>
 
   <div class="controls">
     <label for="scene-select">Scene:</label>

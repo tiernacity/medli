@@ -1,4 +1,5 @@
 import { defineConfig } from "vite";
+import { resolve } from "path";
 
 export default defineConfig({
   optimizeDeps: {
@@ -11,5 +12,13 @@ export default defineConfig({
       "@medli/renderer-svg",
       "@medli/renderer-canvas",
     ],
+  },
+  build: {
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, "index.html"),
+        particle: resolve(__dirname, "particle.html"),
+      },
+    },
   },
 });
