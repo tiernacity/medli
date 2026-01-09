@@ -69,30 +69,9 @@ if (!element) {
 }
 
 // ============================================================================
-// Canvas Size Sync (for Canvas renderer)
-// ============================================================================
-
-function syncCanvasSize() {
-  if (!canvas) return;
-  const rect = canvas.getBoundingClientRect();
-  const dpr = window.devicePixelRatio || 1;
-  const width = Math.round(rect.width * dpr);
-  const height = Math.round(rect.height * dpr);
-  if (canvas.width !== width || canvas.height !== height) {
-    canvas.width = width;
-    canvas.height = height;
-  }
-}
-
-if (rendererType === "canvas" && canvas) {
-  const resizeObserver = new ResizeObserver(syncCanvasSize);
-  resizeObserver.observe(canvas);
-  syncCanvasSize();
-}
-
-// ============================================================================
 // Get Canvas Size Function
 // ============================================================================
+// Note: CanvasRenderer handles buffer size sync internally via ResizeObserver
 
 /**
  * Returns the logical (CSS pixel) dimensions of the rendering surface.

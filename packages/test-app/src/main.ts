@@ -79,34 +79,8 @@ demosSelect.addEventListener("change", () => {
   }
 });
 
-// Canvas elements need buffer size synced with CSS size for crisp rendering
-const canvasElements = [
-  document.querySelector<HTMLCanvasElement>("#proc-canvas")!,
-  document.querySelector<HTMLCanvasElement>("#obj-canvas")!,
-];
-
-// Sync canvas buffer size with CSS size
-function syncCanvasSize(canvas: HTMLCanvasElement) {
-  const rect = canvas.getBoundingClientRect();
-  const dpr = window.devicePixelRatio || 1;
-  const width = Math.round(rect.width * dpr);
-  const height = Math.round(rect.height * dpr);
-  if (canvas.width !== width || canvas.height !== height) {
-    canvas.width = width;
-    canvas.height = height;
-  }
-}
-
-// Use ResizeObserver to keep canvas buffer in sync with CSS size
-const resizeObserver = new ResizeObserver(() => {
-  canvasElements.forEach(syncCanvasSize);
-});
-canvasElements.forEach((canvas) => {
-  syncCanvasSize(canvas);
-  resizeObserver.observe(canvas);
-});
-
 // Create all renderers with scene's generators
+// Note: CanvasRenderer handles buffer size sync internally via ResizeObserver
 const renderers = [
   createProcSvg(
     document.querySelector<SVGSVGElement>("#proc-svg")!,

@@ -4333,6 +4333,28 @@
       "created_at": "2026-01-09T19:18:58.432031+00:00",
       "updated_at": "2026-01-09T19:18:58.432031+00:00",
       "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"commit\":\"639e943\",\"confidence\":95}"
+    },
+    {
+      "id": 395,
+      "change_id": "35c78e4b-3ec7-4a54-b7eb-eac01bcca773",
+      "node_type": "goal",
+      "title": "Internalize canvas buffer resize logic in CanvasRenderer",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T19:22:58.027734+00:00",
+      "updated_at": "2026-01-09T19:22:58.027734+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":85,\"prompt\":\"We have resize observers being created on canvas elements, to increase the buffer size when needed. I believe this should be done inside the canvas renderer - and removed from the two sketch harnesses we have. Do you agree? Investigate please - and it you agree add the goal.\\n\\nI have a related question: do we need similar logic in the svg renderer? What happens when svg elements resize?\"}"
+    },
+    {
+      "id": 396,
+      "change_id": "88d96e7b-a5bd-45ad-a3fb-f9e30557d057",
+      "node_type": "observation",
+      "title": "SVG doesn't need resize observers - viewBox and preserveAspectRatio handle scaling automatically",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T19:22:58.084892+00:00",
+      "updated_at": "2026-01-09T19:22:58.084892+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -8724,6 +8746,17 @@
       "weight": 1.0,
       "rationale": "Goal complete",
       "created_at": "2026-01-09T19:18:58.502721+00:00"
+    },
+    {
+      "id": 400,
+      "from_node_id": 395,
+      "to_node_id": 396,
+      "from_change_id": "35c78e4b-3ec7-4a54-b7eb-eac01bcca773",
+      "to_change_id": "88d96e7b-a5bd-45ad-a3fb-f9e30557d057",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Related investigation finding",
+      "created_at": "2026-01-09T19:23:04.579257+00:00"
     }
   ]
 }

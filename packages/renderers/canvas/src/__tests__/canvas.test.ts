@@ -4,6 +4,14 @@
 import { CanvasRenderer } from "../index";
 import type { Generator } from "@medli/spec";
 
+// Mock ResizeObserver (not available in jsdom)
+class MockResizeObserver {
+  observe = jest.fn();
+  unobserve = jest.fn();
+  disconnect = jest.fn();
+}
+global.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver;
+
 describe("CanvasRenderer", () => {
   let mockContext: CanvasRenderingContext2D;
   let mockElement: HTMLCanvasElement;
@@ -25,6 +33,10 @@ describe("CanvasRenderer", () => {
       width: 100,
       height: 100,
       getContext: jest.fn().mockReturnValue(mockContext),
+      getBoundingClientRect: jest.fn().mockReturnValue({
+        width: 100,
+        height: 100,
+      }),
     } as unknown as HTMLCanvasElement;
 
     mockGenerator = {
@@ -47,16 +59,17 @@ describe("CanvasRenderer", () => {
     };
   });
 
-  it("should query canvas element dimensions (not set them)", () => {
-    // Set known dimensions on the mock element
+  it("should sync canvas buffer size with CSS size on construction", () => {
+    // Set initial dimensions different from CSS size
     mockElement.width = 200;
     mockElement.height = 150;
 
+    // getBoundingClientRect returns CSS size (100x100 from mock)
     new CanvasRenderer(mockElement, mockGenerator);
 
-    // Renderer should NOT modify the element dimensions
-    expect(mockElement.width).toBe(200);
-    expect(mockElement.height).toBe(150);
+    // Renderer should sync buffer to CSS size (DPR=1 in test environment)
+    expect(mockElement.width).toBe(100);
+    expect(mockElement.height).toBe(100);
   });
 
   it("should throw if canvas context is not available", () => {

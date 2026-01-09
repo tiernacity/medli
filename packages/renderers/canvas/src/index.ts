@@ -23,6 +23,7 @@ export class CanvasRenderer extends BaseRenderer {
   private context: CanvasRenderingContext2D;
   private resourceManager: ResourceManager<ImageBitmap>;
   private lastTransform: ViewportTransformResult | null = null;
+  private resizeObserver: ResizeObserver;
 
   constructor(element: HTMLCanvasElement, generator: Generator) {
     super(generator);
@@ -38,6 +39,26 @@ export class CanvasRenderer extends BaseRenderer {
       process: (blob) => createImageBitmap(blob),
       dispose: (bitmap) => bitmap.close(),
     });
+
+    // Sync buffer size with CSS size (accounting for DPR)
+    this.syncBufferSize();
+    this.resizeObserver = new ResizeObserver(() => this.syncBufferSize());
+    this.resizeObserver.observe(this.element);
+  }
+
+  /**
+   * Sync the canvas buffer size with its CSS size, accounting for device pixel ratio.
+   * This ensures crisp rendering on high-DPI displays.
+   */
+  private syncBufferSize(): void {
+    const rect = this.element.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    const width = Math.round(rect.width * dpr);
+    const height = Math.round(rect.height * dpr);
+    if (this.element.width !== width || this.element.height !== height) {
+      this.element.width = width;
+      this.element.height = height;
+    }
   }
 
   async render(time: number = 0): Promise<void> {
@@ -101,6 +122,7 @@ export class CanvasRenderer extends BaseRenderer {
 
   destroy(): void {
     this.stop();
+    this.resizeObserver.disconnect();
     this.resourceManager.destroy();
   }
 
