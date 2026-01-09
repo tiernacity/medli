@@ -94,17 +94,18 @@ if (rendererType === "canvas" && canvas) {
 // Get Canvas Size Function
 // ============================================================================
 
+/**
+ * Returns the logical (CSS pixel) dimensions of the rendering surface.
+ * Sketches should work in CSS pixel space - the renderer handles DPR scaling.
+ */
 function getCanvasSize(): { width: number; height: number } {
   if (rendererType === "canvas" && canvas) {
-    return { width: canvas.width, height: canvas.height };
+    // Return CSS dimensions, not buffer dimensions
+    const rect = canvas.getBoundingClientRect();
+    return { width: rect.width, height: rect.height };
   } else if (svgElement) {
-    // For SVG, use the element's bounding rect with DPR
     const rect = svgElement.getBoundingClientRect();
-    const dpr = window.devicePixelRatio || 1;
-    return {
-      width: Math.round(rect.width * dpr),
-      height: Math.round(rect.height * dpr),
-    };
+    return { width: rect.width, height: rect.height };
   }
   return { width: 800, height: 600 };
 }

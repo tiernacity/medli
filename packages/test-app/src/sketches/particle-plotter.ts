@@ -179,13 +179,13 @@ export function createParticlePlotter(
     // Spawn new particles if mouse is pressed
     if (mouseIsPressed) {
       for (let i = 0; i < 20; i++) {
-        // Mouse position is in canvas buffer coords (0,0 at top-left)
-        // Convert to viewport coords (center at origin, Y-up)
+        // Mouse position is in CSS pixel coords (0,0 at top-left, Y-down)
+        // Add random offset for particle spread
         const screenX = mouseX + random(-100, 100);
         const screenY = mouseY + random(-100, 100);
 
-        // Convert screen coords to viewport coords
-        // Screen: (0,0) at top-left, Y-down
+        // Convert CSS pixel coords to viewport coords
+        // CSS pixels: (0,0) at top-left, Y-down
         // Viewport: (0,0) at center, Y-up
         const viewportX = screenX - halfWidth;
         const viewportY = halfHeight - screenY; // Flip Y

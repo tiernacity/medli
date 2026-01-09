@@ -141,19 +141,13 @@ if (sceneId === "interaction") {
     const hammer = new Hammer(el as HTMLElement);
     hammer.on("tap", (event) => {
       const renderer = renderers[i];
-      // Get element-relative coordinates
+      // Get element-relative coordinates (CSS pixels)
       const rect = el.getBoundingClientRect();
-      let elementX = event.center.x - rect.left;
-      let elementY = event.center.y - rect.top;
-
-      // For canvas elements, scale by DPI (buffer size != CSS size)
-      if (el instanceof HTMLCanvasElement) {
-        const dpr = window.devicePixelRatio || 1;
-        elementX *= dpr;
-        elementY *= dpr;
-      }
+      const elementX = event.center.x - rect.left;
+      const elementY = event.center.y - rect.top;
 
       // Transform to viewport coordinates
+      // (Canvas renderer handles DPR internally, SVG doesn't need it)
       const [x, y] = renderer.toViewportCoords([elementX, elementY]);
 
       // Update the circle position

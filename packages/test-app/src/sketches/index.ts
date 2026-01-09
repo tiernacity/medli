@@ -64,10 +64,11 @@ function setupParticlePlotterInteractions(
   let isPressed = false;
 
   function updateMousePosition(clientX: number, clientY: number) {
+    // Convert to element-relative CSS pixel coordinates
+    // Sketches work in CSS pixel space - renderers handle DPR scaling
     const rect = element.getBoundingClientRect();
-    const dpr = window.devicePixelRatio || 1;
-    const x = (clientX - rect.left) * dpr;
-    const y = (clientY - rect.top) * dpr;
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
     setMouseState(true, x, y);
   }
 

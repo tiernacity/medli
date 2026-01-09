@@ -4223,6 +4223,94 @@
       "created_at": "2026-01-09T18:41:55.697681+00:00",
       "updated_at": "2026-01-09T18:41:55.697681+00:00",
       "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":95,\"files\":[\"packages/generators/procedural/src/index.ts\",\"packages/test-app/src/sketches/trees.ts\",\"packages/test-app/src/sketches/particle-plotter.ts\"]}"
+    },
+    {
+      "id": 385,
+      "change_id": "4624cce0-9066-499f-89b2-e480a07bdf61",
+      "node_type": "goal",
+      "title": "Internalize DPR scaling in canvas renderer",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T18:56:21.334096+00:00",
+      "updated_at": "2026-01-09T18:56:21.334096+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":85,\"prompt\":\"I'm not very happy with the interaction handling we have:\\n- we have logic for accounting for dpr with the canvas renderer. We should design that so it's internal to the canvas renderer\\n- we have some setMouseState() and reset() API for the full-screen sketches. Instead, we want a less opinionated way for sketches to set up interaction they need\\n\\nLet's record two goals: one to hide the dpr logic; another to design and then implement interaction handling in a less opinionated way. Some of the logic may become simpler once the first goal is achieved\"}"
+    },
+    {
+      "id": 386,
+      "change_id": "d7d7a490-d6ac-4e84-90a3-dee757845bc6",
+      "node_type": "goal",
+      "title": "Design less opinionated sketch interaction handling",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T18:56:24.987827+00:00",
+      "updated_at": "2026-01-09T18:56:24.987827+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":80,\"prompt\":\"I'm not very happy with the interaction handling we have:\\n- we have logic for accounting for dpr with the canvas renderer. We should design that so it's internal to the canvas renderer\\n- we have some setMouseState() and reset() API for the full-screen sketches. Instead, we want a less opinionated way for sketches to set up interaction they need\\n\\nLet's record two goals: one to hide the dpr logic; another to design and then implement interaction handling in a less opinionated way. Some of the logic may become simpler once the first goal is achieved\"}"
+    },
+    {
+      "id": 387,
+      "change_id": "c216c3b6-8254-4c6a-b505-1a6ae87a2182",
+      "node_type": "observation",
+      "title": "DPR handled manually by callers - toViewportCoords is not DPR-aware",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T18:59:11.008476+00:00",
+      "updated_at": "2026-01-09T18:59:11.008476+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":95}"
+    },
+    {
+      "id": 388,
+      "change_id": "792e5307-0ad8-493e-ab8a-a17bcafee5ee",
+      "node_type": "observation",
+      "title": "Canvas buffer size = CSS size * DPR, but toViewportCoords uses element dimensions without adjustment",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T18:59:11.063406+00:00",
+      "updated_at": "2026-01-09T18:59:11.063406+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":95}"
+    },
+    {
+      "id": 389,
+      "change_id": "2cdf6e10-4483-4302-a5ec-954fd8eb6d4d",
+      "node_type": "observation",
+      "title": "SVG doesn't need DPR adjustment - viewBox handles scaling naturally",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T18:59:11.111780+00:00",
+      "updated_at": "2026-01-09T18:59:11.111780+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":95}"
+    },
+    {
+      "id": 390,
+      "change_id": "f148f1f8-f3f4-4904-9cd3-08d7e469869d",
+      "node_type": "action",
+      "title": "Implementing DPR internalization in canvas renderer toViewportCoords",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T19:01:00.140633+00:00",
+      "updated_at": "2026-01-09T19:01:00.140633+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":85}"
+    },
+    {
+      "id": 391,
+      "change_id": "92a8e127-4d0b-4e94-b8b1-c58d6ac2cdb5",
+      "node_type": "outcome",
+      "title": "DPR internalization complete - canvas toViewportCoords handles DPR internally, callers pass CSS pixels",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T19:03:50.282080+00:00",
+      "updated_at": "2026-01-09T19:03:50.282080+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":95}"
+    },
+    {
+      "id": 392,
+      "change_id": "4b725525-bd6b-40d3-ba5e-58ae60702b1b",
+      "node_type": "observation",
+      "title": "Cleaned up DPR: removed from getCanvasSize() and interaction handlers, kept in syncCanvasSize() (buffer sizing) and toViewportCoords (internal)",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T19:11:26.731425+00:00",
+      "updated_at": "2026-01-09T19:11:26.731425+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -8493,6 +8581,94 @@
       "weight": 1.0,
       "rationale": "noBackground() removed from API",
       "created_at": "2026-01-09T18:46:07.022548+00:00"
+    },
+    {
+      "id": 389,
+      "from_node_id": 385,
+      "to_node_id": 386,
+      "from_change_id": "4624cce0-9066-499f-89b2-e480a07bdf61",
+      "to_change_id": "d7d7a490-d6ac-4e84-90a3-dee757845bc6",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "DPR internalization may simplify interaction handling",
+      "created_at": "2026-01-09T18:56:30.723736+00:00"
+    },
+    {
+      "id": 390,
+      "from_node_id": 385,
+      "to_node_id": 387,
+      "from_change_id": "4624cce0-9066-499f-89b2-e480a07bdf61",
+      "to_change_id": "c216c3b6-8254-4c6a-b505-1a6ae87a2182",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Investigation finding",
+      "created_at": "2026-01-09T18:59:15.294001+00:00"
+    },
+    {
+      "id": 391,
+      "from_node_id": 385,
+      "to_node_id": 388,
+      "from_change_id": "4624cce0-9066-499f-89b2-e480a07bdf61",
+      "to_change_id": "792e5307-0ad8-493e-ab8a-a17bcafee5ee",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Investigation finding",
+      "created_at": "2026-01-09T18:59:15.315177+00:00"
+    },
+    {
+      "id": 392,
+      "from_node_id": 385,
+      "to_node_id": 389,
+      "from_change_id": "4624cce0-9066-499f-89b2-e480a07bdf61",
+      "to_change_id": "2cdf6e10-4483-4302-a5ec-954fd8eb6d4d",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Investigation finding",
+      "created_at": "2026-01-09T18:59:15.335280+00:00"
+    },
+    {
+      "id": 393,
+      "from_node_id": 385,
+      "to_node_id": 390,
+      "from_change_id": "4624cce0-9066-499f-89b2-e480a07bdf61",
+      "to_change_id": "f148f1f8-f3f4-4904-9cd3-08d7e469869d",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation of goal",
+      "created_at": "2026-01-09T19:01:04.124875+00:00"
+    },
+    {
+      "id": 394,
+      "from_node_id": 390,
+      "to_node_id": 391,
+      "from_change_id": "f148f1f8-f3f4-4904-9cd3-08d7e469869d",
+      "to_change_id": "92a8e127-4d0b-4e94-b8b1-c58d6ac2cdb5",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation complete",
+      "created_at": "2026-01-09T19:03:57.381719+00:00"
+    },
+    {
+      "id": 395,
+      "from_node_id": 385,
+      "to_node_id": 391,
+      "from_change_id": "4624cce0-9066-499f-89b2-e480a07bdf61",
+      "to_change_id": "92a8e127-4d0b-4e94-b8b1-c58d6ac2cdb5",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Goal achieved",
+      "created_at": "2026-01-09T19:03:57.403071+00:00"
+    },
+    {
+      "id": 396,
+      "from_node_id": 385,
+      "to_node_id": 392,
+      "from_change_id": "4624cce0-9066-499f-89b2-e480a07bdf61",
+      "to_change_id": "4b725525-bd6b-40d3-ba5e-58ae60702b1b",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Additional cleanup",
+      "created_at": "2026-01-09T19:11:26.784882+00:00"
     }
   ]
 }

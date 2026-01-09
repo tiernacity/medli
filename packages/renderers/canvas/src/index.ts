@@ -105,29 +105,33 @@ export class CanvasRenderer extends BaseRenderer {
   }
 
   /**
-   * Convert element coordinates to frame (viewport) coordinates.
-   * @param input - Single point [x, y]
+   * Convert CSS pixel coordinates to frame (viewport) coordinates.
+   * Automatically handles DPR scaling internally.
+   * @param input - Single point [x, y] in CSS pixels relative to element
    * @returns Transformed point in frame coordinates
    * @throws Error if called before first render
    */
   toViewportCoords(input: Point): Point;
   /**
-   * Convert an array of element coordinates to frame (viewport) coordinates.
-   * @param input - Array of points [[x, y], ...]
+   * Convert an array of CSS pixel coordinates to frame (viewport) coordinates.
+   * Automatically handles DPR scaling internally.
+   * @param input - Array of points [[x, y], ...] in CSS pixels relative to element
    * @returns Array of transformed points in frame coordinates
    * @throws Error if called before first render
    */
   toViewportCoords(input: Point[]): Point[];
   /**
-   * Convert a record of element coordinates to frame (viewport) coordinates.
-   * @param input - Record mapping keys to points
+   * Convert a record of CSS pixel coordinates to frame (viewport) coordinates.
+   * Automatically handles DPR scaling internally.
+   * @param input - Record mapping keys to points in CSS pixels relative to element
    * @returns Record with same keys, values transformed to frame coordinates
    * @throws Error if called before first render
    */
   toViewportCoords<K extends string>(input: Record<K, Point>): Record<K, Point>;
   /**
-   * Convert a map of element coordinates to frame (viewport) coordinates.
-   * @param input - Map from keys to points
+   * Convert a map of CSS pixel coordinates to frame (viewport) coordinates.
+   * Automatically handles DPR scaling internally.
+   * @param input - Map from keys to points in CSS pixels relative to element
    * @returns Map with same keys, values transformed to frame coordinates
    * @throws Error if called before first render
    */
@@ -138,7 +142,35 @@ export class CanvasRenderer extends BaseRenderer {
     if (!this.lastTransform) {
       throw new Error("Cannot call toViewportCoords before first render");
     }
-    return toViewportCoords(input as Point, this.lastTransform);
+
+    // Scale CSS pixel coordinates to buffer coordinates (accounts for DPR)
+    const dpr = window.devicePixelRatio || 1;
+    const scalePoint = ([x, y]: Point): Point => [x * dpr, y * dpr];
+
+    if (Array.isArray(input)) {
+      if (input.length === 2 && typeof input[0] === "number") {
+        // Single point [x, y]
+        return toViewportCoords(scalePoint(input as Point), this.lastTransform);
+      }
+      // Array of points
+      const scaled = (input as Point[]).map(scalePoint);
+      return toViewportCoords(scaled, this.lastTransform);
+    }
+
+    if (input instanceof Map) {
+      const scaled = new Map<unknown, Point>();
+      for (const [key, point] of input) {
+        scaled.set(key, scalePoint(point));
+      }
+      return toViewportCoords(scaled, this.lastTransform);
+    }
+
+    // Record
+    const scaled: Record<string, Point> = {};
+    for (const [key, point] of Object.entries(input)) {
+      scaled[key] = scalePoint(point);
+    }
+    return toViewportCoords(scaled, this.lastTransform);
   }
 
   private renderNode(
