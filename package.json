@@ -12,12 +12,13 @@
   "scripts": {
     "build": "npm run build --workspaces",
     "dev": "npm run dev -w @medli/test-app",
+    "dev:generate": "while true; do npx tsx packages/test-app/scripts/generate-pendulum.ts > packages/test-app/public/frame.json; sleep 0.1; done",
     "test": "jest",
     "lint": "eslint 'packages/**/src/**/*.ts' --ignore-pattern '**/__tests__/**'",
     "lint:fix": "eslint 'packages/**/src/**/*.ts' --ignore-pattern '**/__tests__/**' --fix",
     "format": "prettier --write 'packages/**/src/**/*.ts'",
     "format:check": "prettier --check 'packages/**/src/**/*.ts'",
-    "typecheck": "tsc --build"
+    "typecheck": "tsc --build && npm run typecheck -w @medli/test-app"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",

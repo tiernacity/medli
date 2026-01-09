@@ -17,7 +17,9 @@
   "dependencies": {
     "@medli/generator-object": "*",
     "@medli/generator-procedural": "*",
+    "@medli/generator-remote": "*",
     "@medli/renderer-canvas": "*",
+    "@medli/renderer-common": "*",
     "@medli/renderer-svg": "*",
     "@medli/spec": "*"
   },
