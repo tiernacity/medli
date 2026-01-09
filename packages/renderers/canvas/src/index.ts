@@ -164,18 +164,22 @@ export class CanvasRenderer extends BaseRenderer {
         );
         this.context.fillStyle = material.fill;
         this.context.fill();
-        this.context.strokeStyle = material.stroke;
-        this.context.lineWidth = material.strokeWidth;
-        this.context.stroke();
+        if (material.strokeWidth > 0) {
+          this.context.strokeStyle = material.stroke;
+          this.context.lineWidth = material.strokeWidth;
+          this.context.stroke();
+        }
         break;
       }
       case "line": {
-        this.context.beginPath();
-        this.context.moveTo(shape.start.x, shape.start.y);
-        this.context.lineTo(shape.end.x, shape.end.y);
-        this.context.strokeStyle = material.stroke;
-        this.context.lineWidth = material.strokeWidth;
-        this.context.stroke();
+        if (material.strokeWidth > 0) {
+          this.context.beginPath();
+          this.context.moveTo(shape.start.x, shape.start.y);
+          this.context.lineTo(shape.end.x, shape.end.y);
+          this.context.strokeStyle = material.stroke;
+          this.context.lineWidth = material.strokeWidth;
+          this.context.stroke();
+        }
         break;
       }
       case "image": {
