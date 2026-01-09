@@ -8,6 +8,7 @@
  * a semi-transparent overlay each frame to create fading trails.
  */
 import { ProceduralGenerator } from "@medli/generator-procedural";
+import type { SketchModule, SketchInstance } from "./types";
 
 // Color palette (from original sketch)
 const COLORS = ["#581845", "#900C3F", "#C70039", "#FF5733", "#FFC30F"];
@@ -27,23 +28,20 @@ interface Particle {
 const CHANGE_DURATION = 3000; // ms
 
 /**
- * Create a particle plotter generator with mouse state control.
+ * Create a particle plotter sketch instance with interaction handling.
  */
-export function createParticlePlotter() {
+function create(element: HTMLCanvasElement | SVGSVGElement): SketchInstance {
   // State
   const particles: Particle[] = [];
   let variation = 0;
   let lastChangeTime = 0;
   let lastFrameTime = 0;
 
-  // Mouse state (controlled externally)
+  // Mouse state (controlled by interaction handlers)
   let mouseIsPressed = false;
   let mouseX = 0;
   let mouseY = 0;
 
-  /**
-   * Set mouse state from external input handler.
-   */
   function setMouseState(pressed: boolean, x: number, y: number) {
     mouseIsPressed = pressed;
     mouseX = x;
@@ -251,5 +249,56 @@ export function createParticlePlotter() {
     }
   });
 
-  return { generator, setMouseState };
+  // Set up interaction handlers
+  let isPressed = false;
+
+  function updateMousePosition(clientX: number, clientY: number) {
+    // Convert to element-relative CSS pixel coordinates
+    // Sketches work in CSS pixel space - renderers handle DPR scaling
+    const rect = element.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
+    setMouseState(true, x, y);
+  }
+
+  function onPointerDown(e: Event) {
+    const event = e as PointerEvent;
+    isPressed = true;
+    updateMousePosition(event.clientX, event.clientY);
+  }
+
+  function onPointerMove(e: Event) {
+    const event = e as PointerEvent;
+    if (isPressed) {
+      updateMousePosition(event.clientX, event.clientY);
+    }
+  }
+
+  function onPointerEnd() {
+    isPressed = false;
+    setMouseState(false, 0, 0);
+  }
+
+  // Attach event listeners
+  element.addEventListener("pointerdown", onPointerDown);
+  element.addEventListener("pointermove", onPointerMove);
+  element.addEventListener("pointerup", onPointerEnd);
+  element.addEventListener("pointerleave", onPointerEnd);
+  element.addEventListener("pointercancel", onPointerEnd);
+
+  function destroy() {
+    element.removeEventListener("pointerdown", onPointerDown);
+    element.removeEventListener("pointermove", onPointerMove);
+    element.removeEventListener("pointerup", onPointerEnd);
+    element.removeEventListener("pointerleave", onPointerEnd);
+    element.removeEventListener("pointercancel", onPointerEnd);
+  }
+
+  return { generator, destroy };
 }
+
+export const particlePlotter: SketchModule = {
+  name: "Particle Plotter",
+  description: "Mouse-driven particles flowing through mathematical fields",
+  create,
+};

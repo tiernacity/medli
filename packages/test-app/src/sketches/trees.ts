@@ -8,6 +8,7 @@
  * and shadows are rendered with low-alpha strokes.
  */
 import { ProceduralGenerator } from "@medli/generator-procedural";
+import type { SketchModule, SketchInstance } from "./types";
 
 // ============================================================================
 // Utility functions
@@ -222,9 +223,10 @@ function initializeTrees(state: TreesState, width: number, height: number) {
 // ============================================================================
 
 /**
- * Create a trees generator with reset capability.
+ * Create a trees sketch instance with interaction handling.
+ * Click to reset tree growth.
  */
-export function createTrees() {
+function create(element: HTMLCanvasElement | SVGSVGElement): SketchInstance {
   const state = createInitialState();
 
   function reset() {
@@ -275,8 +277,25 @@ export function createTrees() {
     }
   });
 
-  return { generator, reset };
+  // Set up click-to-reset interaction
+  function onClick() {
+    reset();
+  }
+
+  element.addEventListener("click", onClick);
+
+  function destroy() {
+    element.removeEventListener("click", onClick);
+  }
+
+  return { generator, destroy };
 }
+
+export const trees: SketchModule = {
+  name: "Trees",
+  description: "Procedural tree generation with branching and shadows",
+  create,
+};
 
 function growBranch(state: TreesState, tree: Tree, branch: Branch) {
   // Branch has reached its max age (or random decides it dies sooner)

@@ -71,7 +71,7 @@ if (!element) {
 // Create Sketch Instance
 // ============================================================================
 
-const instance = sketchModule.create();
+const instance = sketchModule.create(element as HTMLCanvasElement | SVGSVGElement);
 
 // ============================================================================
 // Create Renderer
@@ -86,15 +86,6 @@ if (rendererType === "svg" && svgElement) {
 } else {
   throw new Error("No valid element for renderer");
 }
-
-// ============================================================================
-// Setup Interactions
-// ============================================================================
-
-sketchModule.setupInteractions(
-  element as HTMLCanvasElement | SVGSVGElement,
-  instance
-);
 
 // ============================================================================
 // Update Page Title
@@ -114,9 +105,7 @@ renderer.loop();
 
 window.addEventListener("beforeunload", () => {
   renderer.destroy();
-  if (instance.destroy) {
-    instance.destroy();
-  }
+  instance.destroy();
 });
 
 // ============================================================================
