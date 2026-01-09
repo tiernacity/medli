@@ -4146,6 +4146,61 @@
       "created_at": "2026-01-09T17:37:23.761421+00:00",
       "updated_at": "2026-01-09T17:37:23.761421+00:00",
       "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"commit\":\"879968f\",\"confidence\":100}"
+    },
+    {
+      "id": 378,
+      "change_id": "ff49de19-4191-4c2a-913d-123aa8adc562",
+      "node_type": "goal",
+      "title": "Re-investigate SVG click issue with working HMR",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T17:42:38.987802+00:00",
+      "updated_at": "2026-01-09T17:42:38.987802+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":85,\"prompt\":\"User asked to systematically verify the SVG click problem now that HMR is fixed, stopping after investigation to review findings before implementing any fix\"}"
+    },
+    {
+      "id": 379,
+      "change_id": "361629bd-0368-497e-9947-63cbd676e1d7",
+      "node_type": "observation",
+      "title": "SVG click-to-reset WORKS - visual test confirms trees reset to sprouts on click. Earlier confusion was due to wrapper not intercepting original closure reference and fast tree regrowth.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T17:56:56.718749+00:00",
+      "updated_at": "2026-01-09T17:56:56.718749+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":95}"
+    },
+    {
+      "id": 380,
+      "change_id": "18080743-6272-4884-b1cf-fd7acbbaa8f2",
+      "node_type": "observation",
+      "title": "Node 379 incorrect - SVG clicks still broken. Symptoms: grown tree ignores clicks, growing tree only responds near bounding box, empty space clicks ignored",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T18:24:48.287801+00:00",
+      "updated_at": "2026-01-09T18:24:48.287801+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":95}"
+    },
+    {
+      "id": 381,
+      "change_id": "6f50f7cd-3d94-4b06-9f33-a66ff8892989",
+      "node_type": "action",
+      "title": "Adding pointer-events:none to SVG snapshot image to fix click passthrough",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T18:31:19.826781+00:00",
+      "updated_at": "2026-01-09T18:31:19.826781+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":90}"
+    },
+    {
+      "id": 382,
+      "change_id": "3e8fff5a-6cc5-4217-ae5b-6cb67b2ed2b3",
+      "node_type": "outcome",
+      "title": "SVG click passthrough fixed - clicks anywhere on page now reset tree",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T18:32:34.638618+00:00",
+      "updated_at": "2026-01-09T18:32:34.638618+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -8328,6 +8383,61 @@
       "weight": 1.0,
       "rationale": "Committed Vite fix only",
       "created_at": "2026-01-09T17:37:23.814532+00:00"
+    },
+    {
+      "id": 381,
+      "from_node_id": 351,
+      "to_node_id": 378,
+      "from_change_id": "c67b2c85-b935-4cbc-a13b-87d92659a00f",
+      "to_change_id": "ff49de19-4191-4c2a-913d-123aa8adc562",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Fresh investigation after HMR fix",
+      "created_at": "2026-01-09T17:42:43.898061+00:00"
+    },
+    {
+      "id": 382,
+      "from_node_id": 378,
+      "to_node_id": 379,
+      "from_change_id": "ff49de19-4191-4c2a-913d-123aa8adc562",
+      "to_change_id": "361629bd-0368-497e-9947-63cbd676e1d7",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Investigation finding",
+      "created_at": "2026-01-09T17:57:35.075330+00:00"
+    },
+    {
+      "id": 383,
+      "from_node_id": 381,
+      "to_node_id": 382,
+      "from_change_id": "6f50f7cd-3d94-4b06-9f33-a66ff8892989",
+      "to_change_id": "3e8fff5a-6cc5-4217-ae5b-6cb67b2ed2b3",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Fix verified working",
+      "created_at": "2026-01-09T18:32:34.665028+00:00"
+    },
+    {
+      "id": 384,
+      "from_node_id": 378,
+      "to_node_id": 382,
+      "from_change_id": "ff49de19-4191-4c2a-913d-123aa8adc562",
+      "to_change_id": "3e8fff5a-6cc5-4217-ae5b-6cb67b2ed2b3",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Goal achieved",
+      "created_at": "2026-01-09T18:32:34.738554+00:00"
+    },
+    {
+      "id": 385,
+      "from_node_id": 351,
+      "to_node_id": 382,
+      "from_change_id": "c67b2c85-b935-4cbc-a13b-87d92659a00f",
+      "to_change_id": "3e8fff5a-6cc5-4217-ae5b-6cb67b2ed2b3",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Original SVG click issue finally resolved",
+      "created_at": "2026-01-09T18:32:39.073056+00:00"
     }
   ]
 }
