@@ -234,10 +234,15 @@ function initializeScene(): Scene {
 // Create scene once at startup
 const scene = initializeScene();
 
+// Base viewport configuration
+const BASE_HALF_HEIGHT = 80;
+const BASE_HALF_WIDTH = 80;
+
 /**
  * Generate Frame for the current pendulum state.
+ * Optionally adapts viewport to match target aspect ratio.
  */
-function generateFrame(): Frame {
+function generateFrame(targetWidth?: number, targetHeight?: number): Frame {
   // Derive elapsed time from wall clock (cyclic)
   const now = Date.now();
   const elapsedMs = now % CYCLE_MS;
@@ -267,6 +272,24 @@ function generateFrame(): Frame {
   bob2Circle.x = pos.bob2.x;
   bob2Circle.y = pos.bob2.y;
 
+  // Adapt viewport if both target dimensions are provided
+  if (targetWidth !== undefined && targetHeight !== undefined) {
+    const aspectRatio = targetWidth / targetHeight;
+    const adaptedHalfWidth = BASE_HALF_HEIGHT * aspectRatio;
+    scene.setViewport({
+      halfWidth: adaptedHalfWidth,
+      halfHeight: BASE_HALF_HEIGHT,
+      scaleMode: "fit",
+    });
+  } else {
+    // Use default viewport
+    scene.setViewport({
+      halfWidth: BASE_HALF_WIDTH,
+      halfHeight: BASE_HALF_HEIGHT,
+      scaleMode: "fit",
+    });
+  }
+
   return scene.frame({ time: now, targetDimensions: [100, 100] });
 }
 
@@ -280,7 +303,25 @@ const server = createServer((req, res) => {
   res.setHeader("Content-Type", "application/json");
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Cache-Control", "no-store");
-  res.end(JSON.stringify(generateFrame()));
+
+  // Parse query params for target dimensions
+  const url = new URL(req.url ?? "/", `http://localhost:${port}`);
+  const targetWidthStr = url.searchParams.get("targetWidth");
+  const targetHeightStr = url.searchParams.get("targetHeight");
+
+  // Only use dimensions if BOTH are present and valid
+  let targetWidth: number | undefined;
+  let targetHeight: number | undefined;
+  if (targetWidthStr && targetHeightStr) {
+    const w = parseFloat(targetWidthStr);
+    const h = parseFloat(targetHeightStr);
+    if (!isNaN(w) && !isNaN(h) && w > 0 && h > 0) {
+      targetWidth = w;
+      targetHeight = h;
+    }
+  }
+
+  res.end(JSON.stringify(generateFrame(targetWidth, targetHeight)));
 });
 
 server.listen(port, () => {

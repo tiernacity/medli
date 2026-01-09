@@ -68,6 +68,7 @@ export class RemoteFetchGenerator implements Generator {
   private cachedFrame: Frame;
   private timeoutId: ReturnType<typeof setTimeout> | null = null;
   private destroyed = false;
+  private targetDimensions: [number, number] | null = null;
 
   private constructor(url: string, options: RemoteFetchGeneratorOptions = {}) {
     this.url = url;
@@ -94,10 +95,11 @@ export class RemoteFetchGenerator implements Generator {
 
   /**
    * Returns the most recently fetched frame.
-   * The context parameter is ignored - remote source controls timing.
+   * Updates stored targetDimensions for future polls.
    * Before first successful fetch, returns an empty frame.
    */
-  frame(_context: RenderContext): Frame {
+  frame(context: RenderContext): Frame {
+    this.targetDimensions = context.targetDimensions;
     return this.cachedFrame;
   }
 
@@ -114,13 +116,32 @@ export class RemoteFetchGenerator implements Generator {
   }
 
   /**
+   * Build the fetch URL with optional targetDimensions query params.
+   */
+  private buildUrl(): string {
+    if (!this.targetDimensions) {
+      return this.url;
+    }
+
+    const [width, height] = this.targetDimensions;
+    const url = new URL(
+      this.url,
+      globalThis.location?.href ?? "http://localhost"
+    );
+    url.searchParams.set("targetWidth", String(width));
+    url.searchParams.set("targetHeight", String(height));
+    return url.toString();
+  }
+
+  /**
    * Internal: fetch frame and schedule next poll.
    */
   private async poll(): Promise<void> {
     if (this.destroyed) return;
 
     try {
-      const response = await this.fetchFn(this.url);
+      const fetchUrl = this.buildUrl();
+      const response = await this.fetchFn(fetchUrl);
       if (response.ok) {
         const json = await response.json();
         this.cachedFrame = json as Frame;

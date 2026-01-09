@@ -550,6 +550,15 @@ export class Scene implements Generator {
     this.viewport = viewport;
   }
 
+  /**
+   * Update the viewport configuration.
+   * Useful for adapting to different target dimensions.
+   */
+  setViewport(viewport: Viewport): this {
+    this.viewport = viewport;
+    return this;
+  }
+
   get background(): Background | null {
     return this._background;
   }
