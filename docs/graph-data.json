@@ -4817,6 +4817,39 @@
       "created_at": "2026-01-09T23:15:13.932219+00:00",
       "updated_at": "2026-01-09T23:15:13.932219+00:00",
       "metadata_json": "{\"branch\":\"feat/render-context\",\"confidence\":95}"
+    },
+    {
+      "id": 439,
+      "change_id": "81747fa5-4070-402f-b1bb-9001cea5b5be",
+      "node_type": "goal",
+      "title": "Add viewport adaptation via query params",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T23:26:17.849843+00:00",
+      "updated_at": "2026-01-09T23:26:17.849843+00:00",
+      "metadata_json": "{\"branch\":\"feat/render-context\",\"confidence\":90,\"prompt\":\"Can you upgrade the generate-pendulum.ts script so that it accepts optional query params? For targetWidth and targetHeight. **IF THEY ARE BOTH PRESENT**, the it can adapt the viewport sent with the frame. Half height should remain the same but half width should be adapted to match the aaspect ratio.\\n\\nYou will need to add a method to modify the viewport of Scene.\\n\\nThen, adapt the remote-fetch generator to keep these values up to date as sent during frame(), and send them with the request.\"}"
+    },
+    {
+      "id": 440,
+      "change_id": "696d4e34-7080-4738-9ee8-5fbcf2b401e1",
+      "node_type": "action",
+      "title": "Implemented viewport adaptation via query params",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T23:28:10.631002+00:00",
+      "updated_at": "2026-01-09T23:28:10.631002+00:00",
+      "metadata_json": "{\"branch\":\"feat/render-context\",\"confidence\":95}"
+    },
+    {
+      "id": 441,
+      "change_id": "8567f966-eac4-4e18-a723-2e280e69abdb",
+      "node_type": "outcome",
+      "title": "Viewport adaptation complete - Scene.setViewport(), query param parsing, RemoteFetchGenerator sends targetDimensions",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T23:28:17.947905+00:00",
+      "updated_at": "2026-01-09T23:28:17.947905+00:00",
+      "metadata_json": "{\"branch\":\"feat/render-context\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -9703,6 +9736,39 @@
       "weight": 1.0,
       "rationale": "Goal fully achieved",
       "created_at": "2026-01-09T23:15:14.008548+00:00"
+    },
+    {
+      "id": 445,
+      "from_node_id": 439,
+      "to_node_id": 440,
+      "from_change_id": "81747fa5-4070-402f-b1bb-9001cea5b5be",
+      "to_change_id": "696d4e34-7080-4738-9ee8-5fbcf2b401e1",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation of goal",
+      "created_at": "2026-01-09T23:28:10.682177+00:00"
+    },
+    {
+      "id": 446,
+      "from_node_id": 440,
+      "to_node_id": 441,
+      "from_change_id": "696d4e34-7080-4738-9ee8-5fbcf2b401e1",
+      "to_change_id": "8567f966-eac4-4e18-a723-2e280e69abdb",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation successful",
+      "created_at": "2026-01-09T23:28:17.995272+00:00"
+    },
+    {
+      "id": 447,
+      "from_node_id": 439,
+      "to_node_id": 441,
+      "from_change_id": "81747fa5-4070-402f-b1bb-9001cea5b5be",
+      "to_change_id": "8567f966-eac4-4e18-a723-2e280e69abdb",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Goal achieved",
+      "created_at": "2026-01-09T23:28:22.338738+00:00"
     }
   ]
 }
