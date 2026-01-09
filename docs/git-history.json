@@ -1,5 +1,13 @@
 [
   {
+    "hash": "a0c50c347ebe2d401528bb3d938a9663047fa8ba",
+    "short_hash": "a0c50c3",
+    "author": "Chris Tierney",
+    "date": "2026-01-09T13:17:25Z",
+    "message": "fix: interaction works on all four renderer panels\n\n- Fix object generator: use circle.x/y instead of non-existent circle.center setter\n- Fix canvas DPI scaling: multiply tap coordinates by devicePixelRatio for canvas elements\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 2
+  },
+  {
     "hash": "f2e09873e714389a16f88586104afc3866e68e07",
     "short_hash": "f2e0987",
     "author": "Chris Tierney",

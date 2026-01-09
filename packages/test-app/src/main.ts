@@ -132,8 +132,15 @@ if (sceneId === "interaction") {
       const renderer = renderers[i];
       // Get element-relative coordinates
       const rect = el.getBoundingClientRect();
-      const elementX = event.center.x - rect.left;
-      const elementY = event.center.y - rect.top;
+      let elementX = event.center.x - rect.left;
+      let elementY = event.center.y - rect.top;
+
+      // For canvas elements, scale by DPI (buffer size != CSS size)
+      if (el instanceof HTMLCanvasElement) {
+        const dpr = window.devicePixelRatio || 1;
+        elementX *= dpr;
+        elementY *= dpr;
+      }
 
       // Transform to viewport coordinates
       const [x, y] = renderer.toViewportCoords([elementX, elementY]);

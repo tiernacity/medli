@@ -109,7 +109,8 @@ function setBackground(color: string): void {
 export function setCirclePosition(x: number, y: number): void {
   circleX = x;
   circleY = y;
-  circle.center = { x, y };
+  circle.x = x;
+  circle.y = y;
 }
 
 // =============================================================================
