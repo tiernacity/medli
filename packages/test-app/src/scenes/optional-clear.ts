@@ -88,21 +88,19 @@ class AccumulatingScene extends Scene {
       scaleMode: "fit",
     });
 
-    // Set scene-level default material properties
-    this.fill = "#000000";
-    this.stroke = "#000000";
-    this.strokeWidth = 1;
-
     // DO NOT set background - leaving undefined means no clear
 
     // Create materials for the circles
+    // Stroke color matches fill, strokeWidth is 0 (matches procedural approach)
     this.material1 = new Material({
       fill: "#ff6b6b",
+      stroke: "#ff6b6b",
       strokeWidth: 0,
     });
 
     this.material2 = new Material({
       fill: "#4ecdc4",
+      stroke: "#4ecdc4",
       strokeWidth: 0,
     });
   }

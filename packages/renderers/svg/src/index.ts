@@ -128,15 +128,11 @@ export class SvgRenderer extends BaseRenderer {
       // No background - preserve previous content via snapshot
       if (this.shapeElements.length > 0 || this.snapshotImage) {
         // Capture snapshot BEFORE removing previous snapshot (to include accumulated history)
-        const oldSnapshotUrl = this.snapshotUrl;
         const snapshotUrl = await this.captureSnapshot();
-        // NOW remove previous snapshot image and revoke its URL
+        // NOW remove previous snapshot image (data URLs don't need revocation)
         if (this.snapshotImage) {
           this.snapshotImage.remove();
           this.snapshotImage = null;
-        }
-        if (oldSnapshotUrl) {
-          URL.revokeObjectURL(oldSnapshotUrl);
         }
         // Clear shape elements
         for (const el of this.shapeElements) {
@@ -154,15 +150,12 @@ export class SvgRenderer extends BaseRenderer {
       // Hide background rect
       this.rect.style.display = "none";
     } else {
-      // Remove previous snapshot image and revoke its URL if exists
+      // Remove previous snapshot image if exists (data URLs don't need revocation)
       if (this.snapshotImage) {
         this.snapshotImage.remove();
         this.snapshotImage = null;
       }
-      if (this.snapshotUrl) {
-        URL.revokeObjectURL(this.snapshotUrl);
-        this.snapshotUrl = null;
-      }
+      this.snapshotUrl = null;
       // Has background - clear and show rect with color
       for (const el of this.shapeElements) {
         el.remove();
@@ -188,17 +181,15 @@ export class SvgRenderer extends BaseRenderer {
   destroy(): void {
     this.stop();
     this.resourceManager.destroy();
-    if (this.snapshotUrl) {
-      URL.revokeObjectURL(this.snapshotUrl);
-    }
+    // snapshotUrl is a data URL, no revocation needed
     if (this.snapshotImage) {
       this.snapshotImage.remove();
     }
   }
 
   private async captureSnapshot(): Promise<string> {
-    // Note: Caller is responsible for revoking the old snapshotUrl
-    // after removing the old snapshot image element
+    // Returns a data URL which is self-contained and survives SVG serialization.
+    // Unlike blob URLs, data URLs don't need revocation.
 
     // Serialize SVG to string
     const serializer = new XMLSerializer();
@@ -231,14 +222,8 @@ export class SvgRenderer extends BaseRenderer {
     ctx.drawImage(img, 0, 0, width, height);
     URL.revokeObjectURL(svgUrl);
 
-    // Convert canvas to PNG blob URL
-    const pngBlob = await new Promise<Blob>((resolve, reject) => {
-      canvas.toBlob((blob) => {
-        if (blob) resolve(blob);
-        else reject(new Error("Failed to create blob from canvas"));
-      }, "image/png");
-    });
-    this.snapshotUrl = URL.createObjectURL(pngBlob);
+    // Convert canvas to PNG data URL (self-contained, survives SVG serialization)
+    this.snapshotUrl = canvas.toDataURL("image/png");
 
     return this.snapshotUrl;
   }
