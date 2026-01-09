@@ -292,6 +292,8 @@ export class SvgRenderer extends BaseRenderer {
     image.setAttribute("height", String(vp.halfHeight * 2));
     // Ensure the raster image fills the viewport without distortion
     image.setAttribute("preserveAspectRatio", "none");
+    // Allow clicks to pass through to SVG elements behind
+    image.style.pointerEvents = "none";
     // Insert BEFORE rootGroup to avoid Y-flip transform
     this.svg.insertBefore(image, this.rootGroup);
     this.snapshotImage = image;
