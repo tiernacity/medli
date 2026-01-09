@@ -2,12 +2,12 @@ import { ProceduralGenerator, Sketch } from "../index";
 import type { ChildMaterial, RootMaterial, Transform } from "@medli/spec";
 
 describe("ProceduralGenerator", () => {
-  it("should return default black background when draw does nothing", () => {
+  it("should return undefined background when draw does nothing", () => {
     const generator = new ProceduralGenerator((p) => {
       p.viewport(50, 50);
     });
     const frame = generator.frame(0);
-    expect(frame.backgroundColor).toBe("#000000");
+    expect(frame.background).toBeUndefined();
     expect(frame.viewport).toEqual({
       halfWidth: 50,
       halfHeight: 50,
@@ -21,7 +21,7 @@ describe("ProceduralGenerator", () => {
       p.background("#ff0000");
     });
     const frame = generator.frame(0);
-    expect(frame.backgroundColor).toBe("#ff0000");
+    expect(frame.background).toBe("#ff0000");
   });
 
   it("should use last background() call if called multiple times", () => {
@@ -31,7 +31,36 @@ describe("ProceduralGenerator", () => {
       p.background("#00ff00");
     });
     const frame = generator.frame(0);
-    expect(frame.backgroundColor).toBe("#00ff00");
+    expect(frame.background).toBe("#00ff00");
+  });
+
+  it("should return undefined background when noBackground() is called", () => {
+    const generator = new ProceduralGenerator((p) => {
+      p.viewport(50, 50);
+      p.noBackground();
+    });
+    const frame = generator.frame(0);
+    expect(frame.background).toBeUndefined();
+  });
+
+  it("should allow noBackground() to override previous background() call", () => {
+    const generator = new ProceduralGenerator((p) => {
+      p.viewport(50, 50);
+      p.background("#ff0000");
+      p.noBackground();
+    });
+    const frame = generator.frame(0);
+    expect(frame.background).toBeUndefined();
+  });
+
+  it("should allow background() to override previous noBackground() call", () => {
+    const generator = new ProceduralGenerator((p) => {
+      p.viewport(50, 50);
+      p.noBackground();
+      p.background("#ff0000");
+    });
+    const frame = generator.frame(0);
+    expect(frame.background).toBe("#ff0000");
   });
 
   it("should pass time to draw function via sketch.time", () => {
@@ -56,10 +85,10 @@ describe("ProceduralGenerator", () => {
     });
 
     const frame1 = generator.frame(0);
-    expect(frame1.backgroundColor).toBe("#ff0000");
+    expect(frame1.background).toBe("#ff0000");
 
     const frame2 = generator.frame(1);
-    expect(frame2.backgroundColor).toBe("#000000"); // Reset to default
+    expect(frame2.background).toBeUndefined(); // Reset to default (no background)
   });
 });
 
@@ -68,6 +97,14 @@ describe("Sketch interface", () => {
     const generator = new ProceduralGenerator((p: Sketch) => {
       p.viewport(50, 50);
       expect(typeof p.background).toBe("function");
+    });
+    generator.frame(0);
+  });
+
+  it("should provide noBackground function", () => {
+    const generator = new ProceduralGenerator((p: Sketch) => {
+      p.viewport(50, 50);
+      expect(typeof p.noBackground).toBe("function");
     });
     generator.frame(0);
   });

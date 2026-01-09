@@ -15,14 +15,14 @@ describe("Scene", () => {
   it("should return empty frame with no background", () => {
     const scene = new Scene(defaultViewport);
     const frame = scene.frame(0);
-    expect(frame.backgroundColor).toBeUndefined();
+    expect(frame.background).toBeUndefined();
   });
 
   it("should return background color when background is set", () => {
     const scene = new Scene(defaultViewport);
     scene.setBackground(new Background("#ff0000"));
     const frame = scene.frame(0);
-    expect(frame.backgroundColor).toBe("#ff0000");
+    expect(frame.background).toBe("#ff0000");
   });
 
   it("should allow adding background via add()", () => {
@@ -30,7 +30,7 @@ describe("Scene", () => {
     const bg = new Background("#00ff00");
     scene.add(bg);
     expect(scene.background).toBe(bg);
-    expect(scene.frame(0).backgroundColor).toBe("#00ff00");
+    expect(scene.frame(0).background).toBe("#00ff00");
   });
 
   it("should allow removing background", () => {
@@ -39,7 +39,7 @@ describe("Scene", () => {
     scene.setBackground(bg);
     scene.remove(bg);
     expect(scene.background).toBeNull();
-    expect(scene.frame(0).backgroundColor).toBeUndefined();
+    expect(scene.frame(0).background).toBeUndefined();
   });
 
   it("should allow setting background to null", () => {

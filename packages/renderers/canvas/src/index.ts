@@ -60,8 +60,10 @@ export class CanvasRenderer extends BaseRenderer {
     const elementWidth = this.element.width;
     const elementHeight = this.element.height;
 
-    // Clear canvas to transparent (for letterbox transparency)
-    this.context.clearRect(0, 0, elementWidth, elementHeight);
+    // Only clear if background is defined
+    if (frame.background !== undefined) {
+      this.context.clearRect(0, 0, elementWidth, elementHeight);
+    }
 
     // Compute viewport transform
     const vp = frame.viewport;
@@ -75,14 +77,16 @@ export class CanvasRenderer extends BaseRenderer {
     // Scale with Y-flip (negative scaleY flips Y axis)
     this.context.scale(transform.scaleX, -transform.scaleY);
 
-    // Draw background in viewport coordinates
-    this.context.fillStyle = frame.backgroundColor ?? "transparent";
-    this.context.fillRect(
-      -vp.halfWidth,
-      -vp.halfHeight,
-      vp.halfWidth * 2,
-      vp.halfHeight * 2
-    );
+    // Draw background in viewport coordinates (only if defined)
+    if (frame.background !== undefined) {
+      this.context.fillStyle = frame.background;
+      this.context.fillRect(
+        -vp.halfWidth,
+        -vp.halfHeight,
+        vp.halfWidth * 2,
+        vp.halfHeight * 2
+      );
+    }
 
     // Render all shapes (they're now in viewport coords)
     this.renderNode(frame.root, [frame.root], resourceMap);

@@ -164,7 +164,12 @@ export type Viewport = {
 export type Frame = {
   /** Viewport configuration (required). */
   viewport: Viewport;
-  backgroundColor?: string;
+  /**
+   * Background color for the frame.
+   * - When present: Clear rendered contents and fill with this color before rendering shapes.
+   * - When absent (undefined): Preserve previous frame contents, render new shapes on top.
+   */
+  background?: string;
   root: RootMaterial;
 };
 

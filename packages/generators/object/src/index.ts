@@ -209,7 +209,7 @@ export abstract class Shape extends SceneObject {
 
 /**
  * Background - represents the scene background color.
- * Does not contribute shapes, only sets backgroundColor on Scene.
+ * Does not contribute shapes, only sets background on Scene.
  * Note: Background does not use transforms, but extends SceneObject for consistency.
  */
 export class Background extends SceneObject {
@@ -701,11 +701,11 @@ export class Scene implements Generator {
     };
 
     // Get background color
-    const backgroundColor = this._background?.color;
+    const background = this._background?.color;
 
     return {
       viewport: this.viewport,
-      backgroundColor,
+      background,
       root,
     };
   }

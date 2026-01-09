@@ -4,6 +4,7 @@ import { scene as materials } from "./materials";
 import { scene as transforms } from "./transforms";
 import { scene as imageTransforms } from "./image-transforms";
 import { scene as imageCrop } from "./image-crop";
+import { scene as optionalClear } from "./optional-clear";
 
 export const scenes: Record<string, TestScene> = {
   "full-demo": fullDemo,
@@ -11,6 +12,7 @@ export const scenes: Record<string, TestScene> = {
   transforms: transforms,
   "image-transforms": imageTransforms,
   "image-crop": imageCrop,
+  "optional-clear": optionalClear,
 };
 
 export type SceneId = keyof typeof scenes;
