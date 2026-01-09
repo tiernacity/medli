@@ -11,7 +11,7 @@ describe("spec types", () => {
       children: [],
     };
     const frame: Frame = {
-      backgroundColor: "#ff0000",
+      background: "#ff0000",
       viewport: {
         halfWidth: 50,
         halfHeight: 50,
@@ -19,14 +19,14 @@ describe("spec types", () => {
       },
       root,
     };
-    expect(frame.backgroundColor).toBe("#ff0000");
+    expect(frame.background).toBe("#ff0000");
     expect(frame.root.id).toBe("root");
   });
 
   it("should allow implementing Generator interface", () => {
     const generator: Generator = {
       frame: (time = 0) => ({
-        backgroundColor: `hsl(${time}, 50%, 50%)`,
+        background: `hsl(${time}, 50%, 50%)`,
         viewport: {
           halfWidth: 50,
           halfHeight: 50,
@@ -43,7 +43,7 @@ describe("spec types", () => {
       }),
     };
     const frame = generator.frame(0);
-    expect(frame.backgroundColor).toBe("hsl(0, 50%, 50%)");
+    expect(frame.background).toBe("hsl(0, 50%, 50%)");
     expect(frame.root.type).toBe("material");
   });
 

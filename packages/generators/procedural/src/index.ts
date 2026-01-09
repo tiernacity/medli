@@ -125,6 +125,12 @@ export interface Sketch {
   /** Set the background color for this frame */
   background(color: string): void;
 
+  /**
+   * Disable background clearing. When called, shapes will accumulate
+   * over previous frames instead of being cleared.
+   */
+  noBackground(): void;
+
   /** Set the fill color for subsequent shapes */
   fill(color: string): void;
 
@@ -213,7 +219,7 @@ export class ProceduralGenerator implements Generator {
     let viewportScaleMode: ScaleMode = "fit";
 
     // Default style state
-    let backgroundColor = "#000000";
+    let backgroundColor: string | undefined = undefined;
     const defaultStyle: StyleState = {
       fill: "#000000",
       stroke: "#000000",
@@ -425,6 +431,9 @@ export class ProceduralGenerator implements Generator {
       background(color: string) {
         backgroundColor = color;
       },
+      noBackground() {
+        backgroundColor = undefined;
+      },
       fill(color: string) {
         currentStyle.fill = color;
         styleChangedSinceLastShape = true;
@@ -614,7 +623,7 @@ export class ProceduralGenerator implements Generator {
         halfHeight: viewportHalfHeight,
         scaleMode: viewportScaleMode,
       },
-      backgroundColor,
+      background: backgroundColor,
       root,
     };
   }

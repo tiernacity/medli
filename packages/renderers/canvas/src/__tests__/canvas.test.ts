@@ -29,7 +29,7 @@ describe("CanvasRenderer", () => {
 
     mockGenerator = {
       frame: jest.fn().mockReturnValue({
-        backgroundColor: "#ff0000",
+        background: "#ff0000",
         viewport: {
           halfWidth: 50,
           halfHeight: 50,
@@ -91,12 +91,39 @@ describe("CanvasRenderer", () => {
     expect(mockContext.restore).toHaveBeenCalled();
   });
 
-  it("should clear the canvas before rendering", async () => {
+  it("should clear the canvas when background is defined", async () => {
     const renderer = new CanvasRenderer(mockElement, mockGenerator);
 
     await renderer.render(0);
 
     expect(mockContext.clearRect).toHaveBeenCalledWith(0, 0, 100, 100);
+  });
+
+  it("should NOT clear the canvas when background is undefined", async () => {
+    // Override generator to return frame without background
+    mockGenerator.frame = jest.fn().mockReturnValue({
+      viewport: {
+        halfWidth: 50,
+        halfHeight: 50,
+        scaleMode: "fit" as const,
+      },
+      root: {
+        type: "material",
+        id: "root",
+        fill: "#000000",
+        stroke: "#000000",
+        strokeWidth: 1,
+        children: [],
+      },
+    });
+
+    const renderer = new CanvasRenderer(mockElement, mockGenerator);
+
+    await renderer.render(0);
+
+    expect(mockContext.clearRect).not.toHaveBeenCalled();
+    // Also should not fill background
+    expect(mockContext.fillRect).not.toHaveBeenCalled();
   });
 
   it("should default time to zero", async () => {

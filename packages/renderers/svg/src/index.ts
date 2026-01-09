@@ -53,6 +53,8 @@ export class SvgRenderer extends BaseRenderer {
   private shapeElements: SVGElement[] = [];
   private resourceManager: ResourceManager<ImageResource>;
   private clipIdCounter = 0;
+  private snapshotUrl: string | null = null;
+  private snapshotImage: SVGImageElement | null = null;
 
   constructor(element: SVGSVGElement, generator: Generator) {
     super(generator);
@@ -121,19 +123,52 @@ export class SvgRenderer extends BaseRenderer {
     this.rect.setAttribute("y", String(-vp.halfHeight));
     this.rect.setAttribute("width", String(vp.halfWidth * 2));
     this.rect.setAttribute("height", String(vp.halfHeight * 2));
-    this.rect.setAttribute("fill", frame.backgroundColor ?? "#ffffff");
 
-    // Clear previous shape elements
-    for (const el of this.shapeElements) {
-      el.remove();
-    }
-    this.shapeElements = [];
-
-    // Clear previous clipPath elements from defs
-    const defs = this.svg.querySelector("defs");
-    if (defs) {
-      const clipPaths = defs.querySelectorAll("clipPath");
-      clipPaths.forEach((clip) => clip.remove());
+    if (frame.background === undefined) {
+      // No background - preserve previous content via snapshot
+      if (this.shapeElements.length > 0 || this.snapshotImage) {
+        // Capture snapshot BEFORE removing previous snapshot (to include accumulated history)
+        const snapshotUrl = await this.captureSnapshot();
+        // NOW remove previous snapshot image (data URLs don't need revocation)
+        if (this.snapshotImage) {
+          this.snapshotImage.remove();
+          this.snapshotImage = null;
+        }
+        // Clear shape elements
+        for (const el of this.shapeElements) {
+          el.remove();
+        }
+        this.shapeElements = [];
+        // Clear previous clipPath elements from defs
+        const defs = this.svg.querySelector("defs");
+        if (defs) {
+          const clipPaths = defs.querySelectorAll("clipPath");
+          clipPaths.forEach((clip) => clip.remove());
+        }
+        this.insertSnapshotImage(snapshotUrl, vp);
+      }
+      // Hide background rect
+      this.rect.style.display = "none";
+    } else {
+      // Remove previous snapshot image if exists (data URLs don't need revocation)
+      if (this.snapshotImage) {
+        this.snapshotImage.remove();
+        this.snapshotImage = null;
+      }
+      this.snapshotUrl = null;
+      // Has background - clear and show rect with color
+      for (const el of this.shapeElements) {
+        el.remove();
+      }
+      this.shapeElements = [];
+      // Clear previous clipPath elements from defs
+      const defs = this.svg.querySelector("defs");
+      if (defs) {
+        const clipPaths = defs.querySelectorAll("clipPath");
+        clipPaths.forEach((clip) => clip.remove());
+      }
+      this.rect.style.display = "";
+      this.rect.setAttribute("fill", frame.background);
     }
 
     // Reset clip ID counter for this render
@@ -146,6 +181,72 @@ export class SvgRenderer extends BaseRenderer {
   destroy(): void {
     this.stop();
     this.resourceManager.destroy();
+    // snapshotUrl is a data URL, no revocation needed
+    if (this.snapshotImage) {
+      this.snapshotImage.remove();
+    }
+  }
+
+  private async captureSnapshot(): Promise<string> {
+    // Returns a data URL which is self-contained and survives SVG serialization.
+    // Unlike blob URLs, data URLs don't need revocation.
+
+    // Serialize SVG to string
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(this.svg);
+    const svgBlob = new Blob([svgString], {
+      type: "image/svg+xml;charset=utf-8",
+    });
+    const svgUrl = URL.createObjectURL(svgBlob);
+
+    // Load SVG into an image
+    const img = new window.Image();
+    img.src = svgUrl;
+    await img.decode();
+
+    // Get the actual rendered size of the SVG element
+    const rect = this.svg.getBoundingClientRect();
+    const width = rect.width || 100;
+    const height = rect.height || 100;
+
+    // Render to canvas to create a raster image (PNG)
+    // This avoids SVG-in-SVG rendering issues
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      URL.revokeObjectURL(svgUrl);
+      throw new Error("Could not get canvas context");
+    }
+    ctx.drawImage(img, 0, 0, width, height);
+    URL.revokeObjectURL(svgUrl);
+
+    // Convert canvas to PNG data URL (self-contained, survives SVG serialization)
+    this.snapshotUrl = canvas.toDataURL("image/png");
+
+    return this.snapshotUrl;
+  }
+
+  private insertSnapshotImage(
+    url: string,
+    vp: { halfWidth: number; halfHeight: number }
+  ): void {
+    const image = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "image"
+    );
+    image.setAttribute("href", url);
+    // Position image to cover entire viewport in viewBox coordinates
+    image.setAttribute("x", String(-vp.halfWidth));
+    image.setAttribute("y", String(-vp.halfHeight));
+    image.setAttribute("width", String(vp.halfWidth * 2));
+    image.setAttribute("height", String(vp.halfHeight * 2));
+    // Ensure the raster image fills the viewport without distortion
+    image.setAttribute("preserveAspectRatio", "none");
+    // Insert BEFORE rootGroup to avoid Y-flip transform
+    this.svg.insertBefore(image, this.rootGroup);
+    this.snapshotImage = image;
   }
 
   private renderNode(

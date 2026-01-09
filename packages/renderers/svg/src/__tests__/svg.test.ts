@@ -13,6 +13,7 @@ describe("SvgRenderer", () => {
   beforeEach(() => {
     mockRect = {
       setAttribute: jest.fn(),
+      style: { display: "" },
     } as unknown as SVGRectElement;
 
     mockGroup = {
@@ -34,7 +35,7 @@ describe("SvgRenderer", () => {
 
     mockGenerator = {
       frame: jest.fn().mockReturnValue({
-        backgroundColor: "#ff0000",
+        background: "#ff0000",
         viewport: {
           halfWidth: 50,
           halfHeight: 50,
@@ -133,7 +134,7 @@ describe("SvgRenderer", () => {
   it("should map scaleMode 'fill' to 'xMidYMid slice'", async () => {
     mockGenerator = {
       frame: jest.fn().mockReturnValue({
-        backgroundColor: "#ff0000",
+        background: "#ff0000",
         viewport: {
           halfWidth: 50,
           halfHeight: 50,
@@ -162,7 +163,7 @@ describe("SvgRenderer", () => {
   it("should map scaleMode 'stretch' to 'none'", async () => {
     mockGenerator = {
       frame: jest.fn().mockReturnValue({
-        backgroundColor: "#ff0000",
+        background: "#ff0000",
         viewport: {
           halfWidth: 50,
           halfHeight: 50,
