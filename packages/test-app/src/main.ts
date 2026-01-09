@@ -7,8 +7,6 @@ import { createRenderer as createProcCanvas } from "./harnesses/proc-canvas";
 import { createRenderer as createObjSvg } from "./harnesses/obj-svg";
 import { createRenderer as createObjCanvas } from "./harnesses/obj-canvas";
 
-// Import hammer.js for interaction
-import Hammer from "hammerjs";
 import { setCirclePosition } from "./scenes/interaction";
 
 // Import source code as raw text
@@ -79,34 +77,8 @@ demosSelect.addEventListener("change", () => {
   }
 });
 
-// Canvas elements need buffer size synced with CSS size for crisp rendering
-const canvasElements = [
-  document.querySelector<HTMLCanvasElement>("#proc-canvas")!,
-  document.querySelector<HTMLCanvasElement>("#obj-canvas")!,
-];
-
-// Sync canvas buffer size with CSS size
-function syncCanvasSize(canvas: HTMLCanvasElement) {
-  const rect = canvas.getBoundingClientRect();
-  const dpr = window.devicePixelRatio || 1;
-  const width = Math.round(rect.width * dpr);
-  const height = Math.round(rect.height * dpr);
-  if (canvas.width !== width || canvas.height !== height) {
-    canvas.width = width;
-    canvas.height = height;
-  }
-}
-
-// Use ResizeObserver to keep canvas buffer in sync with CSS size
-const resizeObserver = new ResizeObserver(() => {
-  canvasElements.forEach(syncCanvasSize);
-});
-canvasElements.forEach((canvas) => {
-  syncCanvasSize(canvas);
-  resizeObserver.observe(canvas);
-});
-
 // Create all renderers with scene's generators
+// Note: CanvasRenderer handles buffer size sync internally via ResizeObserver
 const renderers = [
   createProcSvg(
     document.querySelector<SVGSVGElement>("#proc-svg")!,
@@ -126,7 +98,7 @@ const renderers = [
   ),
 ];
 
-// Set up hammer.js for interaction scene
+// Set up native pointer events for interaction scene
 if (sceneId === "interaction") {
   // Get the canvas and svg elements
   const procSvg = document.querySelector<SVGSVGElement>("#proc-svg")!;
@@ -138,22 +110,15 @@ if (sceneId === "interaction") {
   const elements = [procSvg, procCanvas, objSvg, objCanvas];
 
   elements.forEach((el, i) => {
-    const hammer = new Hammer(el as HTMLElement);
-    hammer.on("tap", (event) => {
+    el.addEventListener("pointerup", (event) => {
       const renderer = renderers[i];
-      // Get element-relative coordinates
+      // Get element-relative coordinates (CSS pixels)
       const rect = el.getBoundingClientRect();
-      let elementX = event.center.x - rect.left;
-      let elementY = event.center.y - rect.top;
-
-      // For canvas elements, scale by DPI (buffer size != CSS size)
-      if (el instanceof HTMLCanvasElement) {
-        const dpr = window.devicePixelRatio || 1;
-        elementX *= dpr;
-        elementY *= dpr;
-      }
+      const elementX = event.clientX - rect.left;
+      const elementY = event.clientY - rect.top;
 
       // Transform to viewport coordinates
+      // (Canvas renderer handles DPR internally, SVG doesn't need it)
       const [x, y] = renderer.toViewportCoords([elementX, elementY]);
 
       // Update the circle position

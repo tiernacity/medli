@@ -19,11 +19,9 @@
     "@medli/generator-procedural": "*",
     "@medli/renderer-canvas": "*",
     "@medli/renderer-svg": "*",
-    "@medli/spec": "*",
-    "hammerjs": "^2.0.8"
+    "@medli/spec": "*"
   },
   "devDependencies": {
-    "@types/hammerjs": "^2.0.46",
     "vite": "^6.0.0"
   }
 }

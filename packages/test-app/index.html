@@ -191,7 +191,14 @@
     <div class="demos-dropdown">
       <select id="demos-select">
         <option value="" disabled selected>Full-Screen Demos</option>
-        <option value="particle.html">Particle Plotter</option>
+        <optgroup label="Particle Plotter">
+          <option value="full-screen.html?sketch=particle-plotter&renderer=canvas">Canvas</option>
+          <option value="full-screen.html?sketch=particle-plotter&renderer=svg">SVG</option>
+        </optgroup>
+        <optgroup label="Trees">
+          <option value="full-screen.html?sketch=trees&renderer=canvas">Canvas</option>
+          <option value="full-screen.html?sketch=trees&renderer=svg">SVG</option>
+        </optgroup>
       </select>
     </div>
   </div>
