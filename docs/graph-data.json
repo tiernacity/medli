@@ -3013,6 +3013,160 @@
       "created_at": "2026-01-09T10:34:17.611949+00:00",
       "updated_at": "2026-01-09T10:34:17.611949+00:00",
       "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":85}"
+    },
+    {
+      "id": 275,
+      "change_id": "7d7d773b-1c6e-447e-84a3-19a8df47cab2",
+      "node_type": "goal",
+      "title": "Achieve visual parity for optional clear feature",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T10:38:57.312816+00:00",
+      "updated_at": "2026-01-09T10:38:57.312816+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":85,\"prompt\":\"We want parity. But there are two problems I can see with the optional clear scene. We should investigate each in turn, in this order:\\n1. Looking at the working canvas render, I see a difference between the procedural and object scenes. We should determine why this is, and address it.\\n2. Yes, the SVG renderer is not working correctly and should be fixed. One thing to check - when we snapshot the SVG in order to preserve the frame, is the previous \\\"background\\\" image successfully included in the snapshot? This may be the problem, it may not.\"}"
+    },
+    {
+      "id": 276,
+      "change_id": "2c57e91d-4245-4785-9c76-06acb70dbfd8",
+      "node_type": "goal",
+      "title": "Investigate procedural vs object scene difference in Canvas renderer",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T10:39:02.870825+00:00",
+      "updated_at": "2026-01-09T10:39:02.870825+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":80}"
+    },
+    {
+      "id": 277,
+      "change_id": "833fde49-46c6-498b-b639-b6f8115e808c",
+      "node_type": "goal",
+      "title": "Fix SVG renderer optional clear - check if background image included in snapshot",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T10:39:02.941424+00:00",
+      "updated_at": "2026-01-09T10:39:02.941424+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":80}"
+    },
+    {
+      "id": 278,
+      "change_id": "93ec4a12-ed1c-4e6d-a27c-f86a78c5e9e6",
+      "node_type": "observation",
+      "title": "Object generator scene clears children array and re-adds materials every frame (lines 111-119), unlike procedural which creates fresh Frame IR each call",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T10:39:57.910478+00:00",
+      "updated_at": "2026-01-09T10:39:57.910478+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":85}"
+    },
+    {
+      "id": 279,
+      "change_id": "53f18679-de52-4350-b482-3ae30c84b4aa",
+      "node_type": "observation",
+      "title": "Object Generator scene sets fill=#000000, stroke=#000000, strokeWidth=1 as scene defaults. Materials only override fill and strokeWidth, not stroke. Result: black stroke visible (strokeWidth inheritance issue) and possibly black fill bleeding through",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T10:41:23.790929+00:00",
+      "updated_at": "2026-01-09T10:41:23.790929+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":95}"
+    },
+    {
+      "id": 280,
+      "change_id": "637a7c33-b810-45c6-9fd5-16bc52ec09ef",
+      "node_type": "action",
+      "title": "Fix object generator scene to match procedural material properties",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T10:41:37.927752+00:00",
+      "updated_at": "2026-01-09T10:41:37.927752+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":90}"
+    },
+    {
+      "id": 281,
+      "change_id": "52e2532a-2f50-400d-a814-c29cd6c10e08",
+      "node_type": "outcome",
+      "title": "Fixed: removed scene-level defaults, added stroke colors to materials. Canvas Procedural and Object generators now match visually.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T10:42:40.887443+00:00",
+      "updated_at": "2026-01-09T10:42:40.887443+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":95}"
+    },
+    {
+      "id": 282,
+      "change_id": "45fb1388-7e89-42e6-98fa-c26b7b5753af",
+      "node_type": "action",
+      "title": "Investigating SVG snapshot: checking if previous background image is included when snapshotting",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T10:42:50.499442+00:00",
+      "updated_at": "2026-01-09T10:42:50.499442+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":85}"
+    },
+    {
+      "id": 283,
+      "change_id": "2e4ec71a-498d-4508-b76a-a058678ce8ee",
+      "node_type": "observation",
+      "title": "Root cause: SVG snapshot uses blob URL for href. When SVG is serialized and loaded as image, blob URLs from parent document cannot be resolved. Previous snapshot appears blank in new snapshot - chain breaks each frame.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T10:44:11.357540+00:00",
+      "updated_at": "2026-01-09T10:44:11.357540+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":95}"
+    },
+    {
+      "id": 284,
+      "change_id": "ccea5d1c-9764-460b-8cbd-e432fcae4008",
+      "node_type": "decision",
+      "title": "How to fix SVG snapshot accumulation",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T10:44:17.110894+00:00",
+      "updated_at": "2026-01-09T10:44:17.110894+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":90}"
+    },
+    {
+      "id": 285,
+      "change_id": "d74238a0-fa13-4e92-a353-1f29e51b7af7",
+      "node_type": "option",
+      "title": "Use base64 data URL instead of blob URL for snapshot image (Recommended)",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T10:44:22.064340+00:00",
+      "updated_at": "2026-01-09T10:44:22.064340+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":95}"
+    },
+    {
+      "id": 286,
+      "change_id": "ce566a26-4e11-4bb1-8f38-b1fc5e743c7d",
+      "node_type": "option",
+      "title": "Accumulate shapes in DOM instead of snapshotting",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T10:44:22.144539+00:00",
+      "updated_at": "2026-01-09T10:44:22.144539+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":70}"
+    },
+    {
+      "id": 287,
+      "change_id": "b3a0c193-ed6c-412e-a4db-b8aed18bb2ed",
+      "node_type": "action",
+      "title": "Implementing base64 data URL fix for SVG snapshot accumulation",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T10:44:33.506707+00:00",
+      "updated_at": "2026-01-09T10:44:33.506707+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":90}"
+    },
+    {
+      "id": 288,
+      "change_id": "5b4cc5c7-ff03-4c15-ba47-1effe3c7a083",
+      "node_type": "outcome",
+      "title": "SVG snapshot accumulation fixed. Using base64 data URLs instead of blob URLs. All four renderers (SVG/Canvas x Procedural/Object) now accumulate shapes correctly.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T10:46:21.736061+00:00",
+      "updated_at": "2026-01-09T10:46:21.736061+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -6073,6 +6227,182 @@
       "weight": 1.0,
       "rationale": "Known limitation",
       "created_at": "2026-01-09T10:34:22.824855+00:00"
+    },
+    {
+      "id": 279,
+      "from_node_id": 275,
+      "to_node_id": 276,
+      "from_change_id": "7d7d773b-1c6e-447e-84a3-19a8df47cab2",
+      "to_change_id": "2c57e91d-4245-4785-9c76-06acb70dbfd8",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "First issue to investigate",
+      "created_at": "2026-01-09T10:39:07.471833+00:00"
+    },
+    {
+      "id": 280,
+      "from_node_id": 275,
+      "to_node_id": 277,
+      "from_change_id": "7d7d773b-1c6e-447e-84a3-19a8df47cab2",
+      "to_change_id": "833fde49-46c6-498b-b639-b6f8115e808c",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Second issue to investigate (after first resolved)",
+      "created_at": "2026-01-09T10:39:07.498323+00:00"
+    },
+    {
+      "id": 281,
+      "from_node_id": 276,
+      "to_node_id": 278,
+      "from_change_id": "2c57e91d-4245-4785-9c76-06acb70dbfd8",
+      "to_change_id": "93ec4a12-ed1c-4e6d-a27c-f86a78c5e9e6",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Investigation finding",
+      "created_at": "2026-01-09T10:41:23.871969+00:00"
+    },
+    {
+      "id": 282,
+      "from_node_id": 278,
+      "to_node_id": 279,
+      "from_change_id": "93ec4a12-ed1c-4e6d-a27c-f86a78c5e9e6",
+      "to_change_id": "53f18679-de52-4350-b482-3ae30c84b4aa",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Leads to root cause",
+      "created_at": "2026-01-09T10:41:23.902830+00:00"
+    },
+    {
+      "id": 283,
+      "from_node_id": 279,
+      "to_node_id": 280,
+      "from_change_id": "53f18679-de52-4350-b482-3ae30c84b4aa",
+      "to_change_id": "637a7c33-b810-45c6-9fd5-16bc52ec09ef",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Fix for root cause",
+      "created_at": "2026-01-09T10:41:38.009562+00:00"
+    },
+    {
+      "id": 284,
+      "from_node_id": 280,
+      "to_node_id": 281,
+      "from_change_id": "637a7c33-b810-45c6-9fd5-16bc52ec09ef",
+      "to_change_id": "52e2532a-2f50-400d-a814-c29cd6c10e08",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Fix successful",
+      "created_at": "2026-01-09T10:42:40.968233+00:00"
+    },
+    {
+      "id": 285,
+      "from_node_id": 276,
+      "to_node_id": 281,
+      "from_change_id": "2c57e91d-4245-4785-9c76-06acb70dbfd8",
+      "to_change_id": "52e2532a-2f50-400d-a814-c29cd6c10e08",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Goal achieved",
+      "created_at": "2026-01-09T10:42:40.996251+00:00"
+    },
+    {
+      "id": 286,
+      "from_node_id": 277,
+      "to_node_id": 282,
+      "from_change_id": "833fde49-46c6-498b-b639-b6f8115e808c",
+      "to_change_id": "45fb1388-7e89-42e6-98fa-c26b7b5753af",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Investigation for goal",
+      "created_at": "2026-01-09T10:42:50.573138+00:00"
+    },
+    {
+      "id": 287,
+      "from_node_id": 282,
+      "to_node_id": 283,
+      "from_change_id": "45fb1388-7e89-42e6-98fa-c26b7b5753af",
+      "to_change_id": "2e4ec71a-498d-4508-b76a-a058678ce8ee",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Investigation finding",
+      "created_at": "2026-01-09T10:44:11.449162+00:00"
+    },
+    {
+      "id": 288,
+      "from_node_id": 283,
+      "to_node_id": 284,
+      "from_change_id": "2e4ec71a-498d-4508-b76a-a058678ce8ee",
+      "to_change_id": "ccea5d1c-9764-460b-8cbd-e432fcae4008",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Leads to fix decision",
+      "created_at": "2026-01-09T10:44:27.518925+00:00"
+    },
+    {
+      "id": 289,
+      "from_node_id": 284,
+      "to_node_id": 285,
+      "from_change_id": "ccea5d1c-9764-460b-8cbd-e432fcae4008",
+      "to_change_id": "d74238a0-fa13-4e92-a353-1f29e51b7af7",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Recommended: simple fix, self-contained URLs",
+      "created_at": "2026-01-09T10:44:27.544924+00:00"
+    },
+    {
+      "id": 290,
+      "from_node_id": 284,
+      "to_node_id": 286,
+      "from_change_id": "ccea5d1c-9764-460b-8cbd-e432fcae4008",
+      "to_change_id": "ce566a26-4e11-4bb1-8f38-b1fc5e743c7d",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Alternative: more complex, DOM bloat risk",
+      "created_at": "2026-01-09T10:44:27.573856+00:00"
+    },
+    {
+      "id": 291,
+      "from_node_id": 285,
+      "to_node_id": 287,
+      "from_change_id": "d74238a0-fa13-4e92-a353-1f29e51b7af7",
+      "to_change_id": "b3a0c193-ed6c-412e-a4db-b8aed18bb2ed",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementing selected option",
+      "created_at": "2026-01-09T10:44:33.603589+00:00"
+    },
+    {
+      "id": 292,
+      "from_node_id": 287,
+      "to_node_id": 288,
+      "from_change_id": "b3a0c193-ed6c-412e-a4db-b8aed18bb2ed",
+      "to_change_id": "5b4cc5c7-ff03-4c15-ba47-1effe3c7a083",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Fix successful",
+      "created_at": "2026-01-09T10:46:21.911759+00:00"
+    },
+    {
+      "id": 293,
+      "from_node_id": 277,
+      "to_node_id": 288,
+      "from_change_id": "833fde49-46c6-498b-b639-b6f8115e808c",
+      "to_change_id": "5b4cc5c7-ff03-4c15-ba47-1effe3c7a083",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Goal achieved",
+      "created_at": "2026-01-09T10:46:21.961392+00:00"
+    },
+    {
+      "id": 294,
+      "from_node_id": 275,
+      "to_node_id": 288,
+      "from_change_id": "7d7d773b-1c6e-447e-84a3-19a8df47cab2",
+      "to_change_id": "5b4cc5c7-ff03-4c15-ba47-1effe3c7a083",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Parent goal achieved",
+      "created_at": "2026-01-09T10:46:22.041010+00:00"
     }
   ]
 }
