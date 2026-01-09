@@ -31,6 +31,17 @@ export type Line = {
 };
 
 /**
+ * A rectangle shape with center position and dimensions.
+ * Style (fill, stroke, strokeWidth) inherited from parent Material.
+ */
+export type Rectangle = {
+  type: "rectangle";
+  center: Position;
+  width: number;
+  height: number;
+};
+
+/**
  * Defines a rectangular region within the source image for cropping.
  * Coordinates and dimensions are in source image pixels.
  */
@@ -62,7 +73,7 @@ export type Image = {
 /**
  * Union of all shape types.
  */
-export type Shape = Circle | Line | Image;
+export type Shape = Circle | Line | Rectangle | Image;
 
 /**
  * Root material with all style properties required.

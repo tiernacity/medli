@@ -182,6 +182,21 @@ export class CanvasRenderer extends BaseRenderer {
         }
         break;
       }
+      case "rectangle": {
+        // Convert from center position to top-left corner
+        const x = shape.center.x - shape.width / 2;
+        const y = shape.center.y - shape.height / 2;
+        this.context.beginPath();
+        this.context.rect(x, y, shape.width, shape.height);
+        this.context.fillStyle = material.fill;
+        this.context.fill();
+        if (material.strokeWidth > 0) {
+          this.context.strokeStyle = material.stroke;
+          this.context.lineWidth = material.strokeWidth;
+          this.context.stroke();
+        }
+        break;
+      }
       case "image": {
         const img = shape as Image;
         const bitmap = resourceMap.get(img.url);

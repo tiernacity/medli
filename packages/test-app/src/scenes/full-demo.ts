@@ -25,6 +25,7 @@ import {
   Scene,
   Background,
   Circle,
+  Rectangle,
   Line,
   Material,
   Group,
@@ -112,7 +113,22 @@ const procedural = new ProceduralGenerator((p) => {
   p.lineOffset(40, -40, -30, 0); // Bottom edge
   p.lineOffset(10, -40, 0, 30); // Left edge
 
-  // === Section 5: Transform demonstration ===
+  // === Section 5: Rectangle primitives ===
+  // Draw rectangles in various positions to test rectangle rendering
+  p.push();
+  p.fill("#ff9800"); // Orange
+  p.stroke("#ffffff"); // White
+  p.strokeWidth(2);
+
+  // Rectangle near top center
+  p.rectangle(0, 40, 16, 8);
+
+  // Rectangle near bottom center
+  p.rectangle(0, -40, 12, 12);
+
+  p.pop();
+
+  // === Section 6: Transform demonstration ===
   // Draw a shape at center, then use transforms to draw rotated copies
   p.push();
   p.fill("#ff6b6b"); // Coral/light red
@@ -128,7 +144,7 @@ const procedural = new ProceduralGenerator((p) => {
 
   p.pop();
 
-  // === Section 6: Translate transform ===
+  // === Section 7: Translate transform ===
   // Draw a shape translated from origin
   p.push();
   p.fill("#9b59b6"); // Purple
@@ -142,7 +158,7 @@ const procedural = new ProceduralGenerator((p) => {
 
   p.pop();
 
-  // === Section 7: Rotate transform ===
+  // === Section 8: Rotate transform ===
   // Draw a rotated line pattern
   p.push();
   p.fill("#f39c12"); // Orange
@@ -158,7 +174,7 @@ const procedural = new ProceduralGenerator((p) => {
 
   p.pop();
 
-  // === Section 8: Scale transform ===
+  // === Section 9: Scale transform ===
   // Draw a scaled circle
   p.push();
   p.fill("#1abc9c"); // Teal
@@ -173,7 +189,7 @@ const procedural = new ProceduralGenerator((p) => {
 
   p.pop();
 
-  // === Section 9: Combined transforms (translate + rotate) ===
+  // === Section 10: Combined transforms (translate + rotate) ===
   // Draw a rotated shape at a specific position
   p.push();
   p.fill("#e74c3c"); // Red
@@ -191,7 +207,7 @@ const procedural = new ProceduralGenerator((p) => {
 
   p.pop();
 
-  // === Section 10: Image rendering test ===
+  // === Section 11: Image rendering test ===
   // Draw a test image in the lower-left corner area
   // The image is 32x32 pixels, we'll render it at 20x20 viewport units
   p.image("/test-img.png", -45, -45, 20, 20);
@@ -327,8 +343,27 @@ const line4d = Line.fromOffset(10, -40, 0, 30); // Left edge
 line4d.material = material4;
 object.add(line4d);
 
-// === Section 5: Transform demonstration ===
-// Draw a shape at center (no transform, matches procedural section 5)
+// === Section 5: Rectangle primitives ===
+// Draw rectangles in various positions to test rectangle rendering
+const materialRect = new Material({
+  fill: "#ff9800", // Orange
+  stroke: "#ffffff", // White
+  strokeWidth: 2,
+});
+object.add(materialRect);
+
+// Rectangle near top center
+const rect1 = new Rectangle(0, 40, 16, 8);
+rect1.material = materialRect;
+object.add(rect1);
+
+// Rectangle near bottom center
+const rect2 = new Rectangle(0, -40, 12, 12);
+rect2.material = materialRect;
+object.add(rect2);
+
+// === Section 6: Transform demonstration ===
+// Draw a shape at center (no transform, matches procedural section 6)
 const material5 = new Material({
   fill: "#ff6b6b", // Coral/light red
   stroke: "#ffffff", // White stroke
@@ -350,7 +385,7 @@ const line5b = new Line(0, 8, 0, -8);
 line5b.material = material5;
 object.add(line5b);
 
-// === Section 6: Translate transform ===
+// === Section 7: Translate transform ===
 // Draw a shape translated from origin using shape's position property
 const material6 = new Material({
   fill: "#9b59b6", // Purple
@@ -366,7 +401,7 @@ circle6.position = { x: -35, y: 35 };
 circle6.material = material6;
 object.add(circle6);
 
-// === Section 7: Rotate transform ===
+// === Section 8: Rotate transform ===
 // Draw a rotated line using shape's transform properties
 const material7 = new Material({
   fill: "#f39c12", // Orange
@@ -383,7 +418,7 @@ line7.rotation = Math.PI / 4; // 45 degrees
 line7.material = material7;
 object.add(line7);
 
-// === Section 8: Scale transform ===
+// === Section 9: Scale transform ===
 // Draw a scaled circle using shape's transform properties
 const material8 = new Material({
   fill: "#1abc9c", // Teal
@@ -400,7 +435,7 @@ circle8.scale = 0.5;
 circle8.material = material8;
 object.add(circle8);
 
-// === Section 9: Combined transforms (translate + rotate) ===
+// === Section 10: Combined transforms (translate + rotate) ===
 // Draw a rotated cross at a specific position using Group (demonstrates collective transforms)
 const material9 = new Material({
   fill: "#e74c3c", // Red
@@ -423,7 +458,7 @@ group9.add(line9a);
 group9.add(line9b);
 object.add(group9);
 
-// === Section 10: Image rendering test ===
+// === Section 11: Image rendering test ===
 // Draw a test image in the lower-left corner area
 // The image is 32x32 pixels, we'll render it at 20x20 viewport units
 const image10 = new Image("/test-img.png", -45, -45, 20, 20);
