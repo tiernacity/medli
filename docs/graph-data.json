@@ -2870,6 +2870,149 @@
       "created_at": "2026-01-08T22:59:45.542375+00:00",
       "updated_at": "2026-01-08T22:59:45.542375+00:00",
       "metadata_json": "{\"branch\":\"feat/images\",\"confidence\":80}"
+    },
+    {
+      "id": 262,
+      "change_id": "b6276ec0-d869-40dd-80a1-3d052a217a5e",
+      "node_type": "goal",
+      "title": "Make frame clear optional: rename backgroundColor to background, skip clear when absent",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T09:56:04.234679+00:00",
+      "updated_at": "2026-01-09T09:56:04.234679+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":85,\"prompt\":\"Yes, the goal is to make the canvas clear optional. And I also want to discover whether we can support the same for SVG rendering. Here is the behavior I want:\\n- change Frame.backgroundColor to Frame.background\\n- if it is present, renderers must clear the rendered contents and initially replace them with the correct background color. This is already working\\n- if it is absent, the rendered contents must remain, and the next frame will be drawn over it\\n\\nFor the canvas renderer, I believe this is not difficult. For the SVG renderer, we need a strategy so that SVG elements do not accumulate - which will happen quickly at, say, 60pfs. Capture the goal please, the investigate whether this is possible in the SVG renderer:\\n- if the frame is NOT to be cleared\\n- take a snapshot image of the SVG as it currently is. The size will be the parent element size\\n- clear the SVG contents\\n- place snapthot as an image over the full SVG element\\n- render new elements as normal\"}"
+    },
+    {
+      "id": 263,
+      "change_id": "af1d7305-1a22-4ef3-9d3c-c7343c6eaedc",
+      "node_type": "action",
+      "title": "Investigating SVG snapshot strategy for non-clearing frames",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T09:56:16.303027+00:00",
+      "updated_at": "2026-01-09T09:56:16.303027+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":80}"
+    },
+    {
+      "id": 264,
+      "change_id": "5df3552a-d30c-4622-b967-97f4875fad68",
+      "node_type": "observation",
+      "title": "Canvas renderer: making clear optional is trivial - just skip clearRect/fillRect when background absent",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T10:00:23.205984+00:00",
+      "updated_at": "2026-01-09T10:00:23.205984+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":95}"
+    },
+    {
+      "id": 265,
+      "change_id": "a0807905-e615-462f-9b39-dca7d279bbe4",
+      "node_type": "observation",
+      "title": "SVG snapshot strategy is feasible but ASYNC: XMLSerializer + Blob URL + img.decode() cannot complete synchronously",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T10:00:23.263694+00:00",
+      "updated_at": "2026-01-09T10:00:23.263694+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":90}"
+    },
+    {
+      "id": 266,
+      "change_id": "7b2c3f9a-0b6f-4bd7-82db-555e0c089386",
+      "node_type": "observation",
+      "title": "SVG solution: one-frame-behind snapshot. Frame N snapshot becomes background for frame N+1. Imperceptible at 60fps.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T10:00:23.319525+00:00",
+      "updated_at": "2026-01-09T10:00:23.319525+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":90}"
+    },
+    {
+      "id": 267,
+      "change_id": "07088f9e-bd7a-40bf-b81f-ad2dbdce94c8",
+      "node_type": "outcome",
+      "title": "Investigation complete: optional clear is feasible for both renderers. Canvas trivial, SVG uses one-frame-behind snapshot strategy.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T10:00:29.175131+00:00",
+      "updated_at": "2026-01-09T10:00:29.175131+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":90}"
+    },
+    {
+      "id": 268,
+      "change_id": "3cec486d-f44d-4cdf-9c71-b8774adac447",
+      "node_type": "observation",
+      "title": "Correction: render() is already async (awaits resources). Snapshot can be awaited at START of render, before clear. No frame lag needed.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T10:02:47.066600+00:00",
+      "updated_at": "2026-01-09T10:02:47.066600+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":95}"
+    },
+    {
+      "id": 269,
+      "change_id": "db065186-c7f1-450d-9a34-05f75701ce9f",
+      "node_type": "observation",
+      "title": "Corrected SVG flow: 1) render() called 2) if background absent, await snapshot of current content 3) clear SVG 4) insert snapshot as image 5) render new shapes",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T10:02:52.590890+00:00",
+      "updated_at": "2026-01-09T10:02:52.590890+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":95}"
+    },
+    {
+      "id": 270,
+      "change_id": "c2fc4be6-2398-4975-8000-4b4fb49512f2",
+      "node_type": "decision",
+      "title": "Implementation approach for optional clear feature",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T10:08:20.127139+00:00",
+      "updated_at": "2026-01-09T10:08:20.127139+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":90}"
+    },
+    {
+      "id": 271,
+      "change_id": "dc075f81-083b-4c3c-8a12-acb1cb6bdb98",
+      "node_type": "option",
+      "title": "SVG snapshot outside rootGroup, first frame transparent, hide bg rect when undefined",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T10:08:25.981268+00:00",
+      "updated_at": "2026-01-09T10:08:25.981268+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":95}"
+    },
+    {
+      "id": 272,
+      "change_id": "dd612297-1094-41a7-8e3d-7115b52be5e2",
+      "node_type": "action",
+      "title": "Implementing optional clear feature per approved plan",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T10:11:00.566126+00:00",
+      "updated_at": "2026-01-09T10:11:00.566126+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":90}"
+    },
+    {
+      "id": 273,
+      "change_id": "b090c31f-5bae-4d18-b9d1-8fef1f75b1a2",
+      "node_type": "outcome",
+      "title": "Optional clear feature implemented: backgroundColor renamed to background, Canvas skips clear when undefined, SVG uses raster snapshot strategy. All 192 tests pass, visual verification confirms accumulating shapes in both renderers.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T10:31:56.781531+00:00",
+      "updated_at": "2026-01-09T10:31:56.781531+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":95}"
+    },
+    {
+      "id": 274,
+      "change_id": "f0ddce19-6a62-4d21-b87d-cd86d6cc5192",
+      "node_type": "observation",
+      "title": "SVG snapshot accumulates slower than Canvas due to async raster conversion overhead. Visual parity not achieved - SVG shows fewer accumulated shapes. May need optimization or alternative approach.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T10:34:17.611949+00:00",
+      "updated_at": "2026-01-09T10:34:17.611949+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":85}"
     }
   ],
   "edges": [
@@ -5787,6 +5930,149 @@
       "weight": 1.0,
       "rationale": "User insight",
       "created_at": "2026-01-08T22:59:45.587968+00:00"
+    },
+    {
+      "id": 266,
+      "from_node_id": 262,
+      "to_node_id": 263,
+      "from_change_id": "b6276ec0-d869-40dd-80a1-3d052a217a5e",
+      "to_change_id": "af1d7305-1a22-4ef3-9d3c-c7343c6eaedc",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Investigation for goal",
+      "created_at": "2026-01-09T10:00:17.300255+00:00"
+    },
+    {
+      "id": 267,
+      "from_node_id": 263,
+      "to_node_id": 264,
+      "from_change_id": "af1d7305-1a22-4ef3-9d3c-c7343c6eaedc",
+      "to_change_id": "5df3552a-d30c-4622-b967-97f4875fad68",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Canvas finding",
+      "created_at": "2026-01-09T10:00:29.081628+00:00"
+    },
+    {
+      "id": 268,
+      "from_node_id": 263,
+      "to_node_id": 265,
+      "from_change_id": "af1d7305-1a22-4ef3-9d3c-c7343c6eaedc",
+      "to_change_id": "a0807905-e615-462f-9b39-dca7d279bbe4",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "SVG async constraint",
+      "created_at": "2026-01-09T10:00:29.103429+00:00"
+    },
+    {
+      "id": 269,
+      "from_node_id": 263,
+      "to_node_id": 266,
+      "from_change_id": "af1d7305-1a22-4ef3-9d3c-c7343c6eaedc",
+      "to_change_id": "7b2c3f9a-0b6f-4bd7-82db-555e0c089386",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "SVG solution",
+      "created_at": "2026-01-09T10:00:29.123746+00:00"
+    },
+    {
+      "id": 270,
+      "from_node_id": 263,
+      "to_node_id": 267,
+      "from_change_id": "af1d7305-1a22-4ef3-9d3c-c7343c6eaedc",
+      "to_change_id": "07088f9e-bd7a-40bf-b81f-ad2dbdce94c8",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Investigation result",
+      "created_at": "2026-01-09T10:00:33.611840+00:00"
+    },
+    {
+      "id": 271,
+      "from_node_id": 266,
+      "to_node_id": 268,
+      "from_change_id": "7b2c3f9a-0b6f-4bd7-82db-555e0c089386",
+      "to_change_id": "3cec486d-f44d-4cdf-9c71-b8774adac447",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "User correction: no lag needed",
+      "created_at": "2026-01-09T10:02:52.539073+00:00"
+    },
+    {
+      "id": 272,
+      "from_node_id": 268,
+      "to_node_id": 269,
+      "from_change_id": "3cec486d-f44d-4cdf-9c71-b8774adac447",
+      "to_change_id": "db065186-c7f1-450d-9a34-05f75701ce9f",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Corrected flow",
+      "created_at": "2026-01-09T10:02:56.324505+00:00"
+    },
+    {
+      "id": 273,
+      "from_node_id": 262,
+      "to_node_id": 270,
+      "from_change_id": "b6276ec0-d869-40dd-80a1-3d052a217a5e",
+      "to_change_id": "c2fc4be6-2398-4975-8000-4b4fb49512f2",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Design approach for goal",
+      "created_at": "2026-01-09T10:08:25.930450+00:00"
+    },
+    {
+      "id": 274,
+      "from_node_id": 270,
+      "to_node_id": 271,
+      "from_change_id": "c2fc4be6-2398-4975-8000-4b4fb49512f2",
+      "to_change_id": "dc075f81-083b-4c3c-8a12-acb1cb6bdb98",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Selected design approach",
+      "created_at": "2026-01-09T10:08:30.359159+00:00"
+    },
+    {
+      "id": 275,
+      "from_node_id": 262,
+      "to_node_id": 272,
+      "from_change_id": "b6276ec0-d869-40dd-80a1-3d052a217a5e",
+      "to_change_id": "dd612297-1094-41a7-8e3d-7115b52be5e2",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation of goal",
+      "created_at": "2026-01-09T10:11:06.342435+00:00"
+    },
+    {
+      "id": 276,
+      "from_node_id": 272,
+      "to_node_id": 273,
+      "from_change_id": "dd612297-1094-41a7-8e3d-7115b52be5e2",
+      "to_change_id": "b090c31f-5bae-4d18-b9d1-8fef1f75b1a2",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation complete",
+      "created_at": "2026-01-09T10:32:03.933871+00:00"
+    },
+    {
+      "id": 277,
+      "from_node_id": 262,
+      "to_node_id": 273,
+      "from_change_id": "b6276ec0-d869-40dd-80a1-3d052a217a5e",
+      "to_change_id": "b090c31f-5bae-4d18-b9d1-8fef1f75b1a2",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Goal achieved",
+      "created_at": "2026-01-09T10:32:03.955142+00:00"
+    },
+    {
+      "id": 278,
+      "from_node_id": 273,
+      "to_node_id": 274,
+      "from_change_id": "b090c31f-5bae-4d18-b9d1-8fef1f75b1a2",
+      "to_change_id": "f0ddce19-6a62-4d21-b87d-cd86d6cc5192",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Known limitation",
+      "created_at": "2026-01-09T10:34:22.824855+00:00"
     }
   ]
 }
