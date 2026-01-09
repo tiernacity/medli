@@ -4707,6 +4707,61 @@
       "created_at": "2026-01-09T22:02:07.379318+00:00",
       "updated_at": "2026-01-09T22:02:07.379318+00:00",
       "metadata_json": "{\"branch\":\"feat/server\",\"confidence\":70}"
+    },
+    {
+      "id": 429,
+      "change_id": "cb67e24e-8dc3-4a46-85ca-5678cb9b3409",
+      "node_type": "goal",
+      "title": "Fix slow pendulum animation and refactor to use generator-object package",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T22:05:10.452190+00:00",
+      "updated_at": "2026-01-09T22:05:10.452190+00:00",
+      "metadata_json": "{\"branch\":\"feat/server\",\"confidence\":85,\"prompt\":\"Yes, slow animation first please. Then also, I want the generator script to use one of the generator packages - instead of constructing a frame by-hand. Probably the object generator is easiest\"}"
+    },
+    {
+      "id": 430,
+      "change_id": "11a9f664-5644-4bf8-91f5-5951f44d1bab",
+      "node_type": "observation",
+      "title": "Root cause: tsx process spawn overhead ~620ms per frame. Current loop spawns new tsx process every iteration.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T22:05:56.386104+00:00",
+      "updated_at": "2026-01-09T22:05:56.386104+00:00",
+      "metadata_json": "{\"branch\":\"feat/server\",\"confidence\":95}"
+    },
+    {
+      "id": 431,
+      "change_id": "ce6d9f6f-46fe-4c4d-91e4-2018adccf635",
+      "node_type": "action",
+      "title": "Refactored pendulum to persistent process using generator-object",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T22:09:22.705082+00:00",
+      "updated_at": "2026-01-09T22:09:22.705082+00:00",
+      "metadata_json": "{\"branch\":\"feat/server\",\"confidence\":95,\"files\":[\"packages/test-app/scripts/generate-pendulum.ts\",\"packages/test-app/package.json\",\"package.json\"]}"
+    },
+    {
+      "id": 432,
+      "change_id": "760b9b05-019e-4a9e-aee8-57c160b9299f",
+      "node_type": "outcome",
+      "title": "Performance fix complete - persistent process with generator-object API",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T22:09:27.375951+00:00",
+      "updated_at": "2026-01-09T22:09:27.375951+00:00",
+      "metadata_json": "{\"branch\":\"feat/server\",\"confidence\":95}"
+    },
+    {
+      "id": 433,
+      "change_id": "20572e8f-1aa8-4f7d-823a-985fceafd534",
+      "node_type": "outcome",
+      "title": "Server-side Frame generation complete - HTTP server approach, on-demand generation, using generator-object API",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T22:31:47.090787+00:00",
+      "updated_at": "2026-01-09T22:31:47.090787+00:00",
+      "metadata_json": "{\"branch\":\"feat/server\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -9461,6 +9516,61 @@
       "weight": 1.0,
       "rationale": "Known issue",
       "created_at": "2026-01-09T22:02:12.209899+00:00"
+    },
+    {
+      "id": 433,
+      "from_node_id": 428,
+      "to_node_id": 429,
+      "from_change_id": "e8f9228b-a33a-4319-8818-cde8038acd33",
+      "to_change_id": "cb67e24e-8dc3-4a46-85ca-5678cb9b3409",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Investigation follows from observation",
+      "created_at": "2026-01-09T22:05:10.508447+00:00"
+    },
+    {
+      "id": 434,
+      "from_node_id": 429,
+      "to_node_id": 431,
+      "from_change_id": "cb67e24e-8dc3-4a46-85ca-5678cb9b3409",
+      "to_change_id": "ce6d9f6f-46fe-4c4d-91e4-2018adccf635",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation of goal",
+      "created_at": "2026-01-09T22:09:27.350704+00:00"
+    },
+    {
+      "id": 435,
+      "from_node_id": 431,
+      "to_node_id": 432,
+      "from_change_id": "ce6d9f6f-46fe-4c4d-91e4-2018adccf635",
+      "to_change_id": "760b9b05-019e-4a9e-aee8-57c160b9299f",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation successful",
+      "created_at": "2026-01-09T22:09:30.934472+00:00"
+    },
+    {
+      "id": 436,
+      "from_node_id": 432,
+      "to_node_id": 433,
+      "from_change_id": "760b9b05-019e-4a9e-aee8-57c160b9299f",
+      "to_change_id": "20572e8f-1aa8-4f7d-823a-985fceafd534",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Refinement after file-based approach had race conditions",
+      "created_at": "2026-01-09T22:31:47.141312+00:00"
+    },
+    {
+      "id": 437,
+      "from_node_id": 429,
+      "to_node_id": 433,
+      "from_change_id": "cb67e24e-8dc3-4a46-85ca-5678cb9b3409",
+      "to_change_id": "20572e8f-1aa8-4f7d-823a-985fceafd534",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Goal achieved",
+      "created_at": "2026-01-09T22:31:52.067676+00:00"
     }
   ]
 }
