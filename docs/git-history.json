@@ -1,5 +1,13 @@
 [
   {
+    "hash": "6ed9fdac54cc4c1a69b0d4c4d10d5d9d029c7208",
+    "short_hash": "6ed9fda",
+    "author": "Chris Tierney",
+    "date": "2026-01-09T23:44:54Z",
+    "message": "refactor: simplify sketch module API\n\n- Move SketchModule and SketchInstance types to types.ts\n- Extract remote-pendulum sketch to its own file\n- Each sketch's create() now accepts HTML element and sets up interactions\n- SketchInstance simplified to { generator, destroy }\n- Remove interaction handlers from index.ts registry\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 6
+  },
+  {
     "hash": "639e943f74247d0bc4f4d08aa97bedc7488bf477",
     "short_hash": "639e943",
     "author": "Chris Tierney",

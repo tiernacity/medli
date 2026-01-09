@@ -4850,6 +4850,28 @@
       "created_at": "2026-01-09T23:28:17.947905+00:00",
       "updated_at": "2026-01-09T23:28:17.947905+00:00",
       "metadata_json": "{\"branch\":\"feat/render-context\",\"confidence\":95}"
+    },
+    {
+      "id": 442,
+      "change_id": "9254179e-b821-4944-8770-ae1aea054a02",
+      "node_type": "goal",
+      "title": "Refactor sketch module API",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T23:45:00.857030+00:00",
+      "updated_at": "2026-01-09T23:45:00.857030+00:00",
+      "metadata_json": "{\"branch\":\"feat/render-context\",\"commit\":\"6ed9fda\",\"confidence\":100}"
+    },
+    {
+      "id": 443,
+      "change_id": "bc5dafd8-ef06-483d-83e0-b556b46a4292",
+      "node_type": "outcome",
+      "title": "Sketch API simplified - create(element) returns {generator, destroy}, interactions encapsulated",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T23:45:06.886255+00:00",
+      "updated_at": "2026-01-09T23:45:06.886255+00:00",
+      "metadata_json": "{\"branch\":\"feat/render-context\",\"confidence\":100}"
     }
   ],
   "edges": [
@@ -9769,6 +9791,17 @@
       "weight": 1.0,
       "rationale": "Goal achieved",
       "created_at": "2026-01-09T23:28:22.338738+00:00"
+    },
+    {
+      "id": 448,
+      "from_node_id": 442,
+      "to_node_id": 443,
+      "from_change_id": "9254179e-b821-4944-8770-ae1aea054a02",
+      "to_change_id": "bc5dafd8-ef06-483d-83e0-b556b46a4292",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Refactoring complete and verified",
+      "created_at": "2026-01-09T23:45:12.752528+00:00"
     }
   ]
 }
