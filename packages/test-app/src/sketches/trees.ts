@@ -253,12 +253,11 @@ export function createTrees(
     // Set viewport to match canvas buffer dimensions
     p.viewport(halfWidth, halfHeight);
 
-    // Clear on first frame or after reset, then accumulate
+    // Clear on first frame or after reset, then accumulate.
+    // When background() is not called, shapes draw on top of previous frames.
     if (state.needsClear) {
       p.background(BACKGROUND_COLOR);
       state.needsClear = false;
-    } else {
-      p.noBackground();
     }
 
     // Grow and render all trees

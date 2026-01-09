@@ -126,12 +126,6 @@ export interface Sketch {
   /** Set the background color for this frame */
   background(color: string): void;
 
-  /**
-   * Disable background clearing. When called, shapes will accumulate
-   * over previous frames instead of being cleared.
-   */
-  noBackground(): void;
-
   /** Set the fill color for subsequent shapes */
   fill(color: string): void;
 
@@ -436,9 +430,6 @@ export class ProceduralGenerator implements Generator {
       },
       background(color: string) {
         backgroundColor = color;
-      },
-      noBackground() {
-        backgroundColor = undefined;
       },
       fill(color: string) {
         currentStyle.fill = color;

@@ -162,8 +162,8 @@ export function createParticlePlotter(
     // Origin at center, Y-up coordinate system
     p.viewport(halfWidth, halfHeight);
 
-    // Don't clear the canvas - shapes accumulate
-    p.noBackground();
+    // Shapes accumulate on top of previous frames (no background() call).
+    // This creates the trail effect as particles move.
 
     // Calculate deltaTime for physics
     const currentTime = p.time;
