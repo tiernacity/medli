@@ -1,5 +1,21 @@
 [
   {
+    "hash": "a0c50c347ebe2d401528bb3d938a9663047fa8ba",
+    "short_hash": "a0c50c3",
+    "author": "Chris Tierney",
+    "date": "2026-01-09T13:17:25Z",
+    "message": "fix: interaction works on all four renderer panels\n\n- Fix object generator: use circle.x/y instead of non-existent circle.center setter\n- Fix canvas DPI scaling: multiply tap coordinates by devicePixelRatio for canvas elements\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 2
+  },
+  {
+    "hash": "f2e09873e714389a16f88586104afc3866e68e07",
+    "short_hash": "f2e0987",
+    "author": "Chris Tierney",
+    "date": "2026-01-09T13:08:02Z",
+    "message": "feat: add interaction support with toViewportCoords and hammer.js\n\n- Add flexible toViewportCoords() function to renderer-common that transforms\n  element coordinates to viewport coordinates. Supports multiple input types:\n  single point tuple, array of tuples, Record, and Map.\n- Install es-toolkit in renderer-common for mapValues utility\n- Implement toViewportCoords on CanvasRenderer and SvgRenderer classes\n- Install hammer.js in test-app for gesture recognition\n- Add interaction demo scene with tap-to-move circle\n- Wire up hammer.js tap events to update circle position via coordinate transform\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 15
+  },
+  {
     "hash": "1511527cb760c3312fa1b0e8309b5fc863e8891a",
     "short_hash": "1511527",
     "author": "Chris Tierney",

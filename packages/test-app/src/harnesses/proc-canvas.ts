@@ -1,7 +1,7 @@
 /**
  * Harness: Procedural Generator → Canvas Renderer
  */
-import type { Generator } from "@medli/spec";
+import type { Generator, Point } from "@medli/spec";
 import { CanvasRenderer } from "@medli/renderer-canvas";
 
 export function createRenderer(
@@ -12,5 +12,6 @@ export function createRenderer(
   return {
     start: () => renderer.loop(),
     stop: () => renderer.stop(),
+    toViewportCoords: (point: Point) => renderer.toViewportCoords(point),
   };
 }

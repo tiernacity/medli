@@ -12,6 +12,10 @@ import {
   BaseRenderer,
   ResourceManager,
   extractResourceUrls,
+  computeViewportTransform,
+  toViewportCoords,
+  type Point,
+  type ViewportTransformResult,
 } from "@medli/renderer-common";
 
 /**
@@ -55,6 +59,7 @@ export class SvgRenderer extends BaseRenderer {
   private clipIdCounter = 0;
   private snapshotUrl: string | null = null;
   private snapshotImage: SVGImageElement | null = null;
+  private lastTransform: ViewportTransformResult | null = null;
 
   constructor(element: SVGSVGElement, generator: Generator) {
     super(generator);
@@ -100,6 +105,16 @@ export class SvgRenderer extends BaseRenderer {
 
     // Configure viewport from frame
     const vp = frame.viewport;
+
+    // Get element size from bounding rect and compute transform for toViewportCoords
+    const rect = this.svg.getBoundingClientRect();
+    const elementWidth = rect.width || 100;
+    const elementHeight = rect.height || 100;
+    this.lastTransform = computeViewportTransform(
+      vp,
+      elementWidth,
+      elementHeight
+    );
 
     // Set viewBox with center origin
     this.svg.setAttribute(
@@ -185,6 +200,39 @@ export class SvgRenderer extends BaseRenderer {
     if (this.snapshotImage) {
       this.snapshotImage.remove();
     }
+  }
+
+  /**
+   * Transform element coordinates to frame coordinates.
+   * @param input - Single point [x, y]
+   * @returns Transformed point in frame coordinates
+   */
+  toViewportCoords(input: Point): Point;
+  /**
+   * Transform an array of element coordinates to frame coordinates.
+   * @param input - Array of points [[x, y], ...]
+   * @returns Array of transformed points in frame coordinates
+   */
+  toViewportCoords(input: Point[]): Point[];
+  /**
+   * Transform a record of element coordinates to frame coordinates.
+   * @param input - Record mapping keys to points
+   * @returns Record with same keys, values transformed to frame coordinates
+   */
+  toViewportCoords<K extends string>(input: Record<K, Point>): Record<K, Point>;
+  /**
+   * Transform a map of element coordinates to frame coordinates.
+   * @param input - Map from keys to points
+   * @returns Map with same keys, values transformed to frame coordinates
+   */
+  toViewportCoords<K>(input: Map<K, Point>): Map<K, Point>;
+  toViewportCoords(
+    input: Point | Point[] | Record<string, Point> | Map<unknown, Point>
+  ): Point | Point[] | Record<string, Point> | Map<unknown, Point> {
+    if (!this.lastTransform) {
+      throw new Error("Cannot call toViewportCoords before first render");
+    }
+    return toViewportCoords(input as Point, this.lastTransform);
   }
 
   private async captureSnapshot(): Promise<string> {

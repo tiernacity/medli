@@ -7,12 +7,17 @@ import { createRenderer as createProcCanvas } from "./harnesses/proc-canvas";
 import { createRenderer as createObjSvg } from "./harnesses/obj-svg";
 import { createRenderer as createObjCanvas } from "./harnesses/obj-canvas";
 
+// Import hammer.js for interaction
+import Hammer from "hammerjs";
+import { setCirclePosition } from "./scenes/interaction";
+
 // Import source code as raw text
 import fullDemoSource from "./scenes/full-demo.ts?raw";
 import materialsSource from "./scenes/materials.ts?raw";
 import transformsSource from "./scenes/transforms.ts?raw";
 import imageTransformsSource from "./scenes/image-transforms.ts?raw";
 import transparencySource from "./scenes/transparency.ts?raw";
+import interactionSource from "./scenes/interaction.ts?raw";
 import harnessProcSvgSource from "./harnesses/proc-svg.ts?raw";
 import harnessProcCanvasSource from "./harnesses/proc-canvas.ts?raw";
 import harnessObjSvgSource from "./harnesses/obj-svg.ts?raw";
@@ -25,6 +30,7 @@ const sceneSources: Record<string, string> = {
   transforms: transformsSource,
   "image-transforms": imageTransformsSource,
   transparency: transparencySource,
+  interaction: interactionSource,
 };
 
 // Get scene from URL parameter, fallback to default
@@ -108,6 +114,42 @@ const renderers = [
     scene.object
   ),
 ];
+
+// Set up hammer.js for interaction scene
+if (sceneId === "interaction") {
+  // Get the canvas and svg elements
+  const procSvg = document.querySelector<SVGSVGElement>("#proc-svg")!;
+  const procCanvas = document.querySelector<HTMLCanvasElement>("#proc-canvas")!;
+  const objSvg = document.querySelector<SVGSVGElement>("#obj-svg")!;
+  const objCanvas = document.querySelector<HTMLCanvasElement>("#obj-canvas")!;
+
+  // The renderers array matches: [proc-svg, proc-canvas, obj-svg, obj-canvas]
+  const elements = [procSvg, procCanvas, objSvg, objCanvas];
+
+  elements.forEach((el, i) => {
+    const hammer = new Hammer(el as HTMLElement);
+    hammer.on("tap", (event) => {
+      const renderer = renderers[i];
+      // Get element-relative coordinates
+      const rect = el.getBoundingClientRect();
+      let elementX = event.center.x - rect.left;
+      let elementY = event.center.y - rect.top;
+
+      // For canvas elements, scale by DPI (buffer size != CSS size)
+      if (el instanceof HTMLCanvasElement) {
+        const dpr = window.devicePixelRatio || 1;
+        elementX *= dpr;
+        elementY *= dpr;
+      }
+
+      // Transform to viewport coordinates
+      const [x, y] = renderer.toViewportCoords([elementX, elementY]);
+
+      // Update the circle position
+      setCirclePosition(x, y);
+    });
+  });
+}
 
 // Populate source code displays with current scene's source
 const currentSceneSource = sceneSources[sceneId] || fullDemoSource;
