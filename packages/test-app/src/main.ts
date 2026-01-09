@@ -12,6 +12,7 @@ import fullDemoSource from "./scenes/full-demo.ts?raw";
 import materialsSource from "./scenes/materials.ts?raw";
 import transformsSource from "./scenes/transforms.ts?raw";
 import imageTransformsSource from "./scenes/image-transforms.ts?raw";
+import transparencySource from "./scenes/transparency.ts?raw";
 import harnessProcSvgSource from "./harnesses/proc-svg.ts?raw";
 import harnessProcCanvasSource from "./harnesses/proc-canvas.ts?raw";
 import harnessObjSvgSource from "./harnesses/obj-svg.ts?raw";
@@ -23,6 +24,7 @@ const sceneSources: Record<string, string> = {
   materials: materialsSource,
   transforms: transformsSource,
   "image-transforms": imageTransformsSource,
+  transparency: transparencySource,
 };
 
 // Get scene from URL parameter, fallback to default
