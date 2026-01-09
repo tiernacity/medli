@@ -3,6 +3,7 @@ import type {
   Generator,
   Circle as CircleShape,
   Line as LineShape,
+  Image as ImageShape,
   RootMaterial,
   ChildMaterial,
   FrameNode,
@@ -281,6 +282,70 @@ export class Line extends Shape {
       start: { x: this.x1, y: this.y1 },
       end: { x: this.x2, y: this.y2 },
     };
+    return [shape];
+  }
+}
+
+/**
+ * Image - an image shape positioned in the scene.
+ * Can optionally reference a Material for styling.
+ * Extends Shape which provides transforms and material reference.
+ */
+export class Image extends Shape {
+  url: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  cropX?: number;
+  cropY?: number;
+  cropWidth?: number;
+  cropHeight?: number;
+
+  constructor(
+    url: string,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    cropX?: number,
+    cropY?: number,
+    cropWidth?: number,
+    cropHeight?: number
+  ) {
+    super();
+    this.url = url;
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.cropX = cropX;
+    this.cropY = cropY;
+    this.cropWidth = cropWidth;
+    this.cropHeight = cropHeight;
+  }
+
+  protected geometry(_time: number): FrameNode[] {
+    const shape: ImageShape = {
+      type: "image",
+      url: this.url,
+      position: { x: this.x, y: this.y },
+      width: this.width,
+      height: this.height,
+    };
+    if (
+      this.cropX !== undefined &&
+      this.cropY !== undefined &&
+      this.cropWidth !== undefined &&
+      this.cropHeight !== undefined
+    ) {
+      shape.crop = {
+        x: this.cropX,
+        y: this.cropY,
+        width: this.cropWidth,
+        height: this.cropHeight,
+      };
+    }
     return [shape];
   }
 }

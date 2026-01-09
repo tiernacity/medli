@@ -1,5 +1,9 @@
-import { Scene, Background, Circle, Material, Line } from "../index";
-import type { ChildMaterial, RootMaterial } from "@medli/spec";
+import { Scene, Background, Circle, Material, Line, Image } from "../index";
+import type {
+  ChildMaterial,
+  RootMaterial,
+  Image as ImageShape,
+} from "@medli/spec";
 
 const defaultViewport = {
   halfWidth: 50,
@@ -1410,5 +1414,233 @@ describe("Shape transforms", () => {
     expect(circle.scale).toBe(1);
     expect(typeof circle.computeMatrix).toBe("function");
     expect(typeof circle.hasTransform).toBe("function");
+  });
+});
+
+// ============================================================================
+// Image Tests
+// ============================================================================
+
+describe("Image", () => {
+  describe("construction without crop", () => {
+    it("should create an image with basic properties", () => {
+      const image = new Image("https://example.com/image.png", 10, 20, 100, 50);
+      expect(image.url).toBe("https://example.com/image.png");
+      expect(image.x).toBe(10);
+      expect(image.y).toBe(20);
+      expect(image.width).toBe(100);
+      expect(image.height).toBe(50);
+    });
+
+    it("should have undefined crop properties when not provided", () => {
+      const image = new Image("https://example.com/image.png", 0, 0, 100, 100);
+      expect(image.cropX).toBeUndefined();
+      expect(image.cropY).toBeUndefined();
+      expect(image.cropWidth).toBeUndefined();
+      expect(image.cropHeight).toBeUndefined();
+    });
+
+    it("should output frame node without crop when crop not provided", () => {
+      const scene = new Scene(defaultViewport);
+      const image = new Image("https://example.com/image.png", 10, 20, 100, 50);
+      scene.add(image);
+
+      const frame = scene.frame(0);
+      const imageNode = frame.root.children[0] as ImageShape;
+
+      expect(imageNode).toEqual({
+        type: "image",
+        url: "https://example.com/image.png",
+        position: { x: 10, y: 20 },
+        width: 100,
+        height: 50,
+      });
+      expect(imageNode.crop).toBeUndefined();
+    });
+  });
+
+  describe("construction with crop", () => {
+    it("should create an image with crop properties", () => {
+      const image = new Image(
+        "https://example.com/image.png",
+        10,
+        20,
+        100,
+        50,
+        0,
+        0,
+        200,
+        100
+      );
+      expect(image.url).toBe("https://example.com/image.png");
+      expect(image.x).toBe(10);
+      expect(image.y).toBe(20);
+      expect(image.width).toBe(100);
+      expect(image.height).toBe(50);
+      expect(image.cropX).toBe(0);
+      expect(image.cropY).toBe(0);
+      expect(image.cropWidth).toBe(200);
+      expect(image.cropHeight).toBe(100);
+    });
+
+    it("should output frame node with crop when all crop values provided", () => {
+      const scene = new Scene(defaultViewport);
+      const image = new Image(
+        "https://example.com/image.png",
+        10,
+        20,
+        100,
+        50,
+        50,
+        25,
+        200,
+        100
+      );
+      scene.add(image);
+
+      const frame = scene.frame(0);
+      const imageNode = frame.root.children[0] as ImageShape;
+
+      expect(imageNode).toEqual({
+        type: "image",
+        url: "https://example.com/image.png",
+        position: { x: 10, y: 20 },
+        width: 100,
+        height: 50,
+        crop: { x: 50, y: 25, width: 200, height: 100 },
+      });
+    });
+
+    it("should support crop starting at origin (0, 0)", () => {
+      const scene = new Scene(defaultViewport);
+      const image = new Image(
+        "https://example.com/image.png",
+        0,
+        0,
+        50,
+        50,
+        0,
+        0,
+        100,
+        100
+      );
+      scene.add(image);
+
+      const frame = scene.frame(0);
+      const imageNode = frame.root.children[0] as ImageShape;
+
+      expect(imageNode.crop).toEqual({ x: 0, y: 0, width: 100, height: 100 });
+    });
+  });
+
+  describe("partial crop values", () => {
+    it("should not include crop when only cropX is provided", () => {
+      const image = new Image("https://example.com/image.png", 0, 0, 100, 100);
+      image.cropX = 10;
+
+      const scene = new Scene(defaultViewport);
+      scene.add(image);
+
+      const frame = scene.frame(0);
+      const imageNode = frame.root.children[0] as ImageShape;
+
+      expect(imageNode.crop).toBeUndefined();
+    });
+
+    it("should not include crop when some crop values are undefined", () => {
+      const image = new Image("https://example.com/image.png", 0, 0, 100, 100);
+      image.cropX = 10;
+      image.cropY = 20;
+      // cropWidth and cropHeight remain undefined
+
+      const scene = new Scene(defaultViewport);
+      scene.add(image);
+
+      const frame = scene.frame(0);
+      const imageNode = frame.root.children[0] as ImageShape;
+
+      expect(imageNode.crop).toBeUndefined();
+    });
+
+    it("should include crop when all four values are set after construction", () => {
+      const image = new Image("https://example.com/image.png", 0, 0, 100, 100);
+      image.cropX = 10;
+      image.cropY = 20;
+      image.cropWidth = 50;
+      image.cropHeight = 50;
+
+      const scene = new Scene(defaultViewport);
+      scene.add(image);
+
+      const frame = scene.frame(0);
+      const imageNode = frame.root.children[0] as ImageShape;
+
+      expect(imageNode.crop).toEqual({ x: 10, y: 20, width: 50, height: 50 });
+    });
+  });
+
+  describe("Image with transforms", () => {
+    it("should support position transform with Image", () => {
+      const scene = new Scene(defaultViewport);
+      const image = new Image("https://example.com/image.png", 0, 0, 50, 50);
+      image.position = { x: 25, y: 25 };
+      scene.add(image);
+
+      const frame = scene.frame(0);
+      const transform = frame.root.children[0] as Transform;
+
+      expect(transform.type).toBe("transform");
+      expect(transform.matrix).toEqual([1, 0, 0, 1, 25, 25]);
+      expect(transform.children[0]).toEqual({
+        type: "image",
+        url: "https://example.com/image.png",
+        position: { x: 0, y: 0 },
+        width: 50,
+        height: 50,
+      });
+    });
+
+    it("should support crop with transforms", () => {
+      const scene = new Scene(defaultViewport);
+      const image = new Image(
+        "https://example.com/image.png",
+        0,
+        0,
+        50,
+        50,
+        10,
+        10,
+        100,
+        100
+      );
+      image.position = { x: 25, y: 25 };
+      scene.add(image);
+
+      const frame = scene.frame(0);
+      const transform = frame.root.children[0] as Transform;
+      const imageNode = transform.children[0] as ImageShape;
+
+      expect(imageNode.crop).toEqual({ x: 10, y: 10, width: 100, height: 100 });
+    });
+  });
+
+  describe("Image with materials", () => {
+    it("should support material reference on Image", () => {
+      const scene = new Scene(defaultViewport);
+      const material = new Material({ fill: "#ff0000" });
+      const image = new Image("https://example.com/image.png", 0, 0, 100, 100);
+      image.material = material;
+
+      scene.add(material);
+      scene.add(image);
+
+      const frame = scene.frame(0);
+      const childMaterial = frame.root.children[0] as ChildMaterial;
+
+      expect(childMaterial.type).toBe("material");
+      expect(childMaterial.fill).toBe("#ff0000");
+      expect(childMaterial.children.length).toBe(1);
+      expect((childMaterial.children[0] as ImageShape).type).toBe("image");
+    });
   });
 });

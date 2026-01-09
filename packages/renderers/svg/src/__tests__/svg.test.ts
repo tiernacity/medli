@@ -23,6 +23,7 @@ describe("SvgRenderer", () => {
     mockElement = {
       setAttribute: jest.fn(),
       appendChild: jest.fn(),
+      querySelector: jest.fn().mockReturnValue(null),
     } as unknown as SVGSVGElement;
 
     // Mock document.createElementNS to return appropriate element types
@@ -73,10 +74,10 @@ describe("SvgRenderer", () => {
     expect(mockGroup.appendChild).toHaveBeenCalledWith(mockRect);
   });
 
-  it("should set viewBox and preserveAspectRatio on render based on viewport", () => {
+  it("should set viewBox and preserveAspectRatio on render based on viewport", async () => {
     const renderer = new SvgRenderer(mockElement, mockGenerator);
 
-    renderer.render(0);
+    await renderer.render(0);
 
     // viewBox should be centered: -halfWidth -halfHeight width height
     expect(mockElement.setAttribute).toHaveBeenCalledWith(
@@ -90,10 +91,10 @@ describe("SvgRenderer", () => {
     );
   });
 
-  it("should apply Y-flip transform to root group on render", () => {
+  it("should apply Y-flip transform to root group on render", async () => {
     const renderer = new SvgRenderer(mockElement, mockGenerator);
 
-    renderer.render(0);
+    await renderer.render(0);
 
     expect(mockGroup.setAttribute).toHaveBeenCalledWith(
       "transform",
@@ -101,10 +102,10 @@ describe("SvgRenderer", () => {
     );
   });
 
-  it("should position background rect at viewport coordinates", () => {
+  it("should position background rect at viewport coordinates", async () => {
     const renderer = new SvgRenderer(mockElement, mockGenerator);
 
-    renderer.render(0);
+    await renderer.render(0);
 
     expect(mockRect.setAttribute).toHaveBeenCalledWith("x", "-50");
     expect(mockRect.setAttribute).toHaveBeenCalledWith("y", "-50");
@@ -112,24 +113,24 @@ describe("SvgRenderer", () => {
     expect(mockRect.setAttribute).toHaveBeenCalledWith("height", "100");
   });
 
-  it("should render the background color from the generator", () => {
+  it("should render the background color from the generator", async () => {
     const renderer = new SvgRenderer(mockElement, mockGenerator);
 
-    renderer.render(0);
+    await renderer.render(0);
 
     expect(mockGenerator.frame).toHaveBeenCalledWith(0);
     expect(mockRect.setAttribute).toHaveBeenCalledWith("fill", "#ff0000");
   });
 
-  it("should default time to zero", () => {
+  it("should default time to zero", async () => {
     const renderer = new SvgRenderer(mockElement, mockGenerator);
 
-    renderer.render();
+    await renderer.render();
 
     expect(mockGenerator.frame).toHaveBeenCalledWith(0);
   });
 
-  it("should map scaleMode 'fill' to 'xMidYMid slice'", () => {
+  it("should map scaleMode 'fill' to 'xMidYMid slice'", async () => {
     mockGenerator = {
       frame: jest.fn().mockReturnValue({
         backgroundColor: "#ff0000",
@@ -150,7 +151,7 @@ describe("SvgRenderer", () => {
     };
 
     const renderer = new SvgRenderer(mockElement, mockGenerator);
-    renderer.render(0);
+    await renderer.render(0);
 
     expect(mockElement.setAttribute).toHaveBeenCalledWith(
       "preserveAspectRatio",
@@ -158,7 +159,7 @@ describe("SvgRenderer", () => {
     );
   });
 
-  it("should map scaleMode 'stretch' to 'none'", () => {
+  it("should map scaleMode 'stretch' to 'none'", async () => {
     mockGenerator = {
       frame: jest.fn().mockReturnValue({
         backgroundColor: "#ff0000",
@@ -179,7 +180,7 @@ describe("SvgRenderer", () => {
     };
 
     const renderer = new SvgRenderer(mockElement, mockGenerator);
-    renderer.render(0);
+    await renderer.render(0);
 
     expect(mockElement.setAttribute).toHaveBeenCalledWith(
       "preserveAspectRatio",

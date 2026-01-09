@@ -1,6 +1,5 @@
-// Import generators (for color control)
-import { background as setProceduralBg } from "./generators/procedural";
-import { background as setObjectBg } from "./generators/object";
+// Import scene registry
+import { scenes, defaultSceneId, type SceneId } from "./scenes";
 
 // Import harnesses
 import { createRenderer as createProcSvg } from "./harnesses/proc-svg";
@@ -9,16 +8,57 @@ import { createRenderer as createObjSvg } from "./harnesses/obj-svg";
 import { createRenderer as createObjCanvas } from "./harnesses/obj-canvas";
 
 // Import source code as raw text
-import genProceduralSource from "./generators/procedural.ts?raw";
-import genObjectSource from "./generators/object.ts?raw";
+import fullDemoSource from "./scenes/full-demo.ts?raw";
+import materialsSource from "./scenes/materials.ts?raw";
+import transformsSource from "./scenes/transforms.ts?raw";
+import imageTransformsSource from "./scenes/image-transforms.ts?raw";
 import harnessProcSvgSource from "./harnesses/proc-svg.ts?raw";
 import harnessProcCanvasSource from "./harnesses/proc-canvas.ts?raw";
 import harnessObjSvgSource from "./harnesses/obj-svg.ts?raw";
 import harnessObjCanvasSource from "./harnesses/obj-canvas.ts?raw";
 
+// Map scene IDs to their source code
+const sceneSources: Record<string, string> = {
+  "full-demo": fullDemoSource,
+  materials: materialsSource,
+  transforms: transformsSource,
+  "image-transforms": imageTransformsSource,
+};
+
+// Get scene from URL parameter, fallback to default
+const params = new URLSearchParams(window.location.search);
+const sceneParam = params.get("scene");
+const sceneId: SceneId =
+  sceneParam && sceneParam in scenes ? (sceneParam as SceneId) : defaultSceneId;
+const scene = scenes[sceneId];
+
 // DOM elements
+const sceneSelect = document.getElementById(
+  "scene-select"
+) as HTMLSelectElement;
 const colorInput = document.getElementById("bg-color") as HTMLInputElement;
 const colorValue = document.getElementById("color-value") as HTMLSpanElement;
+
+// Populate scene selector dropdown
+for (const [id, sceneData] of Object.entries(scenes)) {
+  const option = document.createElement("option");
+  option.value = id;
+  option.textContent = sceneData.name;
+  if (id === sceneId) option.selected = true;
+  sceneSelect.appendChild(option);
+}
+
+// Handle scene selection change
+sceneSelect.addEventListener("change", () => {
+  const newSceneId = sceneSelect.value;
+  const url = new URL(window.location.href);
+  if (newSceneId === defaultSceneId) {
+    url.searchParams.delete("scene");
+  } else {
+    url.searchParams.set("scene", newSceneId);
+  }
+  window.location.href = url.toString();
+});
 
 // Canvas elements need buffer size synced with CSS size for crisp rendering
 const canvasElements = [
@@ -47,18 +87,31 @@ canvasElements.forEach((canvas) => {
   resizeObserver.observe(canvas);
 });
 
-// Create all renderers
+// Create all renderers with scene's generators
 const renderers = [
-  createProcSvg(document.querySelector<SVGSVGElement>("#proc-svg")!),
-  createProcCanvas(document.querySelector<HTMLCanvasElement>("#proc-canvas")!),
-  createObjSvg(document.querySelector<SVGSVGElement>("#obj-svg")!),
-  createObjCanvas(document.querySelector<HTMLCanvasElement>("#obj-canvas")!),
+  createProcSvg(
+    document.querySelector<SVGSVGElement>("#proc-svg")!,
+    scene.procedural
+  ),
+  createProcCanvas(
+    document.querySelector<HTMLCanvasElement>("#proc-canvas")!,
+    scene.procedural
+  ),
+  createObjSvg(
+    document.querySelector<SVGSVGElement>("#obj-svg")!,
+    scene.object
+  ),
+  createObjCanvas(
+    document.querySelector<HTMLCanvasElement>("#obj-canvas")!,
+    scene.object
+  ),
 ];
 
-// Populate source code displays
+// Populate source code displays with current scene's source
+const currentSceneSource = sceneSources[sceneId] || fullDemoSource;
 const sourceMap: Record<string, string> = {
-  "gen-procedural-code": genProceduralSource,
-  "gen-object-code": genObjectSource,
+  "gen-procedural-code": currentSceneSource,
+  "gen-object-code": currentSceneSource,
   "harness-proc-svg": harnessProcSvgSource,
   "harness-proc-canvas": harnessProcCanvasSource,
   "harness-obj-svg": harnessObjSvgSource,
@@ -91,19 +144,13 @@ document.querySelectorAll<HTMLButtonElement>("[data-toggle]").forEach((btn) => {
   });
 });
 
-// Set background color on both generators
-function setBackgroundColor(color: string) {
-  setProceduralBg(color);
-  setObjectBg(color);
-}
-
 // Initial setup
-setBackgroundColor(colorInput.value);
+scene.setBackground(colorInput.value);
 renderers.forEach((r) => r.start());
 
 // Update on color change
 colorInput.addEventListener("input", () => {
   const color = colorInput.value;
   colorValue.textContent = color;
-  setBackgroundColor(color);
+  scene.setBackground(color);
 });
