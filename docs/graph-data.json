@@ -3277,6 +3277,149 @@
       "created_at": "2026-01-09T12:06:09.952266+00:00",
       "updated_at": "2026-01-09T12:06:09.952266+00:00",
       "metadata_json": "{\"branch\":\"feat/rectangles\",\"commit\":\"db9c409\",\"confidence\":95}"
+    },
+    {
+      "id": 299,
+      "change_id": "2f392ba9-3b09-4315-8dcb-e05a00cf15c1",
+      "node_type": "goal",
+      "title": "Add transparency support for stroke and fill colors",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T12:10:59.848847+00:00",
+      "updated_at": "2026-01-09T12:10:59.848847+00:00",
+      "metadata_json": "{\"branch\":\"feat/transparency\",\"confidence\":85,\"prompt\":\"I want to add support for transparency in the stroke and fill colors. Please check what's in the codebase already. Examine how p5.js handles this. Look at three.js too. Dispatch tasks to gather information and propose the design, then let me know.\\n\\nBe sure to capture goals, decisions, options, etc\"}"
+    },
+    {
+      "id": 300,
+      "change_id": "68b2b694-35c9-49d0-a0cb-ad90fab0a35b",
+      "node_type": "observation",
+      "title": "Codebase uses string colors (hex, CSS), no structured type. RGBA/HSLA strings work but no explicit alpha API.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T12:16:12.053057+00:00",
+      "updated_at": "2026-01-09T12:16:12.053057+00:00",
+      "metadata_json": "{\"branch\":\"feat/transparency\",\"confidence\":95}"
+    },
+    {
+      "id": 301,
+      "change_id": "afb83631-3ee1-4efd-bdcd-2076514c4dd2",
+      "node_type": "observation",
+      "title": "p5.js: alpha is optional 4th parameter on fill()/stroke(). Default 0-255 range. colorMode() adjusts range. color() objects have setAlpha(). Alpha always last param.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T12:16:12.108175+00:00",
+      "updated_at": "2026-01-09T12:16:12.108175+00:00",
+      "metadata_json": "{\"branch\":\"feat/transparency\",\"confidence\":95}"
+    },
+    {
+      "id": 302,
+      "change_id": "db4d17b1-cd4a-4cfa-bec0-044f47d31ff8",
+      "node_type": "observation",
+      "title": "three.js: Separates color from opacity. Material has 'opacity' (0-1) + 'transparent:true' flag. Color class is RGB-only, no alpha. Performance-first design.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T12:16:12.161673+00:00",
+      "updated_at": "2026-01-09T12:16:12.161673+00:00",
+      "metadata_json": "{\"branch\":\"feat/transparency\",\"confidence\":95}"
+    },
+    {
+      "id": 303,
+      "change_id": "e92321bc-52ad-4ee2-8a6f-ce8a663c3a1a",
+      "node_type": "decision",
+      "title": "How to represent alpha/transparency in the spec and APIs",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T12:16:18.263708+00:00",
+      "updated_at": "2026-01-09T12:16:18.263708+00:00",
+      "metadata_json": "{\"branch\":\"feat/transparency\",\"confidence\":85}"
+    },
+    {
+      "id": 304,
+      "change_id": "74363222-fd4d-4067-8465-e9fd2ae9605d",
+      "node_type": "option",
+      "title": "Option A: Separate opacity properties (three.js style) - fillOpacity, strokeOpacity as numbers 0-1",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T12:16:28.306013+00:00",
+      "updated_at": "2026-01-09T12:16:28.306013+00:00",
+      "metadata_json": "{\"branch\":\"feat/transparency\",\"confidence\":80}"
+    },
+    {
+      "id": 305,
+      "change_id": "ba9ab763-1e72-47e2-83e9-656b92c015d4",
+      "node_type": "option",
+      "title": "Option B: Alpha as 4th param on fill()/stroke() (p5.js style) - fill(r,g,b,a) or fill('#hex', alpha)",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T12:16:28.363816+00:00",
+      "updated_at": "2026-01-09T12:16:28.363816+00:00",
+      "metadata_json": "{\"branch\":\"feat/transparency\",\"confidence\":80}"
+    },
+    {
+      "id": 306,
+      "change_id": "4bbf51ed-4783-472d-97b7-70e1bf6c1cb5",
+      "node_type": "option",
+      "title": "Option C: Keep strings only - document that users pass 'rgba()' CSS strings. No spec changes.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T12:16:28.417242+00:00",
+      "updated_at": "2026-01-09T12:16:28.417242+00:00",
+      "metadata_json": "{\"branch\":\"feat/transparency\",\"confidence\":75}"
+    },
+    {
+      "id": 307,
+      "change_id": "6311e549-5a84-4cee-8f1e-47f0526fc593",
+      "node_type": "option",
+      "title": "Option D (Recommended): Hybrid - add fillOpacity/strokeOpacity to spec (0-1), procedural API uses optional alpha param, object API uses opacity property",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T12:16:34.247448+00:00",
+      "updated_at": "2026-01-09T12:16:34.247448+00:00",
+      "metadata_json": "{\"branch\":\"feat/transparency\",\"confidence\":90}"
+    },
+    {
+      "id": 308,
+      "change_id": "6a003462-b388-4ba0-a055-5edb5a94f469",
+      "node_type": "outcome",
+      "title": "Selected Option C: Keep strings only - no spec changes, users use rgba()/hsla() CSS strings",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T12:18:57.477682+00:00",
+      "updated_at": "2026-01-09T12:18:57.477682+00:00",
+      "metadata_json": "{\"branch\":\"feat/transparency\",\"confidence\":95}"
+    },
+    {
+      "id": 309,
+      "change_id": "74497c35-7b14-4ff1-8c28-101740d888ce",
+      "node_type": "action",
+      "title": "Add transparency demo to test-app with overlapping shapes testing fill/stroke alpha",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T12:20:24.265334+00:00",
+      "updated_at": "2026-01-09T12:20:24.265334+00:00",
+      "metadata_json": "{\"branch\":\"feat/transparency\",\"confidence\":90}"
+    },
+    {
+      "id": 310,
+      "change_id": "56512b40-bdc5-4568-a168-cb8fade5e2bb",
+      "node_type": "outcome",
+      "title": "Transparency demo working - all shapes (circle, rectangle, line) with transparent fill/stroke render identically across SVG and Canvas",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T12:25:12.295739+00:00",
+      "updated_at": "2026-01-09T12:25:12.295739+00:00",
+      "metadata_json": "{\"branch\":\"feat/transparency\",\"confidence\":95}"
+    },
+    {
+      "id": 311,
+      "change_id": "1da595c2-f046-4a4d-a008-48339fac2668",
+      "node_type": "action",
+      "title": "Committed transparency demo",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T12:28:10.620131+00:00",
+      "updated_at": "2026-01-09T12:28:10.620131+00:00",
+      "metadata_json": "{\"branch\":\"feat/transparency\",\"commit\":\"1511527\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -6612,6 +6755,149 @@
       "weight": 1.0,
       "rationale": "Deployment",
       "created_at": "2026-01-09T12:06:09.974096+00:00"
+    },
+    {
+      "id": 304,
+      "from_node_id": 299,
+      "to_node_id": 300,
+      "from_change_id": "2f392ba9-3b09-4315-8dcb-e05a00cf15c1",
+      "to_change_id": "68b2b694-35c9-49d0-a0cb-ad90fab0a35b",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Codebase analysis",
+      "created_at": "2026-01-09T12:16:18.168039+00:00"
+    },
+    {
+      "id": 305,
+      "from_node_id": 299,
+      "to_node_id": 301,
+      "from_change_id": "2f392ba9-3b09-4315-8dcb-e05a00cf15c1",
+      "to_change_id": "afb83631-3ee1-4efd-bdcd-2076514c4dd2",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "p5.js research",
+      "created_at": "2026-01-09T12:16:18.189857+00:00"
+    },
+    {
+      "id": 306,
+      "from_node_id": 299,
+      "to_node_id": 302,
+      "from_change_id": "2f392ba9-3b09-4315-8dcb-e05a00cf15c1",
+      "to_change_id": "db4d17b1-cd4a-4cfa-bec0-044f47d31ff8",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "three.js research",
+      "created_at": "2026-01-09T12:16:18.211140+00:00"
+    },
+    {
+      "id": 307,
+      "from_node_id": 299,
+      "to_node_id": 303,
+      "from_change_id": "2f392ba9-3b09-4315-8dcb-e05a00cf15c1",
+      "to_change_id": "e92321bc-52ad-4ee2-8a6f-ce8a663c3a1a",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Design decision required",
+      "created_at": "2026-01-09T12:16:28.250343+00:00"
+    },
+    {
+      "id": 308,
+      "from_node_id": 303,
+      "to_node_id": 304,
+      "from_change_id": "e92321bc-52ad-4ee2-8a6f-ce8a663c3a1a",
+      "to_change_id": "74363222-fd4d-4067-8465-e9fd2ae9605d",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "three.js style",
+      "created_at": "2026-01-09T12:16:34.148762+00:00"
+    },
+    {
+      "id": 309,
+      "from_node_id": 303,
+      "to_node_id": 305,
+      "from_change_id": "e92321bc-52ad-4ee2-8a6f-ce8a663c3a1a",
+      "to_change_id": "ba9ab763-1e72-47e2-83e9-656b92c015d4",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "p5.js style",
+      "created_at": "2026-01-09T12:16:34.170525+00:00"
+    },
+    {
+      "id": 310,
+      "from_node_id": 303,
+      "to_node_id": 306,
+      "from_change_id": "e92321bc-52ad-4ee2-8a6f-ce8a663c3a1a",
+      "to_change_id": "4bbf51ed-4783-472d-97b7-70e1bf6c1cb5",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Minimal change",
+      "created_at": "2026-01-09T12:16:34.190925+00:00"
+    },
+    {
+      "id": 311,
+      "from_node_id": 303,
+      "to_node_id": 307,
+      "from_change_id": "e92321bc-52ad-4ee2-8a6f-ce8a663c3a1a",
+      "to_change_id": "6311e549-5a84-4cee-8f1e-47f0526fc593",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Recommended: matches both generator philosophies",
+      "created_at": "2026-01-09T12:16:38.561353+00:00"
+    },
+    {
+      "id": 312,
+      "from_node_id": 306,
+      "to_node_id": 308,
+      "from_change_id": "4bbf51ed-4783-472d-97b7-70e1bf6c1cb5",
+      "to_change_id": "6a003462-b388-4ba0-a055-5edb5a94f469",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "User selected for simplicity",
+      "created_at": "2026-01-09T12:19:02.738092+00:00"
+    },
+    {
+      "id": 313,
+      "from_node_id": 299,
+      "to_node_id": 308,
+      "from_change_id": "2f392ba9-3b09-4315-8dcb-e05a00cf15c1",
+      "to_change_id": "6a003462-b388-4ba0-a055-5edb5a94f469",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Goal achieved via Option C",
+      "created_at": "2026-01-09T12:19:02.759198+00:00"
+    },
+    {
+      "id": 314,
+      "from_node_id": 308,
+      "to_node_id": 309,
+      "from_change_id": "6a003462-b388-4ba0-a055-5edb5a94f469",
+      "to_change_id": "74497c35-7b14-4ff1-8c28-101740d888ce",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementing verification demo",
+      "created_at": "2026-01-09T12:21:29.566618+00:00"
+    },
+    {
+      "id": 315,
+      "from_node_id": 309,
+      "to_node_id": 310,
+      "from_change_id": "74497c35-7b14-4ff1-8c28-101740d888ce",
+      "to_change_id": "56512b40-bdc5-4568-a168-cb8fade5e2bb",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Visual verification passed",
+      "created_at": "2026-01-09T12:25:34.862820+00:00"
+    },
+    {
+      "id": 316,
+      "from_node_id": 310,
+      "to_node_id": 311,
+      "from_change_id": "56512b40-bdc5-4568-a168-cb8fade5e2bb",
+      "to_change_id": "1da595c2-f046-4a4d-a008-48339fac2668",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Deployment",
+      "created_at": "2026-01-09T12:28:15.845133+00:00"
     }
   ]
 }
