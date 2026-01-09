@@ -223,12 +223,8 @@ function initializeTrees(state: TreesState, width: number, height: number) {
 
 /**
  * Create a trees generator with reset capability.
- *
- * @param getCanvasSize - Function returning current canvas buffer dimensions
  */
-export function createTrees(
-  getCanvasSize: () => { width: number; height: number }
-) {
+export function createTrees() {
   const state = createInitialState();
 
   function reset() {
@@ -237,7 +233,8 @@ export function createTrees(
   }
 
   const generator = new ProceduralGenerator((p) => {
-    const { width, height } = getCanvasSize();
+    const width = p.targetWidth;
+    const height = p.targetHeight;
     const halfWidth = width / 2;
     const halfHeight = height / 2;
 

@@ -1,5 +1,6 @@
 import type {
   Generator,
+  RenderContext,
   Shape,
   FrameNode,
   Material,
@@ -84,7 +85,14 @@ export class SvgRenderer extends BaseRenderer {
   }
 
   async render(time: number = 0): Promise<void> {
-    const frame = this.generator.frame(time);
+    // Get CSS pixel dimensions for RenderContext
+    const rect = this.svg.getBoundingClientRect();
+    const context: RenderContext = {
+      time,
+      targetDimensions: [rect.width || 100, rect.height || 100],
+    };
+
+    const frame = this.generator.frame(context);
 
     // Validate frame structure
     const result = validateFrame(frame);
@@ -106,10 +114,9 @@ export class SvgRenderer extends BaseRenderer {
     // Configure viewport from frame
     const vp = frame.viewport;
 
-    // Get element size from bounding rect and compute transform for toViewportCoords
-    const rect = this.svg.getBoundingClientRect();
-    const elementWidth = rect.width || 100;
-    const elementHeight = rect.height || 100;
+    // Compute transform for toViewportCoords using dimensions from context
+    const elementWidth = context.targetDimensions[0];
+    const elementHeight = context.targetDimensions[1];
     this.lastTransform = computeViewportTransform(
       vp,
       elementWidth,

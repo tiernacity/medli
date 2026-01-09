@@ -1,6 +1,7 @@
 import type {
   Frame,
   Generator,
+  RenderContext,
   Circle as CircleShape,
   Line as LineShape,
   Rectangle as RectangleShape,
@@ -579,7 +580,8 @@ export class Scene implements Generator {
     return this;
   }
 
-  frame(time: number): Frame {
+  frame(context: RenderContext): Frame {
+    const { time } = context;
     // Collect all materials (from explicit adds and from shape references)
     const allMaterials = new Set<Material>();
     // Track which materials were explicitly added to scene (for ordering)

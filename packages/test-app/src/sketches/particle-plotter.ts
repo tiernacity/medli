@@ -28,12 +28,8 @@ const CHANGE_DURATION = 3000; // ms
 
 /**
  * Create a particle plotter generator with mouse state control.
- *
- * @param getCanvasSize - Function returning current canvas buffer dimensions
  */
-export function createParticlePlotter(
-  getCanvasSize: () => { width: number; height: number }
-) {
+export function createParticlePlotter() {
   // State
   const particles: Particle[] = [];
   let variation = 0;
@@ -154,7 +150,8 @@ export function createParticlePlotter(
   }
 
   const generator = new ProceduralGenerator((p) => {
-    const { width, height } = getCanvasSize();
+    const width = p.targetWidth;
+    const height = p.targetHeight;
     const halfWidth = width / 2;
     const halfHeight = height / 2;
 

@@ -1,4 +1,4 @@
-import type { Frame, Generator } from "@medli/spec";
+import type { Frame, Generator, RenderContext } from "@medli/spec";
 
 /**
  * Options for creating a RemoteFetchGenerator.
@@ -44,7 +44,7 @@ function emptyFrame(): Frame {
  * Generator that fetches Frame data from a remote URL.
  *
  * Polls the URL at a configurable interval and caches the most recent frame.
- * The frame(time) method returns the cached frame immediately (time parameter ignored).
+ * The frame() method returns the cached frame immediately (context parameter ignored).
  * Before the first successful fetch, returns an empty frame.
  *
  * IMPORTANT: Call destroy() when done to clean up the polling timer.
@@ -56,7 +56,7 @@ function emptyFrame(): Frame {
  *   });
  *
  *   // Later...
- *   const frame = generator.frame(Date.now());
+ *   const frame = generator.frame({ time: Date.now(), targetDimensions: [800, 600] });
  *
  *   // When done:
  *   generator.destroy();
@@ -94,10 +94,10 @@ export class RemoteFetchGenerator implements Generator {
 
   /**
    * Returns the most recently fetched frame.
-   * The time parameter is ignored - remote source controls timing.
+   * The context parameter is ignored - remote source controls timing.
    * Before first successful fetch, returns an empty frame.
    */
-  frame(_time: number): Frame {
+  frame(_context: RenderContext): Frame {
     return this.cachedFrame;
   }
 

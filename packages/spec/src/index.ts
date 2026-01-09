@@ -418,10 +418,21 @@ export function resolveMaterial(ancestors: Material[]): ResolvedMaterial {
 }
 
 /**
- * Generator produces frames based on time.
+ * Context passed to generators each frame.
+ * Contains timing and render target information.
+ */
+export type RenderContext = {
+  /** Time in milliseconds (from requestAnimationFrame) */
+  time: number;
+  /** Target element dimensions in CSS pixels [width, height] */
+  targetDimensions: [number, number];
+};
+
+/**
+ * Generator produces frames based on context.
  */
 export interface Generator {
-  frame(time: number): Frame;
+  frame(context: RenderContext): Frame;
 }
 
 /**

@@ -85,7 +85,10 @@ describe("CanvasRenderer", () => {
 
     await renderer.render(0);
 
-    expect(mockGenerator.frame).toHaveBeenCalledWith(0);
+    expect(mockGenerator.frame).toHaveBeenCalledWith({
+      time: 0,
+      targetDimensions: [100, 100],
+    });
     // Background is drawn in viewport coordinates after transform
     // With viewport halfWidth=50, halfHeight=50, it draws at (-50, -50) with size 100x100
     expect(mockContext.fillStyle).toBe("#ff0000");
@@ -144,6 +147,9 @@ describe("CanvasRenderer", () => {
 
     await renderer.render();
 
-    expect(mockGenerator.frame).toHaveBeenCalledWith(0);
+    expect(mockGenerator.frame).toHaveBeenCalledWith({
+      time: 0,
+      targetDimensions: [100, 100],
+    });
   });
 });

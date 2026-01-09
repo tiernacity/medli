@@ -36,9 +36,7 @@ export interface SketchModule {
   /** Short description */
   description: string;
   /** Create a sketch instance */
-  create: (
-    getCanvasSize: () => { width: number; height: number }
-  ) => SketchInstance;
+  create: () => SketchInstance;
   /** Set up interaction handlers for this sketch */
   setupInteractions: (
     element: HTMLCanvasElement | SVGSVGElement,
@@ -133,9 +131,7 @@ function setupRemotePendulumInteractions(
  * Create a remote pendulum sketch instance.
  * Uses RemoteFetchGenerator to poll /frame.json for server-generated frames.
  */
-function createRemotePendulum(
-  _getCanvasSize: () => { width: number; height: number }
-): SketchInstance {
+function createRemotePendulum(): SketchInstance {
   const generator = RemoteFetchGenerator.fromUrl("http://localhost:3001", {
     pollInterval: 10, // Poll frequently for smooth animation
   });
