@@ -1,5 +1,13 @@
 [
   {
+    "hash": "639e943f74247d0bc4f4d08aa97bedc7488bf477",
+    "short_hash": "639e943",
+    "author": "Chris Tierney",
+    "date": "2026-01-09T19:18:50Z",
+    "message": "fix: internalize DPR handling in canvas renderer\n\nCanvas renderer's toViewportCoords() now handles DPR scaling internally.\nCallers pass CSS pixel coordinates; the renderer scales to buffer coords.\n\nThis also fixes a bug where shapes appeared too small on high-DPI displays:\n- getCanvasSize() was returning buffer dimensions (CSS × DPR)\n- Viewport was being set to inflated dimensions\n- Shapes now render at correct size, matching original Processing sketches\n\nChanges:\n- CanvasRenderer.toViewportCoords() scales input by DPR internally\n- getCanvasSize() returns CSS dimensions, not buffer dimensions\n- Removed manual DPR scaling from interaction handlers\n- Updated comments to reflect CSS pixel coordinate space\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 6
+  },
+  {
     "hash": "879968fc3efd8457978a5e60b24497ae8067c0c9",
     "short_hash": "879968f",
     "author": "Chris Tierney",

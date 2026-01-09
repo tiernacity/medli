@@ -4311,6 +4311,28 @@
       "created_at": "2026-01-09T19:11:26.731425+00:00",
       "updated_at": "2026-01-09T19:11:26.731425+00:00",
       "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":95}"
+    },
+    {
+      "id": 393,
+      "change_id": "63f4ec7c-af8a-4452-836a-2a2febe9e722",
+      "node_type": "observation",
+      "title": "Root cause found: viewport was set to buffer dims (CSS×DPR) making shapes appear small. Now set to CSS dims, shapes appear at correct size matching original Processing sketches",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T19:16:41.735785+00:00",
+      "updated_at": "2026-01-09T19:16:41.735785+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":95}"
+    },
+    {
+      "id": 394,
+      "change_id": "8ab23939-1216-4d17-811a-82347b0042c2",
+      "node_type": "outcome",
+      "title": "DPR internalization committed - fixes shape sizing bug on high-DPI displays",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T19:18:58.432031+00:00",
+      "updated_at": "2026-01-09T19:18:58.432031+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"commit\":\"639e943\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -8669,6 +8691,39 @@
       "weight": 1.0,
       "rationale": "Additional cleanup",
       "created_at": "2026-01-09T19:11:26.784882+00:00"
+    },
+    {
+      "id": 397,
+      "from_node_id": 385,
+      "to_node_id": 393,
+      "from_change_id": "4624cce0-9066-499f-89b2-e480a07bdf61",
+      "to_change_id": "63f4ec7c-af8a-4452-836a-2a2febe9e722",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Root cause of size bug",
+      "created_at": "2026-01-09T19:16:41.784002+00:00"
+    },
+    {
+      "id": 398,
+      "from_node_id": 391,
+      "to_node_id": 394,
+      "from_change_id": "92a8e127-4d0b-4e94-b8b1-c58d6ac2cdb5",
+      "to_change_id": "8ab23939-1216-4d17-811a-82347b0042c2",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Committed",
+      "created_at": "2026-01-09T19:18:58.482551+00:00"
+    },
+    {
+      "id": 399,
+      "from_node_id": 385,
+      "to_node_id": 394,
+      "from_change_id": "4624cce0-9066-499f-89b2-e480a07bdf61",
+      "to_change_id": "8ab23939-1216-4d17-811a-82347b0042c2",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Goal complete",
+      "created_at": "2026-01-09T19:18:58.502721+00:00"
     }
   ]
 }
