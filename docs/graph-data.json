@@ -4377,6 +4377,138 @@
       "created_at": "2026-01-09T19:28:26.275494+00:00",
       "updated_at": "2026-01-09T19:28:26.275494+00:00",
       "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":95}"
+    },
+    {
+      "id": 399,
+      "change_id": "ac8647e1-5b8d-4206-8977-34f0dfa474ab",
+      "node_type": "goal",
+      "title": "Design less opinionated sketch interaction handling",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T20:02:13.440334+00:00",
+      "updated_at": "2026-01-09T20:02:13.440334+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":70,\"prompt\":\"Yes, 386. Can you investigate our use of hammer.js - I'm not convinced we need it, or perhaps aren't using any of its events.\\n\\nI'd like interaction handling to be an internal concern for sketches. So... if a sketch wanted to use hammer.js, it could choose to. That will mean we need to consider how best to support that. I also want to keep frame generation separate from frame rendering - but both interaction and inspecting the viewport size, are coupling them together right now, for some of our scenes.\\n\\nTask some agents to review these things:\\n- interaction/event handling, and our use of hammer\\n- coupling of sketches to the viewport\\n- different requirements of the procedural and object generators. p5.js and three.js both have different mechanisms for dealing with these dependencies\\n\\nProduce a summary of what we have - see if you can either describe it or diagram it for me. It's not clear how best to proceed.\"}"
+    },
+    {
+      "id": 400,
+      "change_id": "ce38d2b6-7df7-4794-8592-f0890baf877f",
+      "node_type": "observation",
+      "title": "Hammer.js is unnecessary - only using tap/press/pan which PointerEvent handles natively. Code has redundant Hammer + native listeners.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T20:02:28.649309+00:00",
+      "updated_at": "2026-01-09T20:02:28.649309+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":95}"
+    },
+    {
+      "id": 401,
+      "change_id": "8f677109-b91e-4817-8de3-9261f2ab92e7",
+      "node_type": "observation",
+      "title": "Current coupling: sketches declare viewport (required), poll getCanvasSize() for dynamic sizing, receive CSS pixel coords via setMouseState() callback",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T20:02:28.704155+00:00",
+      "updated_at": "2026-01-09T20:02:28.704155+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":90}"
+    },
+    {
+      "id": 402,
+      "change_id": "8b146327-c887-4933-8d9a-6ab810a857b9",
+      "node_type": "observation",
+      "title": "Key architectural difference: p5.js has globals (width, mouseX), medli passes explicit Sketch param. three.js has live scene graph, medli generates Frame IR each call.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T20:02:28.762744+00:00",
+      "updated_at": "2026-01-09T20:02:28.762744+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":90}"
+    },
+    {
+      "id": 403,
+      "change_id": "13dc7298-07ad-4a92-a172-8a550c0a2d98",
+      "node_type": "decision",
+      "title": "Architectural direction for viewport and interaction coupling",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T20:19:44.626302+00:00",
+      "updated_at": "2026-01-09T20:19:44.626302+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":50}"
+    },
+    {
+      "id": 404,
+      "change_id": "3952e383-3251-41fa-99a6-1e25b02fdcb1",
+      "node_type": "option",
+      "title": "Generators declarative (100x100), renderers adapt to element",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T20:19:54.644747+00:00",
+      "updated_at": "2026-01-09T20:19:54.644747+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":60}"
+    },
+    {
+      "id": 405,
+      "change_id": "8f25fda7-e475-4c9c-a2a7-4feca9e4a2ad",
+      "node_type": "option",
+      "title": "Generators receive aspect ratio context, set viewport accordingly",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T20:19:54.696497+00:00",
+      "updated_at": "2026-01-09T20:19:54.696497+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":40}"
+    },
+    {
+      "id": 406,
+      "change_id": "b8086450-dcd6-4dd4-b7b3-58280bd0afe3",
+      "node_type": "option",
+      "title": "Option A style context object for interaction - abstracts browser details with typed interface",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T20:19:54.751300+00:00",
+      "updated_at": "2026-01-09T20:19:54.751300+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":60}"
+    },
+    {
+      "id": 407,
+      "change_id": "71874d69-c8a6-4fc2-be9d-a724b7f6b5c2",
+      "node_type": "observation",
+      "title": "Headless/server rendering requires either: context about render target (aspect ratio), OR generators are purely declarative about coordinate space",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T20:19:54.795846+00:00",
+      "updated_at": "2026-01-09T20:19:54.795846+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":85}"
+    },
+    {
+      "id": 408,
+      "change_id": "ef28343c-69ea-4145-a74d-fe795734025e",
+      "node_type": "observation",
+      "title": "Current Processing sketch ports poll canvas size - they could instead use fixed declarative viewport and let renderer adapt",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T20:19:54.847243+00:00",
+      "updated_at": "2026-01-09T20:19:54.847243+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":85}"
+    },
+    {
+      "id": 409,
+      "change_id": "9b764184-238c-4aa0-b2ed-23398d0fe052",
+      "node_type": "action",
+      "title": "Remove hammer.js dependency - replace with native PointerEvent",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T20:20:05.636658+00:00",
+      "updated_at": "2026-01-09T20:20:05.636658+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":90}"
+    },
+    {
+      "id": 410,
+      "change_id": "95a8ccd6-acef-42aa-8978-10483d9c8497",
+      "node_type": "outcome",
+      "title": "Hammer.js removed - all interactions verified working with native PointerEvent API",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T20:26:42.434459+00:00",
+      "updated_at": "2026-01-09T20:26:42.434459+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -8801,6 +8933,138 @@
       "weight": 1.0,
       "rationale": "Goal achieved",
       "created_at": "2026-01-09T19:28:26.350822+00:00"
+    },
+    {
+      "id": 403,
+      "from_node_id": 386,
+      "to_node_id": 399,
+      "from_change_id": "d7d7a490-d6ac-4e84-90a3-dee757845bc6",
+      "to_change_id": "ac8647e1-5b8d-4206-8977-34f0dfa474ab",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Continued investigation from prior session",
+      "created_at": "2026-01-09T20:02:20.059543+00:00"
+    },
+    {
+      "id": 404,
+      "from_node_id": 399,
+      "to_node_id": 400,
+      "from_change_id": "ac8647e1-5b8d-4206-8977-34f0dfa474ab",
+      "to_change_id": "ce38d2b6-7df7-4794-8592-f0890baf877f",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Investigation finding",
+      "created_at": "2026-01-09T20:02:38.250554+00:00"
+    },
+    {
+      "id": 405,
+      "from_node_id": 399,
+      "to_node_id": 401,
+      "from_change_id": "ac8647e1-5b8d-4206-8977-34f0dfa474ab",
+      "to_change_id": "8f677109-b91e-4817-8de3-9261f2ab92e7",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Investigation finding",
+      "created_at": "2026-01-09T20:02:38.271325+00:00"
+    },
+    {
+      "id": 406,
+      "from_node_id": 399,
+      "to_node_id": 402,
+      "from_change_id": "ac8647e1-5b8d-4206-8977-34f0dfa474ab",
+      "to_change_id": "8b146327-c887-4933-8d9a-6ab810a857b9",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Investigation finding",
+      "created_at": "2026-01-09T20:02:38.291561+00:00"
+    },
+    {
+      "id": 407,
+      "from_node_id": 399,
+      "to_node_id": 403,
+      "from_change_id": "ac8647e1-5b8d-4206-8977-34f0dfa474ab",
+      "to_change_id": "13dc7298-07ad-4a92-a172-8a550c0a2d98",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Design decision needed",
+      "created_at": "2026-01-09T20:20:01.793278+00:00"
+    },
+    {
+      "id": 408,
+      "from_node_id": 403,
+      "to_node_id": 404,
+      "from_change_id": "13dc7298-07ad-4a92-a172-8a550c0a2d98",
+      "to_change_id": "3952e383-3251-41fa-99a6-1e25b02fdcb1",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Viewport option",
+      "created_at": "2026-01-09T20:20:01.814642+00:00"
+    },
+    {
+      "id": 409,
+      "from_node_id": 403,
+      "to_node_id": 405,
+      "from_change_id": "13dc7298-07ad-4a92-a172-8a550c0a2d98",
+      "to_change_id": "8f25fda7-e475-4c9c-a2a7-4feca9e4a2ad",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Viewport option",
+      "created_at": "2026-01-09T20:20:01.834292+00:00"
+    },
+    {
+      "id": 410,
+      "from_node_id": 403,
+      "to_node_id": 406,
+      "from_change_id": "13dc7298-07ad-4a92-a172-8a550c0a2d98",
+      "to_change_id": "b8086450-dcd6-4dd4-b7b3-58280bd0afe3",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Interaction option",
+      "created_at": "2026-01-09T20:20:01.854258+00:00"
+    },
+    {
+      "id": 411,
+      "from_node_id": 403,
+      "to_node_id": 407,
+      "from_change_id": "13dc7298-07ad-4a92-a172-8a550c0a2d98",
+      "to_change_id": "71874d69-c8a6-4fc2-be9d-a724b7f6b5c2",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Informs decision",
+      "created_at": "2026-01-09T20:20:01.879517+00:00"
+    },
+    {
+      "id": 412,
+      "from_node_id": 403,
+      "to_node_id": 408,
+      "from_change_id": "13dc7298-07ad-4a92-a172-8a550c0a2d98",
+      "to_change_id": "ef28343c-69ea-4145-a74d-fe795734025e",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Informs decision",
+      "created_at": "2026-01-09T20:20:01.902349+00:00"
+    },
+    {
+      "id": 413,
+      "from_node_id": 399,
+      "to_node_id": 409,
+      "from_change_id": "ac8647e1-5b8d-4206-8977-34f0dfa474ab",
+      "to_change_id": "9b764184-238c-4aa0-b2ed-23398d0fe052",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Clear simplification while design is pending",
+      "created_at": "2026-01-09T20:20:11.703806+00:00"
+    },
+    {
+      "id": 414,
+      "from_node_id": 409,
+      "to_node_id": 410,
+      "from_change_id": "9b764184-238c-4aa0-b2ed-23398d0fe052",
+      "to_change_id": "95a8ccd6-acef-42aa-8978-10483d9c8497",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation successful",
+      "created_at": "2026-01-09T20:26:49.709482+00:00"
     }
   ]
 }
