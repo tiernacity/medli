@@ -4355,6 +4355,28 @@
       "created_at": "2026-01-09T19:22:58.084892+00:00",
       "updated_at": "2026-01-09T19:22:58.084892+00:00",
       "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":95}"
+    },
+    {
+      "id": 397,
+      "change_id": "d0c78da4-85d2-4dd6-896b-e61708e6651b",
+      "node_type": "action",
+      "title": "Implementing canvas buffer resize internalization",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T19:24:10.872087+00:00",
+      "updated_at": "2026-01-09T19:24:10.872087+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":85}"
+    },
+    {
+      "id": 398,
+      "change_id": "58c60c15-4513-44e8-8c80-056b51f5e509",
+      "node_type": "outcome",
+      "title": "Canvas resize logic internalized - ResizeObserver now managed by CanvasRenderer",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T19:28:26.275494+00:00",
+      "updated_at": "2026-01-09T19:28:26.275494+00:00",
+      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -8757,6 +8779,28 @@
       "weight": 1.0,
       "rationale": "Related investigation finding",
       "created_at": "2026-01-09T19:23:04.579257+00:00"
+    },
+    {
+      "id": 401,
+      "from_node_id": 397,
+      "to_node_id": 398,
+      "from_change_id": "d0c78da4-85d2-4dd6-896b-e61708e6651b",
+      "to_change_id": "58c60c15-4513-44e8-8c80-056b51f5e509",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation complete",
+      "created_at": "2026-01-09T19:28:26.330890+00:00"
+    },
+    {
+      "id": 402,
+      "from_node_id": 395,
+      "to_node_id": 398,
+      "from_change_id": "35c78e4b-3ec7-4a54-b7eb-eac01bcca773",
+      "to_change_id": "58c60c15-4513-44e8-8c80-056b51f5e509",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Goal achieved",
+      "created_at": "2026-01-09T19:28:26.350822+00:00"
     }
   ]
 }
