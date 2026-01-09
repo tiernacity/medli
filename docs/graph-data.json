@@ -4762,6 +4762,61 @@
       "created_at": "2026-01-09T22:31:47.090787+00:00",
       "updated_at": "2026-01-09T22:31:47.090787+00:00",
       "metadata_json": "{\"branch\":\"feat/server\",\"confidence\":95}"
+    },
+    {
+      "id": 434,
+      "change_id": "b8cafe5c-c3af-4d5e-a439-4491aaa79422",
+      "node_type": "goal",
+      "title": "Add RenderContext to Generator.frame API",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T22:45:07.558325+00:00",
+      "updated_at": "2026-01-09T22:45:07.558325+00:00",
+      "metadata_json": "{\"branch\":\"feat/render-context\",\"confidence\":90,\"prompt\":\"I'd like to address the viewport matter. Interaction is still paused until later.\\n\\nI think the correct solution is to pass more metadata in the Generator.frame API. We are passing `time: number` currently. Let's update this with a Context object which contains some things that might be useful:\\n- time\\n- targetDimensions: [number, number]\\n\\nThe targetDimensions can be used to hint the frame generator/sketch **if it cares and can adapt to that**. Our two renderers can send this context.\\n\\nOnce that's done and working, we can probably simplify both our harness and the full-screen page sketches. No need for a getCanvasSize function to be passed in.\"}"
+    },
+    {
+      "id": 435,
+      "change_id": "33f3477d-10e1-4e23-a038-941c7aa88611",
+      "node_type": "action",
+      "title": "Implementing RenderContext API",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T22:51:42.875795+00:00",
+      "updated_at": "2026-01-09T22:51:42.875795+00:00",
+      "metadata_json": "{\"branch\":\"feat/render-context\",\"confidence\":90}"
+    },
+    {
+      "id": 436,
+      "change_id": "8d7ce8c1-8031-4bc2-bdc1-641a280de1f2",
+      "node_type": "outcome",
+      "title": "RenderContext API complete - targetDimensions passed to generators, getCanvasSize callback eliminated",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T23:05:31.890181+00:00",
+      "updated_at": "2026-01-09T23:05:31.890181+00:00",
+      "metadata_json": "{\"branch\":\"feat/render-context\",\"confidence\":95}"
+    },
+    {
+      "id": 437,
+      "change_id": "24659c22-0158-4a20-a3b8-e02a8f3670ec",
+      "node_type": "action",
+      "title": "Fixed generate-pendulum script and expanded check patterns to include scripts/",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T23:08:51.559362+00:00",
+      "updated_at": "2026-01-09T23:08:51.559362+00:00",
+      "metadata_json": "{\"branch\":\"feat/render-context\",\"confidence\":95}"
+    },
+    {
+      "id": 438,
+      "change_id": "91ceca65-5afa-4dd2-b453-312425a02e2a",
+      "node_type": "outcome",
+      "title": "RenderContext goal achieved - API updated, sketches simplified, checks inclusive",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T23:15:13.932219+00:00",
+      "updated_at": "2026-01-09T23:15:13.932219+00:00",
+      "metadata_json": "{\"branch\":\"feat/render-context\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -9571,6 +9626,83 @@
       "weight": 1.0,
       "rationale": "Goal achieved",
       "created_at": "2026-01-09T22:31:52.067676+00:00"
+    },
+    {
+      "id": 438,
+      "from_node_id": 403,
+      "to_node_id": 434,
+      "from_change_id": "13dc7298-07ad-4a92-a172-8a550c0a2d98",
+      "to_change_id": "b8cafe5c-c3af-4d5e-a439-4491aaa79422",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Resolves viewport aspect of the coupling decision",
+      "created_at": "2026-01-09T22:45:07.610003+00:00"
+    },
+    {
+      "id": 439,
+      "from_node_id": 434,
+      "to_node_id": 435,
+      "from_change_id": "b8cafe5c-c3af-4d5e-a439-4491aaa79422",
+      "to_change_id": "33f3477d-10e1-4e23-a038-941c7aa88611",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation of goal",
+      "created_at": "2026-01-09T22:51:47.705963+00:00"
+    },
+    {
+      "id": 440,
+      "from_node_id": 435,
+      "to_node_id": 436,
+      "from_change_id": "33f3477d-10e1-4e23-a038-941c7aa88611",
+      "to_change_id": "8d7ce8c1-8031-4bc2-bdc1-641a280de1f2",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation successful",
+      "created_at": "2026-01-09T23:05:38.883942+00:00"
+    },
+    {
+      "id": 441,
+      "from_node_id": 434,
+      "to_node_id": 436,
+      "from_change_id": "b8cafe5c-c3af-4d5e-a439-4491aaa79422",
+      "to_change_id": "8d7ce8c1-8031-4bc2-bdc1-641a280de1f2",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Goal achieved",
+      "created_at": "2026-01-09T23:05:38.908218+00:00"
+    },
+    {
+      "id": 442,
+      "from_node_id": 436,
+      "to_node_id": 437,
+      "from_change_id": "8d7ce8c1-8031-4bc2-bdc1-641a280de1f2",
+      "to_change_id": "24659c22-0158-4a20-a3b8-e02a8f3670ec",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Follow-on fix for RenderContext API",
+      "created_at": "2026-01-09T23:08:57.542718+00:00"
+    },
+    {
+      "id": 443,
+      "from_node_id": 437,
+      "to_node_id": 438,
+      "from_change_id": "24659c22-0158-4a20-a3b8-e02a8f3670ec",
+      "to_change_id": "91ceca65-5afa-4dd2-b453-312425a02e2a",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Fix complete",
+      "created_at": "2026-01-09T23:15:13.985524+00:00"
+    },
+    {
+      "id": 444,
+      "from_node_id": 434,
+      "to_node_id": 438,
+      "from_change_id": "b8cafe5c-c3af-4d5e-a439-4491aaa79422",
+      "to_change_id": "91ceca65-5afa-4dd2-b453-312425a02e2a",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Goal fully achieved",
+      "created_at": "2026-01-09T23:15:14.008548+00:00"
     }
   ]
 }
