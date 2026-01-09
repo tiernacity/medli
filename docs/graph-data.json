@@ -3167,6 +3167,61 @@
       "created_at": "2026-01-09T10:46:21.736061+00:00",
       "updated_at": "2026-01-09T10:46:21.736061+00:00",
       "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":95}"
+    },
+    {
+      "id": 289,
+      "change_id": "6b4a4c2f-9b5c-456a-adc5-ba79f0aa2685",
+      "node_type": "goal",
+      "title": "Investigate Canvas+Procedural rendering blue circle with red border (should match SVG)",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T10:54:48.307611+00:00",
+      "updated_at": "2026-01-09T10:54:48.307611+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":85,\"prompt\":\"Compare canvas+procedural with canvas+object. Canvas+procedural, after a time, has much less \\\"blue\\\". Assuming the page has only one procedural and one object scene, used with both renderers (is this true?) I'd expect to see the same difference with the SVG render. But I do not.\\n\\nSo, something about the canvas+procedural combination means that the blue dot is different. If I refresh the page, and look at the two procedural scenes:\\n- the svg renderer renders a blue circle\\n- the canvas renderer renders a blue circle with a red border\\n\\nI think this is the issue. Before fixing it, please capture the goal, investigate and tell me the root cause\"}"
+    },
+    {
+      "id": 290,
+      "change_id": "0d6ba88d-089c-4690-87fc-2be394a8afb7",
+      "node_type": "action",
+      "title": "Investigating stroke rendering difference between Canvas and SVG for procedural generator",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T10:55:00.079561+00:00",
+      "updated_at": "2026-01-09T10:55:00.079561+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":85}"
+    },
+    {
+      "id": 291,
+      "change_id": "3308dd76-7204-4094-9c0a-c8d9db5f037d",
+      "node_type": "observation",
+      "title": "Root cause: Canvas renderer always calls stroke() even when strokeWidth=0. Canvas API renders 1px hairline at lineWidth=0, while SVG renders nothing at stroke-width=0. Procedural circle 2 has stroke=#ff6b6b (red) inherited from circle 1.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T10:55:26.198760+00:00",
+      "updated_at": "2026-01-09T10:55:26.198760+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":95}"
+    },
+    {
+      "id": 292,
+      "change_id": "71f7c833-41fd-4008-9a3f-538ac6554c50",
+      "node_type": "action",
+      "title": "Fix Canvas renderer to skip stroke() when strokeWidth is 0",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T10:57:51.613307+00:00",
+      "updated_at": "2026-01-09T10:57:51.613307+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":95}"
+    },
+    {
+      "id": 293,
+      "change_id": "83bcd7a6-f4c2-4cb3-9509-117edb0de66c",
+      "node_type": "outcome",
+      "title": "Fixed: Canvas renderer now skips stroke() when strokeWidth=0. All four renderers show consistent teal/coral coverage.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T10:59:13.425188+00:00",
+      "updated_at": "2026-01-09T10:59:13.425188+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -6403,6 +6458,61 @@
       "weight": 1.0,
       "rationale": "Parent goal achieved",
       "created_at": "2026-01-09T10:46:22.041010+00:00"
+    },
+    {
+      "id": 295,
+      "from_node_id": 289,
+      "to_node_id": 290,
+      "from_change_id": "6b4a4c2f-9b5c-456a-adc5-ba79f0aa2685",
+      "to_change_id": "0d6ba88d-089c-4690-87fc-2be394a8afb7",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Investigation for goal",
+      "created_at": "2026-01-09T10:55:00.174075+00:00"
+    },
+    {
+      "id": 296,
+      "from_node_id": 290,
+      "to_node_id": 291,
+      "from_change_id": "0d6ba88d-089c-4690-87fc-2be394a8afb7",
+      "to_change_id": "3308dd76-7204-4094-9c0a-c8d9db5f037d",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Investigation finding",
+      "created_at": "2026-01-09T10:55:26.297662+00:00"
+    },
+    {
+      "id": 297,
+      "from_node_id": 291,
+      "to_node_id": 292,
+      "from_change_id": "3308dd76-7204-4094-9c0a-c8d9db5f037d",
+      "to_change_id": "71f7c833-41fd-4008-9a3f-538ac6554c50",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Fix for root cause",
+      "created_at": "2026-01-09T10:57:51.705550+00:00"
+    },
+    {
+      "id": 298,
+      "from_node_id": 292,
+      "to_node_id": 293,
+      "from_change_id": "71f7c833-41fd-4008-9a3f-538ac6554c50",
+      "to_change_id": "83bcd7a6-f4c2-4cb3-9509-117edb0de66c",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Fix successful",
+      "created_at": "2026-01-09T10:59:13.538157+00:00"
+    },
+    {
+      "id": 299,
+      "from_node_id": 289,
+      "to_node_id": 293,
+      "from_change_id": "6b4a4c2f-9b5c-456a-adc5-ba79f0aa2685",
+      "to_change_id": "83bcd7a6-f4c2-4cb3-9509-117edb0de66c",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Goal achieved",
+      "created_at": "2026-01-09T10:59:13.576612+00:00"
     }
   ]
 }
