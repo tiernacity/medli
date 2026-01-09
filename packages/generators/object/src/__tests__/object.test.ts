@@ -14,14 +14,14 @@ const defaultViewport = {
 describe("Scene", () => {
   it("should return empty frame with no background", () => {
     const scene = new Scene(defaultViewport);
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
     expect(frame.background).toBeUndefined();
   });
 
   it("should return background color when background is set", () => {
     const scene = new Scene(defaultViewport);
     scene.setBackground(new Background("#ff0000"));
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
     expect(frame.background).toBe("#ff0000");
   });
 
@@ -30,7 +30,9 @@ describe("Scene", () => {
     const bg = new Background("#00ff00");
     scene.add(bg);
     expect(scene.background).toBe(bg);
-    expect(scene.frame(0).background).toBe("#00ff00");
+    expect(
+      scene.frame({ time: 0, targetDimensions: [100, 100] }).background
+    ).toBe("#00ff00");
   });
 
   it("should allow removing background", () => {
@@ -39,7 +41,9 @@ describe("Scene", () => {
     scene.setBackground(bg);
     scene.remove(bg);
     expect(scene.background).toBeNull();
-    expect(scene.frame(0).background).toBeUndefined();
+    expect(
+      scene.frame({ time: 0, targetDimensions: [100, 100] }).background
+    ).toBeUndefined();
   });
 
   it("should allow setting background to null", () => {
@@ -62,7 +66,7 @@ describe("Scene", () => {
 
   it("should include viewport in frame output", () => {
     const scene = new Scene(defaultViewport);
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
     expect(frame.viewport).toEqual(defaultViewport);
   });
 });
@@ -91,7 +95,7 @@ describe("SceneObject integration", () => {
     const scene = new Scene(defaultViewport);
     scene.add(new Circle(50, 50, 10));
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
     // Frame has root material with circle as child
     expect(frame.root.children.length).toBe(1);
     expect(frame.root.children[0]).toEqual({
@@ -106,7 +110,7 @@ describe("SceneObject integration", () => {
     scene.add(new Circle(10, 10, 5));
     scene.add(new Circle(90, 90, 5));
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
     expect(frame.root.children.length).toBe(2);
     expect((frame.root.children[0] as { center: { x: number } }).center.x).toBe(
       10
@@ -120,7 +124,7 @@ describe("SceneObject integration", () => {
 describe("Scene material properties", () => {
   it("should use default fill/stroke/strokeWidth in root material", () => {
     const scene = new Scene(defaultViewport);
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
 
     expect(frame.root.fill).toBe("#000000");
     expect(frame.root.stroke).toBe("#000000");
@@ -131,7 +135,7 @@ describe("Scene material properties", () => {
     const scene = new Scene(defaultViewport);
     scene.fill = "#ff0000";
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
     expect(frame.root.fill).toBe("#ff0000");
   });
 
@@ -139,7 +143,7 @@ describe("Scene material properties", () => {
     const scene = new Scene(defaultViewport);
     scene.stroke = "#00ff00";
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
     expect(frame.root.stroke).toBe("#00ff00");
   });
 
@@ -147,7 +151,7 @@ describe("Scene material properties", () => {
     const scene = new Scene(defaultViewport);
     scene.strokeWidth = 5;
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
     expect(frame.root.strokeWidth).toBe(5);
   });
 
@@ -157,7 +161,7 @@ describe("Scene material properties", () => {
     scene.stroke = "#00ff00";
     scene.strokeWidth = 3;
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
     expect(frame.root.fill).toBe("#ff0000");
     expect(frame.root.stroke).toBe("#00ff00");
     expect(frame.root.strokeWidth).toBe(3);
@@ -169,11 +173,11 @@ describe("Editing Scene material properties", () => {
     const scene = new Scene(defaultViewport);
     scene.fill = "#ff0000";
 
-    const frame1 = scene.frame(0);
+    const frame1 = scene.frame({ time: 0, targetDimensions: [100, 100] });
     expect(frame1.root.fill).toBe("#ff0000");
 
     scene.fill = "#0000ff";
-    const frame2 = scene.frame(1);
+    const frame2 = scene.frame({ time: 1, targetDimensions: [100, 100] });
     expect(frame2.root.fill).toBe("#0000ff");
   });
 
@@ -181,11 +185,11 @@ describe("Editing Scene material properties", () => {
     const scene = new Scene(defaultViewport);
     scene.stroke = "#ff0000";
 
-    const frame1 = scene.frame(0);
+    const frame1 = scene.frame({ time: 0, targetDimensions: [100, 100] });
     expect(frame1.root.stroke).toBe("#ff0000");
 
     scene.stroke = "#00ff00";
-    const frame2 = scene.frame(1);
+    const frame2 = scene.frame({ time: 1, targetDimensions: [100, 100] });
     expect(frame2.root.stroke).toBe("#00ff00");
   });
 
@@ -193,11 +197,11 @@ describe("Editing Scene material properties", () => {
     const scene = new Scene(defaultViewport);
     scene.strokeWidth = 2;
 
-    const frame1 = scene.frame(0);
+    const frame1 = scene.frame({ time: 0, targetDimensions: [100, 100] });
     expect(frame1.root.strokeWidth).toBe(2);
 
     scene.strokeWidth = 10;
-    const frame2 = scene.frame(1);
+    const frame2 = scene.frame({ time: 1, targetDimensions: [100, 100] });
     expect(frame2.root.strokeWidth).toBe(10);
   });
 });
@@ -287,7 +291,7 @@ describe("Material as ChildMaterial in frame", () => {
     const material = new Material({ fill: "#ff0000" });
     scene.add(material);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
 
     expect(frame.root.children.length).toBe(1);
     const childNode = frame.root.children[0] as ChildMaterial;
@@ -300,7 +304,7 @@ describe("Material as ChildMaterial in frame", () => {
     const material = new Material({ fill: "#ff0000" });
     scene.add(material);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
 
     const childNode = frame.root.children[0] as ChildMaterial;
     expect(childNode.ref).toBe("root");
@@ -313,7 +317,7 @@ describe("Material as ChildMaterial in frame", () => {
     scene.add(material1);
     scene.add(material2);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
 
     const child1 = frame.root.children[0] as ChildMaterial;
     const child2 = frame.root.children[1] as ChildMaterial;
@@ -327,7 +331,7 @@ describe("Material as ChildMaterial in frame", () => {
     const material = new Material({ fill: "#ff0000" }); // Only fill set
     scene.add(material);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
 
     const childNode = frame.root.children[0] as ChildMaterial;
     expect(childNode.fill).toBe("#ff0000");
@@ -342,13 +346,13 @@ describe("Material edits take effect next frame", () => {
     const material = new Material({ fill: "#ff0000" });
     scene.add(material);
 
-    const frame1 = scene.frame(0);
+    const frame1 = scene.frame({ time: 0, targetDimensions: [100, 100] });
     const child1 = frame1.root.children[0] as ChildMaterial;
     expect(child1.fill).toBe("#ff0000");
 
     material.fill = "#0000ff";
 
-    const frame2 = scene.frame(1);
+    const frame2 = scene.frame({ time: 1, targetDimensions: [100, 100] });
     const child2 = frame2.root.children[0] as ChildMaterial;
     expect(child2.fill).toBe("#0000ff");
   });
@@ -358,13 +362,13 @@ describe("Material edits take effect next frame", () => {
     const material = new Material({ stroke: "#ff0000" });
     scene.add(material);
 
-    const frame1 = scene.frame(0);
+    const frame1 = scene.frame({ time: 0, targetDimensions: [100, 100] });
     const child1 = frame1.root.children[0] as ChildMaterial;
     expect(child1.stroke).toBe("#ff0000");
 
     material.stroke = "#00ff00";
 
-    const frame2 = scene.frame(1);
+    const frame2 = scene.frame({ time: 1, targetDimensions: [100, 100] });
     const child2 = frame2.root.children[0] as ChildMaterial;
     expect(child2.stroke).toBe("#00ff00");
   });
@@ -374,13 +378,13 @@ describe("Material edits take effect next frame", () => {
     const material = new Material({ strokeWidth: 2 });
     scene.add(material);
 
-    const frame1 = scene.frame(0);
+    const frame1 = scene.frame({ time: 0, targetDimensions: [100, 100] });
     const child1 = frame1.root.children[0] as ChildMaterial;
     expect(child1.strokeWidth).toBe(2);
 
     material.strokeWidth = 10;
 
-    const frame2 = scene.frame(1);
+    const frame2 = scene.frame({ time: 1, targetDimensions: [100, 100] });
     const child2 = frame2.root.children[0] as ChildMaterial;
     expect(child2.strokeWidth).toBe(10);
   });
@@ -390,13 +394,13 @@ describe("Material edits take effect next frame", () => {
     const material = new Material(); // No styles initially
     scene.add(material);
 
-    const frame1 = scene.frame(0);
+    const frame1 = scene.frame({ time: 0, targetDimensions: [100, 100] });
     const child1 = frame1.root.children[0] as ChildMaterial;
     expect(child1.fill).toBeUndefined();
 
     material.fill = "#ff0000";
 
-    const frame2 = scene.frame(1);
+    const frame2 = scene.frame({ time: 1, targetDimensions: [100, 100] });
     const child2 = frame2.root.children[0] as ChildMaterial;
     expect(child2.fill).toBe("#ff0000");
   });
@@ -412,7 +416,7 @@ describe("Shapes referencing materials (three.js-style)", () => {
     scene.add(material);
     scene.add(circle);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
 
     const childMaterial = frame.root.children[0] as ChildMaterial;
     expect(childMaterial.children.length).toBe(1);
@@ -436,7 +440,7 @@ describe("Shapes referencing materials (three.js-style)", () => {
     scene.add(circle1);
     scene.add(circle2);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
 
     const childMaterial = frame.root.children[0] as ChildMaterial;
     expect(childMaterial.children.length).toBe(2);
@@ -451,7 +455,7 @@ describe("Shapes referencing materials (three.js-style)", () => {
     scene.add(material);
     scene.add(line);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
 
     const childMaterial = frame.root.children[0] as ChildMaterial;
     expect(childMaterial.children.length).toBe(1);
@@ -474,7 +478,7 @@ describe("Shapes referencing materials (three.js-style)", () => {
     scene.add(material);
     scene.add(circle2);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
 
     // Root should have circle and material as children
     expect(frame.root.children.length).toBe(2);
@@ -504,7 +508,7 @@ describe("Nested Materials via parent property", () => {
     scene.add(outerMaterial);
     scene.add(innerMaterial);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
 
     const outerChild = frame.root.children[0] as ChildMaterial;
     expect(outerChild.type).toBe("material");
@@ -525,7 +529,7 @@ describe("Nested Materials via parent property", () => {
     scene.add(outerMaterial);
     scene.add(innerMaterial);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
 
     const outerChild = frame.root.children[0] as ChildMaterial;
     const innerChild = outerChild.children[0] as ChildMaterial;
@@ -550,7 +554,7 @@ describe("Nested Materials via parent property", () => {
     scene.add(level3);
     scene.add(circle);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
 
     const l1 = frame.root.children[0] as ChildMaterial;
     expect(l1.fill).toBe("#ff0000");
@@ -584,7 +588,7 @@ describe("Nested Materials via parent property", () => {
     scene.add(innerMaterial);
     scene.add(circle);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
 
     const outerChild = frame.root.children[0] as ChildMaterial;
     const innerChild = outerChild.children[0] as ChildMaterial;
@@ -605,7 +609,7 @@ describe("Multiple Materials as siblings", () => {
     scene.add(material1);
     scene.add(material2);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
 
     expect(frame.root.children.length).toBe(2);
     const child1 = frame.root.children[0] as ChildMaterial;
@@ -623,7 +627,7 @@ describe("Multiple Materials as siblings", () => {
     scene.add(material1);
     scene.add(material2);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
 
     const child1 = frame.root.children[0] as ChildMaterial;
     const child2 = frame.root.children[1] as ChildMaterial;
@@ -640,7 +644,7 @@ describe("Multiple Materials as siblings", () => {
     scene.add(material2);
     scene.add(material3);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
 
     expect(frame.root.children.length).toBe(3);
     expect((frame.root.children[0] as ChildMaterial).fill).toBe("#ff0000");
@@ -658,7 +662,7 @@ describe("Multiple Materials as siblings", () => {
     scene.add(new Circle(90, 90, 5));
     scene.add(material2);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
 
     expect(frame.root.children.length).toBe(4);
     expect(frame.root.children[0]).toEqual({
@@ -690,7 +694,7 @@ describe("Multiple Materials as siblings", () => {
     scene.add(childMaterial1);
     scene.add(childMaterial2);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
 
     const parent = frame.root.children[0] as ChildMaterial;
     expect(parent.children.length).toBe(2);
@@ -723,7 +727,7 @@ describe("Materials and shapes both added to scene independently", () => {
     scene.add(blueMaterial);
     scene.add(circle3);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
 
     // Should have two materials in root
     expect(frame.root.children.length).toBe(2);
@@ -749,7 +753,7 @@ describe("Materials and shapes both added to scene independently", () => {
     // Only add shape, not material directly
     scene.add(circle);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
 
     // Material should still appear because shape references it
     expect(frame.root.children.length).toBe(1);
@@ -1137,7 +1141,7 @@ describe("Group in Scene", () => {
     group.add(new Circle(0, 0, 10));
     scene.add(group);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
     expect(frame.root.children.length).toBe(1);
 
     const transform = frame.root.children[0] as Transform;
@@ -1156,7 +1160,7 @@ describe("Group in Scene", () => {
     group.add(new Circle(50, 50, 10));
     scene.add(group);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
     expect(frame.root.children.length).toBe(1);
     // Should be the circle directly, not wrapped in transform
     expect(frame.root.children[0]).toEqual({
@@ -1177,7 +1181,7 @@ describe("Group in Scene", () => {
 
     scene.add(group);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
 
     // Group emits Transform directly to root
     const transform = frame.root.children[0] as Transform;
@@ -1207,7 +1211,7 @@ describe("Group in Scene", () => {
     scene.add(material);
     scene.add(group);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
 
     // Material is first (added first) - empty since circle is inside Group
     const childMaterial = frame.root.children[0] as ChildMaterial;
@@ -1242,7 +1246,7 @@ describe("Group in Scene", () => {
     group.add(new Circle(10, 0, 5));
     scene.add(group);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
     const transform = frame.root.children[0] as Transform;
 
     expect(transform.type).toBe("transform");
@@ -1262,7 +1266,7 @@ describe("Group in Scene", () => {
     group.add(new Circle(10, 10, 5));
     scene.add(group);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
     const transform = frame.root.children[0] as Transform;
 
     expect(transform.type).toBe("transform");
@@ -1282,7 +1286,7 @@ describe("Group in Scene", () => {
     scene.add(material);
     scene.add(circle);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
 
     // Material contains the transformed circle
     const childMaterial = frame.root.children[0] as ChildMaterial;
@@ -1308,7 +1312,7 @@ describe("Shape transforms", () => {
     circle.position = { x: 50, y: 50 };
     scene.add(circle);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
     const transform = frame.root.children[0] as Transform;
     expect(transform.type).toBe("transform");
     expect(transform.matrix).toEqual([1, 0, 0, 1, 50, 50]);
@@ -1325,7 +1329,7 @@ describe("Shape transforms", () => {
     circle.rotation = Math.PI / 2;
     scene.add(circle);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
     const transform = frame.root.children[0] as Transform;
     expect(transform.type).toBe("transform");
     expect(transform.matrix[0]).toBeCloseTo(0);
@@ -1338,7 +1342,7 @@ describe("Shape transforms", () => {
     circle.scale = 2;
     scene.add(circle);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
     const transform = frame.root.children[0] as Transform;
     expect(transform.type).toBe("transform");
     expect(transform.matrix).toEqual([2, 0, 0, 2, 0, 0]);
@@ -1350,7 +1354,7 @@ describe("Shape transforms", () => {
     line.position = { x: 25, y: 25 };
     scene.add(line);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
     const transform = frame.root.children[0] as Transform;
     expect(transform.type).toBe("transform");
     expect(transform.matrix).toEqual([1, 0, 0, 1, 25, 25]);
@@ -1367,7 +1371,7 @@ describe("Shape transforms", () => {
     // No position/rotation/scale set
     scene.add(circle);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
     // Should be the circle directly, not wrapped in transform
     expect(frame.root.children[0]).toEqual({
       type: "circle",
@@ -1386,7 +1390,7 @@ describe("Shape transforms", () => {
     scene.add(material);
     scene.add(circle);
 
-    const frame = scene.frame(0);
+    const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
 
     // Material node contains the transform
     const childMaterial = frame.root.children[0] as ChildMaterial;
@@ -1445,7 +1449,7 @@ describe("Image", () => {
       const image = new Image("https://example.com/image.png", 10, 20, 100, 50);
       scene.add(image);
 
-      const frame = scene.frame(0);
+      const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
       const imageNode = frame.root.children[0] as ImageShape;
 
       expect(imageNode).toEqual({
@@ -1498,7 +1502,7 @@ describe("Image", () => {
       );
       scene.add(image);
 
-      const frame = scene.frame(0);
+      const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
       const imageNode = frame.root.children[0] as ImageShape;
 
       expect(imageNode).toEqual({
@@ -1526,7 +1530,7 @@ describe("Image", () => {
       );
       scene.add(image);
 
-      const frame = scene.frame(0);
+      const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
       const imageNode = frame.root.children[0] as ImageShape;
 
       expect(imageNode.crop).toEqual({ x: 0, y: 0, width: 100, height: 100 });
@@ -1541,7 +1545,7 @@ describe("Image", () => {
       const scene = new Scene(defaultViewport);
       scene.add(image);
 
-      const frame = scene.frame(0);
+      const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
       const imageNode = frame.root.children[0] as ImageShape;
 
       expect(imageNode.crop).toBeUndefined();
@@ -1556,7 +1560,7 @@ describe("Image", () => {
       const scene = new Scene(defaultViewport);
       scene.add(image);
 
-      const frame = scene.frame(0);
+      const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
       const imageNode = frame.root.children[0] as ImageShape;
 
       expect(imageNode.crop).toBeUndefined();
@@ -1572,7 +1576,7 @@ describe("Image", () => {
       const scene = new Scene(defaultViewport);
       scene.add(image);
 
-      const frame = scene.frame(0);
+      const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
       const imageNode = frame.root.children[0] as ImageShape;
 
       expect(imageNode.crop).toEqual({ x: 10, y: 20, width: 50, height: 50 });
@@ -1586,7 +1590,7 @@ describe("Image", () => {
       image.position = { x: 25, y: 25 };
       scene.add(image);
 
-      const frame = scene.frame(0);
+      const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
       const transform = frame.root.children[0] as Transform;
 
       expect(transform.type).toBe("transform");
@@ -1616,7 +1620,7 @@ describe("Image", () => {
       image.position = { x: 25, y: 25 };
       scene.add(image);
 
-      const frame = scene.frame(0);
+      const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
       const transform = frame.root.children[0] as Transform;
       const imageNode = transform.children[0] as ImageShape;
 
@@ -1634,7 +1638,7 @@ describe("Image", () => {
       scene.add(material);
       scene.add(image);
 
-      const frame = scene.frame(0);
+      const frame = scene.frame({ time: 0, targetDimensions: [100, 100] });
       const childMaterial = frame.root.children[0] as ChildMaterial;
 
       expect(childMaterial.type).toBe("material");

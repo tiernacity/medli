@@ -1,4 +1,10 @@
-import type { Frame, Generator, Renderer, RootMaterial } from "../index";
+import type {
+  Frame,
+  Generator,
+  RenderContext,
+  Renderer,
+  RootMaterial,
+} from "../index";
 
 describe("spec types", () => {
   it("should allow creating a frame", () => {
@@ -25,8 +31,8 @@ describe("spec types", () => {
 
   it("should allow implementing Generator interface", () => {
     const generator: Generator = {
-      frame: (time = 0) => ({
-        background: `hsl(${time}, 50%, 50%)`,
+      frame: (context: RenderContext) => ({
+        background: `hsl(${context.time}, 50%, 50%)`,
         viewport: {
           halfWidth: 50,
           halfHeight: 50,
@@ -42,7 +48,7 @@ describe("spec types", () => {
         },
       }),
     };
-    const frame = generator.frame(0);
+    const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
     expect(frame.background).toBe("hsl(0, 50%, 50%)");
     expect(frame.root.type).toBe("material");
   });

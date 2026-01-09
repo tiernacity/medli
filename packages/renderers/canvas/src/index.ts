@@ -6,6 +6,7 @@ import type {
   ResolvedMaterial,
   Transform,
   Image,
+  RenderContext,
 } from "@medli/spec";
 import { validateFrame, resolveMaterial } from "@medli/spec";
 import {
@@ -62,7 +63,13 @@ export class CanvasRenderer extends BaseRenderer {
   }
 
   async render(time: number = 0): Promise<void> {
-    const frame = this.generator.frame(time);
+    // Build RenderContext with CSS pixel dimensions
+    const rect = this.element.getBoundingClientRect();
+    const context: RenderContext = {
+      time,
+      targetDimensions: [rect.width, rect.height],
+    };
+    const frame = this.generator.frame(context);
 
     // Validate frame structure
     const result = validateFrame(frame);

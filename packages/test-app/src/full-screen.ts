@@ -68,31 +68,10 @@ if (!element) {
 }
 
 // ============================================================================
-// Get Canvas Size Function
-// ============================================================================
-// Note: CanvasRenderer handles buffer size sync internally via ResizeObserver
-
-/**
- * Returns the logical (CSS pixel) dimensions of the rendering surface.
- * Sketches should work in CSS pixel space - the renderer handles DPR scaling.
- */
-function getCanvasSize(): { width: number; height: number } {
-  if (rendererType === "canvas" && canvas) {
-    // Return CSS dimensions, not buffer dimensions
-    const rect = canvas.getBoundingClientRect();
-    return { width: rect.width, height: rect.height };
-  } else if (svgElement) {
-    const rect = svgElement.getBoundingClientRect();
-    return { width: rect.width, height: rect.height };
-  }
-  return { width: 800, height: 600 };
-}
-
-// ============================================================================
 // Create Sketch Instance
 // ============================================================================
 
-const instance = sketchModule.create(getCanvasSize);
+const instance = sketchModule.create(element as HTMLCanvasElement | SVGSVGElement);
 
 // ============================================================================
 // Create Renderer
@@ -107,15 +86,6 @@ if (rendererType === "svg" && svgElement) {
 } else {
   throw new Error("No valid element for renderer");
 }
-
-// ============================================================================
-// Setup Interactions
-// ============================================================================
-
-sketchModule.setupInteractions(
-  element as HTMLCanvasElement | SVGSVGElement,
-  instance
-);
 
 // ============================================================================
 // Update Page Title
@@ -135,9 +105,7 @@ renderer.loop();
 
 window.addEventListener("beforeunload", () => {
   renderer.destroy();
-  if (instance.destroy) {
-    instance.destroy();
-  }
+  instance.destroy();
 });
 
 // ============================================================================

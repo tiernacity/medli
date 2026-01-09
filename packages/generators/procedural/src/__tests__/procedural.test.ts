@@ -6,7 +6,7 @@ describe("ProceduralGenerator", () => {
     const generator = new ProceduralGenerator((p) => {
       p.viewport(50, 50);
     });
-    const frame = generator.frame(0);
+    const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
     expect(frame.background).toBeUndefined();
     expect(frame.viewport).toEqual({
       halfWidth: 50,
@@ -20,7 +20,7 @@ describe("ProceduralGenerator", () => {
       p.viewport(50, 50);
       p.background("#ff0000");
     });
-    const frame = generator.frame(0);
+    const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
     expect(frame.background).toBe("#ff0000");
   });
 
@@ -30,7 +30,7 @@ describe("ProceduralGenerator", () => {
       p.background("#ff0000");
       p.background("#00ff00");
     });
-    const frame = generator.frame(0);
+    const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
     expect(frame.background).toBe("#00ff00");
   });
 
@@ -40,7 +40,7 @@ describe("ProceduralGenerator", () => {
       p.viewport(50, 50);
       capturedTime = p.time;
     });
-    generator.frame(12345);
+    generator.frame({ time: 12345, targetDimensions: [100, 100] });
     expect(capturedTime).toBe(12345);
   });
 
@@ -55,10 +55,10 @@ describe("ProceduralGenerator", () => {
       // Second call doesn't set background
     });
 
-    const frame1 = generator.frame(0);
+    const frame1 = generator.frame({ time: 0, targetDimensions: [100, 100] });
     expect(frame1.background).toBe("#ff0000");
 
-    const frame2 = generator.frame(1);
+    const frame2 = generator.frame({ time: 1, targetDimensions: [100, 100] });
     expect(frame2.background).toBeUndefined(); // Reset to default (no background)
   });
 });
@@ -69,7 +69,7 @@ describe("Sketch interface", () => {
       p.viewport(50, 50);
       expect(typeof p.background).toBe("function");
     });
-    generator.frame(0);
+    generator.frame({ time: 0, targetDimensions: [100, 100] });
   });
 
   it("should provide readonly time property", () => {
@@ -77,7 +77,7 @@ describe("Sketch interface", () => {
       p.viewport(50, 50);
       expect(typeof p.time).toBe("number");
     });
-    generator.frame(100);
+    generator.frame({ time: 100, targetDimensions: [100, 100] });
   });
 });
 
@@ -88,7 +88,7 @@ describe("Material output", () => {
         p.viewport(50, 50);
         p.circle(50, 50, 10);
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       expect(frame.root.fill).toBe("#000000");
       expect(frame.root.stroke).toBe("#000000");
@@ -101,7 +101,7 @@ describe("Material output", () => {
         p.fill("#ff0000");
         p.circle(50, 50, 10);
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       expect(frame.root.fill).toBe("#ff0000");
     });
@@ -112,7 +112,7 @@ describe("Material output", () => {
         p.stroke("#00ff00");
         p.circle(50, 50, 10);
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       expect(frame.root.stroke).toBe("#00ff00");
     });
@@ -123,7 +123,7 @@ describe("Material output", () => {
         p.strokeWidth(5);
         p.circle(50, 50, 10);
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       expect(frame.root.strokeWidth).toBe(5);
     });
@@ -136,7 +136,7 @@ describe("Material output", () => {
         p.fill("#0000ff");
         p.circle(50, 50, 10);
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       expect(frame.root.fill).toBe("#0000ff");
     });
@@ -149,7 +149,7 @@ describe("Material output", () => {
         p.strokeWidth(3);
         p.circle(50, 50, 10);
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       expect(frame.root.fill).toBe("#ff0000");
       expect(frame.root.stroke).toBe("#00ff00");
@@ -166,7 +166,7 @@ describe("Material output", () => {
         p.fill("blue");
         p.circle(20, 20, 5);
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       // Root should have two ChildMaterial children
       expect(frame.root.children).toHaveLength(2);
@@ -195,7 +195,7 @@ describe("Material output", () => {
         p.fill("blue");
         p.circle(30, 30, 5);
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       // Should have two ChildMaterial children (red group, blue group)
       expect(frame.root.children).toHaveLength(2);
@@ -217,7 +217,7 @@ describe("Material output", () => {
         p.stroke("blue");
         p.line(20, 20, 30, 30);
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       expect(frame.root.children).toHaveLength(2);
 
@@ -236,7 +236,7 @@ describe("Material output", () => {
         p.strokeWidth(5);
         p.line(20, 20, 30, 30);
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       expect(frame.root.children).toHaveLength(2);
 
@@ -257,7 +257,7 @@ describe("Material output", () => {
         p.fill("green");
         p.circle(30, 30, 5);
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       const ids = frame.root.children.map((c) => (c as ChildMaterial).id);
       const uniqueIds = new Set(ids);
@@ -275,7 +275,7 @@ describe("Material output", () => {
         p.circle(10, 10, 5);
         p.pop();
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       // Root fill should be red (set before push)
       expect(frame.root.fill).toBe("red");
@@ -300,7 +300,7 @@ describe("Material output", () => {
         p.pop();
         p.circle(20, 20, 5);
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       // Root should have red fill
       expect(frame.root.fill).toBe("red");
@@ -339,7 +339,7 @@ describe("Material output", () => {
         // After pop, should be back to red/green/2
         p.circle(20, 20, 5);
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       // Root should have the initial style (red/green/2)
       expect(frame.root.fill).toBe("red");
@@ -367,7 +367,7 @@ describe("Material output", () => {
         p.pop();
         p.pop();
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       // Root > ChildMaterial(blue) > ChildMaterial(green) > circle
       expect(frame.root.fill).toBe("red");
@@ -399,7 +399,7 @@ describe("Material output", () => {
         p.pop();
         p.circle(20, 20, 5); // red circle at root level
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       // Should have 3 top-level children: circle, pushed group, circle
       // (or wrapped in ChildMaterials)
@@ -417,7 +417,7 @@ describe("Material output", () => {
         p.circle(10, 10, 5);
         p.pop();
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       const child = frame.root.children[0] as ChildMaterial;
       expect(child.ref).toBe(frame.root.id);
@@ -434,7 +434,7 @@ describe("Material output", () => {
         p.pop();
         p.pop();
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       // Navigate down the tree and verify each ref points to parent
       let current = frame.root;
@@ -461,7 +461,7 @@ describe("Material output", () => {
         p.circle(10, 10, 5);
         p.pop();
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       const child = frame.root.children[0] as ChildMaterial;
       expect(child.fill).toBe("blue");
@@ -479,7 +479,7 @@ describe("Material output", () => {
           "function"
         );
       });
-      generator.frame(0);
+      generator.frame({ time: 0, targetDimensions: [100, 100] });
     });
 
     it("should provide pop function", () => {
@@ -487,7 +487,7 @@ describe("Material output", () => {
         p.viewport(50, 50);
         expect(typeof (p as unknown as { pop: unknown }).pop).toBe("function");
       });
-      generator.frame(0);
+      generator.frame({ time: 0, targetDimensions: [100, 100] });
     });
   });
 });
@@ -500,7 +500,7 @@ describe("Transform output", () => {
         p.translate(10, 20);
         p.circle(0, 0, 5);
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       // Find the circle wrapped in a transform
       const childMaterial = frame.root.children[0] as ChildMaterial;
@@ -517,7 +517,7 @@ describe("Transform output", () => {
         p.viewport(50, 50);
         p.circle(10, 10, 5);
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       // Shape should be directly in the material, not wrapped in Transform
       const childMaterial = frame.root.children[0] as ChildMaterial;
@@ -531,7 +531,7 @@ describe("Transform output", () => {
         p.translate(5, 10);
         p.circle(0, 0, 5);
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       const childMaterial = frame.root.children[0] as ChildMaterial;
       const transformNode = childMaterial.children[0] as Transform;
@@ -548,7 +548,7 @@ describe("Transform output", () => {
         p.rotate(Math.PI / 2); // 90 degrees
         p.circle(0, 0, 5);
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       const childMaterial = frame.root.children[0] as ChildMaterial;
       const transformNode = childMaterial.children[0] as Transform;
@@ -572,7 +572,7 @@ describe("Transform output", () => {
         p.scale(2);
         p.circle(0, 0, 5);
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       const childMaterial = frame.root.children[0] as ChildMaterial;
       const transformNode = childMaterial.children[0] as Transform;
@@ -588,7 +588,7 @@ describe("Transform output", () => {
         p.scale(2, 3);
         p.circle(0, 0, 5);
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       const childMaterial = frame.root.children[0] as ChildMaterial;
       const transformNode = childMaterial.children[0] as Transform;
@@ -606,7 +606,7 @@ describe("Transform output", () => {
         p.scale(2);
         p.circle(0, 0, 5);
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       const childMaterial = frame.root.children[0] as ChildMaterial;
       const transformNode = childMaterial.children[0] as Transform;
@@ -623,7 +623,7 @@ describe("Transform output", () => {
         p.translate(10, 20);
         p.circle(0, 0, 5);
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       const childMaterial = frame.root.children[0] as ChildMaterial;
       const transformNode = childMaterial.children[0] as Transform;
@@ -645,7 +645,7 @@ describe("Transform output", () => {
         p.pop();
         p.circle(0, 0, 5); // Should have translate(10, 0)
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       // First child is the pushed context material
       const pushedMaterial = frame.root.children[0] as ChildMaterial;
@@ -669,7 +669,7 @@ describe("Transform output", () => {
         p.pop();
         p.circle(0, 0, 5); // No transform
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       // First child is pushed context with translated circle
       const pushedMaterial = frame.root.children[0] as ChildMaterial;
@@ -688,7 +688,7 @@ describe("Transform output", () => {
         p.viewport(50, 50);
         expect(typeof p.translate).toBe("function");
       });
-      generator.frame(0);
+      generator.frame({ time: 0, targetDimensions: [100, 100] });
     });
 
     it("should provide rotate function", () => {
@@ -696,7 +696,7 @@ describe("Transform output", () => {
         p.viewport(50, 50);
         expect(typeof p.rotate).toBe("function");
       });
-      generator.frame(0);
+      generator.frame({ time: 0, targetDimensions: [100, 100] });
     });
 
     it("should provide scale function", () => {
@@ -704,7 +704,7 @@ describe("Transform output", () => {
         p.viewport(50, 50);
         expect(typeof p.scale).toBe("function");
       });
-      generator.frame(0);
+      generator.frame({ time: 0, targetDimensions: [100, 100] });
     });
   });
 });
@@ -716,7 +716,7 @@ describe("Image output", () => {
         p.viewport(50, 50);
         p.image("https://example.com/test.png", 10, 20, 100, 50);
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       const childMaterial = frame.root.children[0] as ChildMaterial;
       const imageShape = childMaterial.children[0] as {
@@ -753,7 +753,7 @@ describe("Image output", () => {
           32
         );
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       const childMaterial = frame.root.children[0] as ChildMaterial;
       const imageShape = childMaterial.children[0] as {
@@ -779,7 +779,7 @@ describe("Image output", () => {
         // Only providing cropX and cropY, not cropWidth and cropHeight
         p.image("https://example.com/test.png", 10, 20, 100, 50, 0, 0);
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       const childMaterial = frame.root.children[0] as ChildMaterial;
       const imageShape = childMaterial.children[0] as {
@@ -797,7 +797,7 @@ describe("Image output", () => {
         // All crop params are 0 (which is valid - top-left corner with 0x0 region)
         p.image("https://example.com/test.png", 10, 20, 100, 50, 0, 0, 0, 0);
       });
-      const frame = generator.frame(0);
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       const childMaterial = frame.root.children[0] as ChildMaterial;
       const imageShape = childMaterial.children[0] as {
@@ -817,7 +817,7 @@ describe("Image output", () => {
         p.viewport(50, 50);
         expect(typeof p.image).toBe("function");
       });
-      generator.frame(0);
+      generator.frame({ time: 0, targetDimensions: [100, 100] });
     });
   });
 });

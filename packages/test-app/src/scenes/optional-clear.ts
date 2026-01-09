@@ -17,6 +17,7 @@
  */
 import { ProceduralGenerator } from "@medli/generator-procedural";
 import { Scene, Circle, Material } from "@medli/generator-object";
+import type { RenderContext } from "@medli/spec";
 import type { TestScene } from "./types";
 
 // =============================================================================
@@ -105,7 +106,9 @@ class AccumulatingScene extends Scene {
     });
   }
 
-  frame(time: number) {
+  frame(context: RenderContext) {
+    const { time } = context;
+
     // Clear existing children and rebuild each frame
     // This is necessary because circle positions change with time
     while (this["children"].length > 0) {
@@ -139,7 +142,7 @@ class AccumulatingScene extends Scene {
     circle2.material = this.material2;
     this.add(circle2);
 
-    return super.frame(time);
+    return super.frame(context);
   }
 }
 

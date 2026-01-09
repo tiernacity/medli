@@ -123,7 +123,10 @@ describe("SvgRenderer", () => {
 
     await renderer.render(0);
 
-    expect(mockGenerator.frame).toHaveBeenCalledWith(0);
+    expect(mockGenerator.frame).toHaveBeenCalledWith({
+      time: 0,
+      targetDimensions: [200, 200],
+    });
     expect(mockRect.setAttribute).toHaveBeenCalledWith("fill", "#ff0000");
   });
 
@@ -132,7 +135,10 @@ describe("SvgRenderer", () => {
 
     await renderer.render();
 
-    expect(mockGenerator.frame).toHaveBeenCalledWith(0);
+    expect(mockGenerator.frame).toHaveBeenCalledWith({
+      time: 0,
+      targetDimensions: [200, 200],
+    });
   });
 
   it("should map scaleMode 'fill' to 'xMidYMid slice'", async () => {

@@ -11,6 +11,7 @@ import type {
   Matrix2D,
   Transform,
   ScaleMode,
+  RenderContext,
 } from "@medli/spec";
 
 // ============================================================================
@@ -182,6 +183,11 @@ export interface Sketch {
 
   /** Current time in milliseconds (from requestAnimationFrame) */
   readonly time: number;
+
+  /** Target element width in CSS pixels */
+  readonly targetWidth: number;
+  /** Target element height in CSS pixels */
+  readonly targetHeight: number;
 }
 
 /**
@@ -210,7 +216,9 @@ export class ProceduralGenerator implements Generator {
     this.drawFn = draw;
   }
 
-  frame(time: number = 0): Frame {
+  frame(context: RenderContext): Frame {
+    const { time, targetDimensions } = context;
+    const [targetWidth, targetHeight] = targetDimensions;
     // Viewport state (must be set by draw function)
     let viewportHalfWidth: number | null = null;
     let viewportHalfHeight: number | null = null;
@@ -601,6 +609,8 @@ export class ProceduralGenerator implements Generator {
         );
       },
       time,
+      targetWidth,
+      targetHeight,
     };
 
     // Run user's draw function

@@ -20,31 +20,31 @@ import { createServer } from "http";
 // Physics constants
 // =============================================================================
 
-const G = 9.81;           // Gravity (m/s^2)
-const L1 = 30;            // Length of first arm (viewport units)
-const L2 = 30;            // Length of second arm (viewport units)
-const M1 = 1;             // Mass of first bob
-const M2 = 1;             // Mass of second bob
+const G = 9.81; // Gravity (m/s^2)
+const L1 = 30; // Length of first arm (viewport units)
+const L2 = 30; // Length of second arm (viewport units)
+const M1 = 1; // Mass of first bob
+const M2 = 1; // Mass of second bob
 
 // Initial state (angles in radians, angular velocities)
-const INITIAL_THETA1 = Math.PI / 2 + 0.5;  // ~135 degrees
-const INITIAL_THETA2 = Math.PI / 2 - 0.3;  // ~80 degrees
+const INITIAL_THETA1 = Math.PI / 2 + 0.5; // ~135 degrees
+const INITIAL_THETA2 = Math.PI / 2 - 0.3; // ~80 degrees
 const INITIAL_OMEGA1 = 0;
 const INITIAL_OMEGA2 = 0;
 
 // Simulation parameters
-const DT = 0.002;         // Integration timestep (seconds)
-const CYCLE_MS = 120000;  // Cycle length (2 minutes) - simulation restarts
+const DT = 0.002; // Integration timestep (seconds)
+const CYCLE_MS = 120000; // Cycle length (2 minutes) - simulation restarts
 
 // =============================================================================
 // Double pendulum differential equations
 // =============================================================================
 
 interface PendulumState {
-  theta1: number;  // Angle of first arm (from vertical)
-  theta2: number;  // Angle of second arm (from first bob)
-  omega1: number;  // Angular velocity of first arm
-  omega2: number;  // Angular velocity of second arm
+  theta1: number; // Angle of first arm (from vertical)
+  theta2: number; // Angle of second arm (from first bob)
+  omega1: number; // Angular velocity of first arm
+  omega2: number; // Angular velocity of second arm
 }
 
 /**
@@ -59,20 +59,20 @@ function derivatives(state: PendulumState): PendulumState {
   const den2 = (L2 / L1) * den1;
 
   // Angular acceleration of first pendulum
-  const alpha1 = (
-    M2 * L1 * omega1 * omega1 * Math.sin(delta) * Math.cos(delta) +
-    M2 * G * Math.sin(theta2) * Math.cos(delta) +
-    M2 * L2 * omega2 * omega2 * Math.sin(delta) -
-    (M1 + M2) * G * Math.sin(theta1)
-  ) / den1;
+  const alpha1 =
+    (M2 * L1 * omega1 * omega1 * Math.sin(delta) * Math.cos(delta) +
+      M2 * G * Math.sin(theta2) * Math.cos(delta) +
+      M2 * L2 * omega2 * omega2 * Math.sin(delta) -
+      (M1 + M2) * G * Math.sin(theta1)) /
+    den1;
 
   // Angular acceleration of second pendulum
-  const alpha2 = (
-    -M2 * L2 * omega2 * omega2 * Math.sin(delta) * Math.cos(delta) +
-    (M1 + M2) * G * Math.sin(theta1) * Math.cos(delta) -
-    (M1 + M2) * L1 * omega1 * omega1 * Math.sin(delta) -
-    (M1 + M2) * G * Math.sin(theta2)
-  ) / den2;
+  const alpha2 =
+    (-M2 * L2 * omega2 * omega2 * Math.sin(delta) * Math.cos(delta) +
+      (M1 + M2) * G * Math.sin(theta1) * Math.cos(delta) -
+      (M1 + M2) * L1 * omega1 * omega1 * Math.sin(delta) -
+      (M1 + M2) * G * Math.sin(theta2)) /
+    den2;
 
   return {
     theta1: omega1,
@@ -89,18 +89,18 @@ function rk4Step(state: PendulumState, dt: number): PendulumState {
   const k1 = derivatives(state);
 
   const s2: PendulumState = {
-    theta1: state.theta1 + k1.theta1 * dt / 2,
-    theta2: state.theta2 + k1.theta2 * dt / 2,
-    omega1: state.omega1 + k1.omega1 * dt / 2,
-    omega2: state.omega2 + k1.omega2 * dt / 2,
+    theta1: state.theta1 + (k1.theta1 * dt) / 2,
+    theta2: state.theta2 + (k1.theta2 * dt) / 2,
+    omega1: state.omega1 + (k1.omega1 * dt) / 2,
+    omega2: state.omega2 + (k1.omega2 * dt) / 2,
   };
   const k2 = derivatives(s2);
 
   const s3: PendulumState = {
-    theta1: state.theta1 + k2.theta1 * dt / 2,
-    theta2: state.theta2 + k2.theta2 * dt / 2,
-    omega1: state.omega1 + k2.omega1 * dt / 2,
-    omega2: state.omega2 + k2.omega2 * dt / 2,
+    theta1: state.theta1 + (k2.theta1 * dt) / 2,
+    theta2: state.theta2 + (k2.theta2 * dt) / 2,
+    omega1: state.omega1 + (k2.omega1 * dt) / 2,
+    omega2: state.omega2 + (k2.omega2 * dt) / 2,
   };
   const k3 = derivatives(s3);
 
@@ -113,10 +113,18 @@ function rk4Step(state: PendulumState, dt: number): PendulumState {
   const k4 = derivatives(s4);
 
   return {
-    theta1: state.theta1 + (k1.theta1 + 2*k2.theta1 + 2*k3.theta1 + k4.theta1) * dt / 6,
-    theta2: state.theta2 + (k1.theta2 + 2*k2.theta2 + 2*k3.theta2 + k4.theta2) * dt / 6,
-    omega1: state.omega1 + (k1.omega1 + 2*k2.omega1 + 2*k3.omega1 + k4.omega1) * dt / 6,
-    omega2: state.omega2 + (k1.omega2 + 2*k2.omega2 + 2*k3.omega2 + k4.omega2) * dt / 6,
+    theta1:
+      state.theta1 +
+      ((k1.theta1 + 2 * k2.theta1 + 2 * k3.theta1 + k4.theta1) * dt) / 6,
+    theta2:
+      state.theta2 +
+      ((k1.theta2 + 2 * k2.theta2 + 2 * k3.theta2 + k4.theta2) * dt) / 6,
+    omega1:
+      state.omega1 +
+      ((k1.omega1 + 2 * k2.omega1 + 2 * k3.omega1 + k4.omega1) * dt) / 6,
+    omega2:
+      state.omega2 +
+      ((k1.omega2 + 2 * k2.omega2 + 2 * k3.omega2 + k4.omega2) * dt) / 6,
   };
 }
 
@@ -226,10 +234,15 @@ function initializeScene(): Scene {
 // Create scene once at startup
 const scene = initializeScene();
 
+// Base viewport configuration
+const BASE_HALF_HEIGHT = 80;
+const BASE_HALF_WIDTH = 80;
+
 /**
  * Generate Frame for the current pendulum state.
+ * Optionally adapts viewport to match target aspect ratio.
  */
-function generateFrame(): Frame {
+function generateFrame(targetWidth?: number, targetHeight?: number): Frame {
   // Derive elapsed time from wall clock (cyclic)
   const now = Date.now();
   const elapsedMs = now % CYCLE_MS;
@@ -259,7 +272,25 @@ function generateFrame(): Frame {
   bob2Circle.x = pos.bob2.x;
   bob2Circle.y = pos.bob2.y;
 
-  return scene.frame(now);
+  // Adapt viewport if both target dimensions are provided
+  if (targetWidth !== undefined && targetHeight !== undefined) {
+    const aspectRatio = targetWidth / targetHeight;
+    const adaptedHalfWidth = BASE_HALF_HEIGHT * aspectRatio;
+    scene.setViewport({
+      halfWidth: adaptedHalfWidth,
+      halfHeight: BASE_HALF_HEIGHT,
+      scaleMode: "fit",
+    });
+  } else {
+    // Use default viewport
+    scene.setViewport({
+      halfWidth: BASE_HALF_WIDTH,
+      halfHeight: BASE_HALF_HEIGHT,
+      scaleMode: "fit",
+    });
+  }
+
+  return scene.frame({ time: now, targetDimensions: [100, 100] });
 }
 
 // =============================================================================
@@ -272,7 +303,25 @@ const server = createServer((req, res) => {
   res.setHeader("Content-Type", "application/json");
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Cache-Control", "no-store");
-  res.end(JSON.stringify(generateFrame()));
+
+  // Parse query params for target dimensions
+  const url = new URL(req.url ?? "/", `http://localhost:${port}`);
+  const targetWidthStr = url.searchParams.get("targetWidth");
+  const targetHeightStr = url.searchParams.get("targetHeight");
+
+  // Only use dimensions if BOTH are present and valid
+  let targetWidth: number | undefined;
+  let targetHeight: number | undefined;
+  if (targetWidthStr && targetHeightStr) {
+    const w = parseFloat(targetWidthStr);
+    const h = parseFloat(targetHeightStr);
+    if (!isNaN(w) && !isNaN(h) && w > 0 && h > 0) {
+      targetWidth = w;
+      targetHeight = h;
+    }
+  }
+
+  res.end(JSON.stringify(generateFrame(targetWidth, targetHeight)));
 });
 
 server.listen(port, () => {

@@ -14,10 +14,10 @@
     "dev": "npm run dev -w @medli/test-app",
     "dev:generate": "npm run dev:generate -w @medli/test-app",
     "test": "jest",
-    "lint": "eslint 'packages/**/src/**/*.ts' --ignore-pattern '**/__tests__/**'",
-    "lint:fix": "eslint 'packages/**/src/**/*.ts' --ignore-pattern '**/__tests__/**' --fix",
-    "format": "prettier --write 'packages/**/src/**/*.ts'",
-    "format:check": "prettier --check 'packages/**/src/**/*.ts'",
+    "lint": "eslint 'packages/**/{src,scripts}/**/*.ts' --ignore-pattern '**/__tests__/**'",
+    "lint:fix": "eslint 'packages/**/{src,scripts}/**/*.ts' --ignore-pattern '**/__tests__/**' --fix",
+    "format": "prettier --write 'packages/**/{src,scripts}/**/*.ts'",
+    "format:check": "prettier --check 'packages/**/{src,scripts}/**/*.ts'",
     "typecheck": "tsc --build && npm run typecheck -w @medli/test-app"
   },
   "devDependencies": {

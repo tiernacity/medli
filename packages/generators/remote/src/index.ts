@@ -1,4 +1,4 @@
-import type { Frame, Generator } from "@medli/spec";
+import type { Frame, Generator, RenderContext } from "@medli/spec";
 
 /**
  * Options for creating a RemoteFetchGenerator.
@@ -44,7 +44,7 @@ function emptyFrame(): Frame {
  * Generator that fetches Frame data from a remote URL.
  *
  * Polls the URL at a configurable interval and caches the most recent frame.
- * The frame(time) method returns the cached frame immediately (time parameter ignored).
+ * The frame() method returns the cached frame immediately (context parameter ignored).
  * Before the first successful fetch, returns an empty frame.
  *
  * IMPORTANT: Call destroy() when done to clean up the polling timer.
@@ -56,7 +56,7 @@ function emptyFrame(): Frame {
  *   });
  *
  *   // Later...
- *   const frame = generator.frame(Date.now());
+ *   const frame = generator.frame({ time: Date.now(), targetDimensions: [800, 600] });
  *
  *   // When done:
  *   generator.destroy();
@@ -68,6 +68,7 @@ export class RemoteFetchGenerator implements Generator {
   private cachedFrame: Frame;
   private timeoutId: ReturnType<typeof setTimeout> | null = null;
   private destroyed = false;
+  private targetDimensions: [number, number] | null = null;
 
   private constructor(url: string, options: RemoteFetchGeneratorOptions = {}) {
     this.url = url;
@@ -94,10 +95,11 @@ export class RemoteFetchGenerator implements Generator {
 
   /**
    * Returns the most recently fetched frame.
-   * The time parameter is ignored - remote source controls timing.
+   * Updates stored targetDimensions for future polls.
    * Before first successful fetch, returns an empty frame.
    */
-  frame(_time: number): Frame {
+  frame(context: RenderContext): Frame {
+    this.targetDimensions = context.targetDimensions;
     return this.cachedFrame;
   }
 
@@ -114,13 +116,32 @@ export class RemoteFetchGenerator implements Generator {
   }
 
   /**
+   * Build the fetch URL with optional targetDimensions query params.
+   */
+  private buildUrl(): string {
+    if (!this.targetDimensions) {
+      return this.url;
+    }
+
+    const [width, height] = this.targetDimensions;
+    const url = new URL(
+      this.url,
+      globalThis.location?.href ?? "http://localhost"
+    );
+    url.searchParams.set("targetWidth", String(width));
+    url.searchParams.set("targetHeight", String(height));
+    return url.toString();
+  }
+
+  /**
    * Internal: fetch frame and schedule next poll.
    */
   private async poll(): Promise<void> {
     if (this.destroyed) return;
 
     try {
-      const response = await this.fetchFn(this.url);
+      const fetchUrl = this.buildUrl();
+      const response = await this.fetchFn(fetchUrl);
       if (response.ok) {
         const json = await response.json();
         this.cachedFrame = json as Frame;

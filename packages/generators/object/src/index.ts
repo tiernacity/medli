@@ -1,6 +1,7 @@
 import type {
   Frame,
   Generator,
+  RenderContext,
   Circle as CircleShape,
   Line as LineShape,
   Rectangle as RectangleShape,
@@ -549,6 +550,15 @@ export class Scene implements Generator {
     this.viewport = viewport;
   }
 
+  /**
+   * Update the viewport configuration.
+   * Useful for adapting to different target dimensions.
+   */
+  setViewport(viewport: Viewport): this {
+    this.viewport = viewport;
+    return this;
+  }
+
   get background(): Background | null {
     return this._background;
   }
@@ -579,7 +589,8 @@ export class Scene implements Generator {
     return this;
   }
 
-  frame(time: number): Frame {
+  frame(context: RenderContext): Frame {
+    const { time } = context;
     // Collect all materials (from explicit adds and from shape references)
     const allMaterials = new Set<Material>();
     // Track which materials were explicitly added to scene (for ordering)
