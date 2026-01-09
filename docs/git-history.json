@@ -1,5 +1,13 @@
 [
   {
+    "hash": "db9c40916273b7cbb286536b78b22296e807614e",
+    "short_hash": "db9c409",
+    "author": "Chris Tierney",
+    "date": "2026-01-09T12:06:01Z",
+    "message": "feat: add rectangle primitive\n\nAdd Rectangle shape type to spec with center-based positioning.\nImplement rectangle() in procedural generator and Rectangle class\nin object generator. Both renderers handle center-to-corner\nconversion for their respective APIs.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 8
+  },
+  {
     "hash": "4ba3bec6e2c97066dd427297cc0ff0acbcb3c3c3",
     "short_hash": "4ba3bec",
     "author": "Chris Tierney",
