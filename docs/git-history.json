@@ -1,5 +1,13 @@
 [
   {
+    "hash": "4ba3bec6e2c97066dd427297cc0ff0acbcb3c3c3",
+    "short_hash": "4ba3bec",
+    "author": "Chris Tierney",
+    "date": "2026-01-09T11:29:25Z",
+    "message": "Merge branch 'feat/optional-clear'",
+    "files_changed": 0
+  },
+  {
     "hash": "3a4d3ddb4b119dc8072408e859bbef57987a76c9",
     "short_hash": "3a4d3dd",
     "author": "Chris Tierney",

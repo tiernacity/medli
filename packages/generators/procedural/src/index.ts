@@ -3,6 +3,7 @@ import type {
   Generator,
   Circle,
   Line,
+  Rectangle,
   Image,
   RootMaterial,
   ChildMaterial,
@@ -142,6 +143,9 @@ export interface Sketch {
 
   /** Draw a circle at (x, y) with given radius */
   circle(x: number, y: number, radius: number): void;
+
+  /** Draw a rectangle centered at (x, y) with given width and height */
+  rectangle(x: number, y: number, width: number, height: number): void;
 
   /** Draw a line from (x1, y1) to (x2, y2) */
   line(x1: number, y1: number, x2: number, y2: number): void;
@@ -312,7 +316,9 @@ export class ProceduralGenerator implements Generator {
     /**
      * Helper: Wrap a shape in a Transform node if the current transform is not identity.
      */
-    const wrapWithTransform = (shape: Circle | Line | Image): FrameNode => {
+    const wrapWithTransform = (
+      shape: Circle | Rectangle | Line | Image
+    ): FrameNode => {
       if (isIdentity(currentTransform)) {
         return shape;
       }
@@ -335,7 +341,7 @@ export class ProceduralGenerator implements Generator {
      *   unless style changes WITHIN the pushed context (then new nested ChildMaterial).
      * - If a transform is active, the shape is wrapped in a Transform node.
      */
-    const addShape = (shape: Circle | Line | Image) => {
+    const addShape = (shape: Circle | Rectangle | Line | Image) => {
       const isAtRootLevel = contextStack.length === 0;
       const node = wrapWithTransform(shape);
 
@@ -456,6 +462,15 @@ export class ProceduralGenerator implements Generator {
           radius,
         };
         addShape(circleShape);
+      },
+      rectangle(x: number, y: number, width: number, height: number) {
+        const rectangleShape: Rectangle = {
+          type: "rectangle",
+          center: { x, y },
+          width,
+          height,
+        };
+        addShape(rectangleShape);
       },
       line(x1: number, y1: number, x2: number, y2: number) {
         const lineShape: Line = {

@@ -3233,6 +3233,39 @@
       "created_at": "2026-01-09T11:28:16.944423+00:00",
       "updated_at": "2026-01-09T11:28:16.944423+00:00",
       "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":85}"
+    },
+    {
+      "id": 295,
+      "change_id": "c271ca29-3200-4633-b7e8-aa74881d8dd5",
+      "node_type": "goal",
+      "title": "Add rectangle primitive",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T11:54:23.242303+00:00",
+      "updated_at": "2026-01-09T11:54:23.242303+00:00",
+      "metadata_json": "{\"branch\":\"feat/rectangles\",\"confidence\":90,\"prompt\":\"add rectangle primitive\"}"
+    },
+    {
+      "id": 296,
+      "change_id": "ed76f73b-08fe-42f8-94b0-90f997a6b63a",
+      "node_type": "action",
+      "title": "Implemented rectangle primitive",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T12:02:35.433731+00:00",
+      "updated_at": "2026-01-09T12:02:35.433731+00:00",
+      "metadata_json": "{\"branch\":\"feat/rectangles\",\"commit\":\"4ba3bec\",\"confidence\":95}"
+    },
+    {
+      "id": 297,
+      "change_id": "79b5e41a-2971-45db-86d9-4d8042d6ca7a",
+      "node_type": "outcome",
+      "title": "Rectangle primitive implemented with full parity",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T12:02:42.551523+00:00",
+      "updated_at": "2026-01-09T12:02:42.551523+00:00",
+      "metadata_json": "{\"branch\":\"feat/rectangles\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -6535,6 +6568,28 @@
       "weight": 1.0,
       "rationale": "Known limitation of current approach",
       "created_at": "2026-01-09T11:28:17.053390+00:00"
+    },
+    {
+      "id": 301,
+      "from_node_id": 295,
+      "to_node_id": 296,
+      "from_change_id": "c271ca29-3200-4633-b7e8-aa74881d8dd5",
+      "to_change_id": "ed76f73b-08fe-42f8-94b0-90f997a6b63a",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation",
+      "created_at": "2026-01-09T12:02:42.572896+00:00"
+    },
+    {
+      "id": 302,
+      "from_node_id": 296,
+      "to_node_id": 297,
+      "from_change_id": "ed76f73b-08fe-42f8-94b0-90f997a6b63a",
+      "to_change_id": "79b5e41a-2971-45db-86d9-4d8042d6ca7a",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation complete",
+      "created_at": "2026-01-09T12:02:42.592627+00:00"
     }
   ]
 }

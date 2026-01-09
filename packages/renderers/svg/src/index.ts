@@ -337,6 +337,23 @@ export class SvgRenderer extends BaseRenderer {
         // Lines don't use fill
         return line;
       }
+      case "rectangle": {
+        const rect = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "rect"
+        );
+        // Convert from center position to top-left corner (SVG rect uses top-left)
+        const x = shape.center.x - shape.width / 2;
+        const y = shape.center.y - shape.height / 2;
+        rect.setAttribute("x", String(x));
+        rect.setAttribute("y", String(y));
+        rect.setAttribute("width", String(shape.width));
+        rect.setAttribute("height", String(shape.height));
+        rect.setAttribute("fill", material.fill);
+        rect.setAttribute("stroke", material.stroke);
+        rect.setAttribute("stroke-width", String(material.strokeWidth));
+        return rect;
+      }
       case "image": {
         const img = shape as Image;
         const resource = resourceMap.get(img.url);

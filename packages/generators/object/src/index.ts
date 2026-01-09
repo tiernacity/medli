@@ -3,6 +3,7 @@ import type {
   Generator,
   Circle as CircleShape,
   Line as LineShape,
+  Rectangle as RectangleShape,
   Image as ImageShape,
   RootMaterial,
   ChildMaterial,
@@ -248,6 +249,36 @@ export class Circle extends Shape {
       type: "circle",
       center: { x: this.x, y: this.y },
       radius: this.radius,
+    };
+    return [shape];
+  }
+}
+
+/**
+ * Rectangle - a rectangle shape with center position and dimensions.
+ * Can optionally reference a Material for styling.
+ * Extends Shape which provides transforms and material reference.
+ */
+export class Rectangle extends Shape {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+
+  constructor(x: number, y: number, width: number, height: number) {
+    super();
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+  }
+
+  protected geometry(_time: number): FrameNode[] {
+    const shape: RectangleShape = {
+      type: "rectangle",
+      center: { x: this.x, y: this.y },
+      width: this.width,
+      height: this.height,
     };
     return [shape];
   }
