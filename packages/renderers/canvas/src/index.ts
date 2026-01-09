@@ -13,12 +13,16 @@ import {
   computeViewportTransform,
   ResourceManager,
   extractResourceUrls,
+  toViewportCoords,
+  type Point,
+  type ViewportTransformResult,
 } from "@medli/renderer-common";
 
 export class CanvasRenderer extends BaseRenderer {
   private element: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
   private resourceManager: ResourceManager<ImageBitmap>;
+  private lastTransform: ViewportTransformResult | null = null;
 
   constructor(element: HTMLCanvasElement, generator: Generator) {
     super(generator);
@@ -68,6 +72,7 @@ export class CanvasRenderer extends BaseRenderer {
     // Compute viewport transform
     const vp = frame.viewport;
     const transform = computeViewportTransform(vp, elementWidth, elementHeight);
+    this.lastTransform = transform;
 
     this.context.save();
 
@@ -97,6 +102,43 @@ export class CanvasRenderer extends BaseRenderer {
   destroy(): void {
     this.stop();
     this.resourceManager.destroy();
+  }
+
+  /**
+   * Convert element coordinates to frame (viewport) coordinates.
+   * @param input - Single point [x, y]
+   * @returns Transformed point in frame coordinates
+   * @throws Error if called before first render
+   */
+  toViewportCoords(input: Point): Point;
+  /**
+   * Convert an array of element coordinates to frame (viewport) coordinates.
+   * @param input - Array of points [[x, y], ...]
+   * @returns Array of transformed points in frame coordinates
+   * @throws Error if called before first render
+   */
+  toViewportCoords(input: Point[]): Point[];
+  /**
+   * Convert a record of element coordinates to frame (viewport) coordinates.
+   * @param input - Record mapping keys to points
+   * @returns Record with same keys, values transformed to frame coordinates
+   * @throws Error if called before first render
+   */
+  toViewportCoords<K extends string>(input: Record<K, Point>): Record<K, Point>;
+  /**
+   * Convert a map of element coordinates to frame (viewport) coordinates.
+   * @param input - Map from keys to points
+   * @returns Map with same keys, values transformed to frame coordinates
+   * @throws Error if called before first render
+   */
+  toViewportCoords<K>(input: Map<K, Point>): Map<K, Point>;
+  toViewportCoords(
+    input: Point | Point[] | Record<string, Point> | Map<unknown, Point>
+  ): Point | Point[] | Record<string, Point> | Map<unknown, Point> {
+    if (!this.lastTransform) {
+      throw new Error("Cannot call toViewportCoords before first render");
+    }
+    return toViewportCoords(input as Point, this.lastTransform);
   }
 
   private renderNode(

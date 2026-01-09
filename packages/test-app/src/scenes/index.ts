@@ -6,6 +6,7 @@ import { scene as imageTransforms } from "./image-transforms";
 import { scene as imageCrop } from "./image-crop";
 import { scene as optionalClear } from "./optional-clear";
 import { scene as transparency } from "./transparency";
+import { scene as interaction, setCirclePosition } from "./interaction";
 
 export const scenes: Record<string, TestScene> = {
   "full-demo": fullDemo,
@@ -15,9 +16,11 @@ export const scenes: Record<string, TestScene> = {
   "image-crop": imageCrop,
   "optional-clear": optionalClear,
   transparency: transparency,
+  interaction: interaction,
 };
 
 export type SceneId = keyof typeof scenes;
 export const defaultSceneId = "full-demo";
 
 export type { TestScene };
+export { setCirclePosition };

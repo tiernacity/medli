@@ -1,7 +1,7 @@
 /**
  * Harness: Object Generator → SVG Renderer
  */
-import type { Generator } from "@medli/spec";
+import type { Generator, Point } from "@medli/spec";
 import { SvgRenderer } from "@medli/renderer-svg";
 
 export function createRenderer(element: SVGSVGElement, generator: Generator) {
@@ -9,5 +9,6 @@ export function createRenderer(element: SVGSVGElement, generator: Generator) {
   return {
     start: () => renderer.loop(),
     stop: () => renderer.stop(),
+    toViewportCoords: (point: Point) => renderer.toViewportCoords(point),
   };
 }

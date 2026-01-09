@@ -15,13 +15,15 @@
     "test": "echo 'No tests'"
   },
   "dependencies": {
-    "@medli/spec": "*",
-    "@medli/generator-procedural": "*",
     "@medli/generator-object": "*",
+    "@medli/generator-procedural": "*",
+    "@medli/renderer-canvas": "*",
     "@medli/renderer-svg": "*",
-    "@medli/renderer-canvas": "*"
+    "@medli/spec": "*",
+    "hammerjs": "^2.0.8"
   },
   "devDependencies": {
+    "@types/hammerjs": "^2.0.46",
     "vite": "^6.0.0"
   }
 }

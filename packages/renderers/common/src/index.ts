@@ -5,6 +5,7 @@ import type {
   Frame,
   FrameNode,
 } from "@medli/spec";
+import { mapValues } from "es-toolkit/object";
 
 /**
  * Post-processor for transforming fetched blobs into renderer-specific resources.
@@ -267,4 +268,106 @@ export function computeViewportTransform(
     scaleX,
     scaleY,
   };
+}
+
+/**
+ * A 2D point represented as a tuple [x, y].
+ */
+export type Point = [number, number];
+
+/**
+ * Transform element coordinates to frame coordinates.
+ *
+ * This inverts the viewport transform computed by `computeViewportTransform`,
+ * converting from:
+ * - Origin at top-left, Y-down, pixel units (element/screen space)
+ * To:
+ * - Origin at center (0,0), Y-up, viewport units (frame space)
+ *
+ * @param input - Single point [x, y]
+ * @param transform - The viewport transform to invert
+ * @returns Transformed point in frame coordinates
+ */
+export function toViewportCoords(
+  input: Point,
+  transform: ViewportTransformResult
+): Point;
+
+/**
+ * Transform an array of element coordinates to frame coordinates.
+ *
+ * @param input - Array of points [[x, y], ...]
+ * @param transform - The viewport transform to invert
+ * @returns Array of transformed points in frame coordinates
+ */
+export function toViewportCoords(
+  input: Point[],
+  transform: ViewportTransformResult
+): Point[];
+
+/**
+ * Transform a record of element coordinates to frame coordinates.
+ *
+ * @param input - Record mapping keys to points
+ * @param transform - The viewport transform to invert
+ * @returns Record with same keys, values transformed to frame coordinates
+ */
+export function toViewportCoords<K extends string>(
+  input: Record<K, Point>,
+  transform: ViewportTransformResult
+): Record<K, Point>;
+
+/**
+ * Transform a map of element coordinates to frame coordinates.
+ *
+ * @param input - Map from keys to points
+ * @param transform - The viewport transform to invert
+ * @returns Map with same keys, values transformed to frame coordinates
+ */
+export function toViewportCoords<K>(
+  input: Map<K, Point>,
+  transform: ViewportTransformResult
+): Map<K, Point>;
+
+/**
+ * Transform element coordinates to frame coordinates.
+ * Implementation supporting all overloaded signatures.
+ */
+export function toViewportCoords<K extends string>(
+  input: Point | Point[] | Record<K, Point> | Map<unknown, Point>,
+  transform: ViewportTransformResult
+): Point | Point[] | Record<K, Point> | Map<unknown, Point> {
+  // Helper to transform a single point
+  const transformPoint = ([elementX, elementY]: Point): Point => {
+    const x = (elementX - transform.translateX) / transform.scaleX;
+    const y = (elementY - transform.translateY) / -transform.scaleY;
+    return [x, y];
+  };
+
+  // Single point: [number, number]
+  if (
+    Array.isArray(input) &&
+    input.length === 2 &&
+    typeof input[0] === "number" &&
+    typeof input[1] === "number"
+  ) {
+    return transformPoint(input as Point);
+  }
+
+  // Array of points: [number, number][]
+  if (Array.isArray(input)) {
+    return (input as Point[]).map(transformPoint);
+  }
+
+  // Map<K, Point>
+  if (input instanceof Map) {
+    const result = new Map<unknown, Point>();
+    for (const [key, point] of input) {
+      result.set(key, transformPoint(point));
+    }
+    return result;
+  }
+
+  // Record<string, Point>
+  return mapValues(input as Record<K, Point>, transformPoint);
 }
