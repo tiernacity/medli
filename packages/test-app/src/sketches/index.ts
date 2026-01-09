@@ -5,7 +5,6 @@
  * Each sketch exports a factory function and optional interaction handler.
  */
 import type { ProceduralGenerator } from "@medli/generator-procedural";
-import Hammer from "hammerjs";
 import { createParticlePlotter } from "./particle-plotter";
 import { createTrees } from "./trees";
 
@@ -39,7 +38,6 @@ export interface SketchModule {
   ) => SketchInstance;
   /** Set up interaction handlers for this sketch */
   setupInteractions: (
-    hammer: Hammer.Manager,
     element: HTMLCanvasElement | SVGSVGElement,
     instance: SketchInstance
   ) => void;
@@ -51,10 +49,10 @@ export interface SketchModule {
 
 /**
  * Particle Plotter interaction handler.
- * Tracks mouse/touch position and pressed state for continuous particle spawning.
+ * Tracks pointer position and pressed state for continuous particle spawning.
+ * Uses native PointerEvent API for unified mouse/touch handling.
  */
 function setupParticlePlotterInteractions(
-  hammer: Hammer.Manager,
   element: HTMLCanvasElement | SVGSVGElement,
   instance: SketchInstance
 ): void {
@@ -72,77 +70,29 @@ function setupParticlePlotterInteractions(
     setMouseState(true, x, y);
   }
 
-  // Hammer.js events
-  hammer.on("press", (event) => {
-    isPressed = true;
-    updateMousePosition(event.center.x, event.center.y);
-  });
-
-  hammer.on("pressup", () => {
-    isPressed = false;
-    setMouseState(false, 0, 0);
-  });
-
-  hammer.on("panstart", (event) => {
-    isPressed = true;
-    updateMousePosition(event.center.x, event.center.y);
-  });
-
-  hammer.on("panmove", (event) => {
-    if (isPressed) {
-      updateMousePosition(event.center.x, event.center.y);
-    }
-  });
-
-  hammer.on("panend pancancel", () => {
-    isPressed = false;
-    setMouseState(false, 0, 0);
-  });
-
-  // Native mouse events for robustness
-  element.addEventListener("mousedown", (event) => {
+  // Pointer events provide unified mouse/touch handling
+  element.addEventListener("pointerdown", (event) => {
     isPressed = true;
     updateMousePosition(event.clientX, event.clientY);
   });
 
-  element.addEventListener("mousemove", (event) => {
+  element.addEventListener("pointermove", (event) => {
     if (isPressed) {
       updateMousePosition(event.clientX, event.clientY);
     }
   });
 
-  element.addEventListener("mouseup", () => {
+  element.addEventListener("pointerup", () => {
     isPressed = false;
     setMouseState(false, 0, 0);
   });
 
-  element.addEventListener("mouseleave", () => {
+  element.addEventListener("pointerleave", () => {
     isPressed = false;
     setMouseState(false, 0, 0);
   });
 
-  // Touch events for mobile
-  element.addEventListener("touchstart", (event) => {
-    event.preventDefault();
-    isPressed = true;
-    const touch = event.touches[0];
-    updateMousePosition(touch.clientX, touch.clientY);
-  });
-
-  element.addEventListener("touchmove", (event) => {
-    event.preventDefault();
-    if (isPressed && event.touches.length > 0) {
-      const touch = event.touches[0];
-      updateMousePosition(touch.clientX, touch.clientY);
-    }
-  });
-
-  element.addEventListener("touchend", () => {
-    isPressed = false;
-    setMouseState(false, 0, 0);
-  });
-
-  element.addEventListener("touchcancel", () => {
+  element.addEventListener("pointercancel", () => {
     isPressed = false;
     setMouseState(false, 0, 0);
   });
@@ -153,7 +103,6 @@ function setupParticlePlotterInteractions(
  * Click/tap to reset the tree growth.
  */
 function setupTreesInteractions(
-  _hammer: Hammer.Manager,
   element: HTMLCanvasElement | SVGSVGElement,
   instance: SketchInstance
 ): void {

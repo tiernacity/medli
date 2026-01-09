@@ -7,8 +7,6 @@ import { createRenderer as createProcCanvas } from "./harnesses/proc-canvas";
 import { createRenderer as createObjSvg } from "./harnesses/obj-svg";
 import { createRenderer as createObjCanvas } from "./harnesses/obj-canvas";
 
-// Import hammer.js for interaction
-import Hammer from "hammerjs";
 import { setCirclePosition } from "./scenes/interaction";
 
 // Import source code as raw text
@@ -100,7 +98,7 @@ const renderers = [
   ),
 ];
 
-// Set up hammer.js for interaction scene
+// Set up native pointer events for interaction scene
 if (sceneId === "interaction") {
   // Get the canvas and svg elements
   const procSvg = document.querySelector<SVGSVGElement>("#proc-svg")!;
@@ -112,13 +110,12 @@ if (sceneId === "interaction") {
   const elements = [procSvg, procCanvas, objSvg, objCanvas];
 
   elements.forEach((el, i) => {
-    const hammer = new Hammer(el as HTMLElement);
-    hammer.on("tap", (event) => {
+    el.addEventListener("pointerup", (event) => {
       const renderer = renderers[i];
       // Get element-relative coordinates (CSS pixels)
       const rect = el.getBoundingClientRect();
-      const elementX = event.center.x - rect.left;
-      const elementY = event.center.y - rect.top;
+      const elementX = event.clientX - rect.left;
+      const elementY = event.clientY - rect.top;
 
       // Transform to viewport coordinates
       // (Canvas renderer handles DPR internally, SVG doesn't need it)

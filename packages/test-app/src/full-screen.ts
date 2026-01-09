@@ -13,7 +13,6 @@
  */
 import { CanvasRenderer } from "@medli/renderer-canvas";
 import { SvgRenderer } from "@medli/renderer-svg";
-import Hammer from "hammerjs";
 import { getSketch, getSketchIds } from "./sketches";
 
 // ============================================================================
@@ -113,15 +112,7 @@ if (rendererType === "svg" && svgElement) {
 // Setup Interactions
 // ============================================================================
 
-const hammer = new Hammer(element as HTMLElement, {
-  recognizers: [
-    [Hammer.Press, { time: 0 }],
-    [Hammer.Pan, { threshold: 0 }],
-  ],
-});
-
 sketchModule.setupInteractions(
-  hammer,
   element as HTMLCanvasElement | SVGSVGElement,
   instance
 );
