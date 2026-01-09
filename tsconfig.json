@@ -19,6 +19,8 @@
     { "path": "packages/spec" },
     { "path": "packages/generators/procedural" },
     { "path": "packages/generators/object" },
+    { "path": "packages/generators/remote" },
+    { "path": "packages/renderers/common" },
     { "path": "packages/renderers/svg" },
     { "path": "packages/renderers/canvas" }
   ],

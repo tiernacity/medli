@@ -1,7 +1,8 @@
 /**
  * Harness: Procedural Generator → SVG Renderer
  */
-import type { Generator, Point } from "@medli/spec";
+import type { Generator } from "@medli/spec";
+import type { Point } from "@medli/renderer-common";
 import { SvgRenderer } from "@medli/renderer-svg";
 
 export function createRenderer(element: SVGSVGElement, generator: Generator) {

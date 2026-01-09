@@ -14,6 +14,10 @@ export default defineConfig({
         __dirname,
         "../generators/object/src/index.ts"
       ),
+      "@medli/generator-remote": resolve(
+        __dirname,
+        "../generators/remote/src/index.ts"
+      ),
       "@medli/renderer-common": resolve(
         __dirname,
         "../renderers/common/src/index.ts"
@@ -34,6 +38,7 @@ export default defineConfig({
       "@medli/spec",
       "@medli/generator-procedural",
       "@medli/generator-object",
+      "@medli/generator-remote",
       "@medli/renderer-common",
       "@medli/renderer-svg",
       "@medli/renderer-canvas",

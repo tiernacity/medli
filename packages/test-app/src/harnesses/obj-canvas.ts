@@ -1,7 +1,8 @@
 /**
  * Harness: Object Generator → Canvas Renderer
  */
-import type { Generator, Point } from "@medli/spec";
+import type { Generator } from "@medli/spec";
+import type { Point } from "@medli/renderer-common";
 import { CanvasRenderer } from "@medli/renderer-canvas";
 
 export function createRenderer(

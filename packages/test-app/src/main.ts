@@ -110,7 +110,8 @@ if (sceneId === "interaction") {
   const elements = [procSvg, procCanvas, objSvg, objCanvas];
 
   elements.forEach((el, i) => {
-    el.addEventListener("pointerup", (event) => {
+    el.addEventListener("pointerup", (e) => {
+      const event = e as PointerEvent;
       const renderer = renderers[i];
       // Get element-relative coordinates (CSS pixels)
       const rect = el.getBoundingClientRect();

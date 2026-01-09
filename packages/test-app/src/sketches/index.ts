@@ -1,10 +1,11 @@
 /**
  * Sketch Registry
  *
- * Central registry for all p5.js-style sketch ports.
+ * Central registry for all sketch ports.
  * Each sketch exports a factory function and optional interaction handler.
  */
-import type { ProceduralGenerator } from "@medli/generator-procedural";
+import type { Generator } from "@medli/spec";
+import { RemoteFetchGenerator } from "@medli/generator-remote";
 import { createParticlePlotter } from "./particle-plotter";
 import { createTrees } from "./trees";
 
@@ -17,11 +18,13 @@ import { createTrees } from "./trees";
  * All sketches return a generator, plus optional control methods.
  */
 export interface SketchInstance {
-  generator: ProceduralGenerator;
+  generator: Generator;
   /** ParticlePlotter: control mouse state */
   setMouseState?: (pressed: boolean, x: number, y: number) => void;
   /** Trees: reset/restart the sketch */
   reset?: () => void;
+  /** Cleanup function for generators that need it (e.g., RemoteFetchGenerator) */
+  destroy?: () => void;
 }
 
 /**
@@ -71,12 +74,14 @@ function setupParticlePlotterInteractions(
   }
 
   // Pointer events provide unified mouse/touch handling
-  element.addEventListener("pointerdown", (event) => {
+  element.addEventListener("pointerdown", (e) => {
+    const event = e as PointerEvent;
     isPressed = true;
     updateMousePosition(event.clientX, event.clientY);
   });
 
-  element.addEventListener("pointermove", (event) => {
+  element.addEventListener("pointermove", (e) => {
+    const event = e as PointerEvent;
     if (isPressed) {
       updateMousePosition(event.clientX, event.clientY);
     }
@@ -114,6 +119,33 @@ function setupTreesInteractions(
   });
 }
 
+/**
+ * Remote Pendulum - no interactions needed (server-driven animation).
+ */
+function setupRemotePendulumInteractions(
+  _element: HTMLCanvasElement | SVGSVGElement,
+  _instance: SketchInstance
+): void {
+  // No interactions - the pendulum animation is driven by the server
+}
+
+/**
+ * Create a remote pendulum sketch instance.
+ * Uses RemoteFetchGenerator to poll /frame.json for server-generated frames.
+ */
+function createRemotePendulum(
+  _getCanvasSize: () => { width: number; height: number }
+): SketchInstance {
+  const generator = RemoteFetchGenerator.fromUrl("http://localhost:3001", {
+    pollInterval: 10, // Poll frequently for smooth animation
+  });
+
+  return {
+    generator,
+    destroy: () => generator.destroy(),
+  };
+}
+
 // ============================================================================
 // Sketch Registry
 // ============================================================================
@@ -134,6 +166,12 @@ export const sketches: Record<string, SketchModule> = {
     description: "Procedural tree generation with branching and shadows",
     create: createTrees,
     setupInteractions: setupTreesInteractions,
+  },
+  "remote-pendulum": {
+    name: "Double Pendulum (Remote)",
+    description: "Server-generated chaotic double pendulum simulation",
+    create: createRemotePendulum,
+    setupInteractions: setupRemotePendulumInteractions,
   },
 };
 
