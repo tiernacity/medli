@@ -17,7 +17,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, "index.html"),
-        particle: resolve(__dirname, "particle.html"),
+        "full-screen": resolve(__dirname, "full-screen.html"),
       },
     },
   },

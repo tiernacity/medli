@@ -118,7 +118,11 @@ interface TreesState {
   height: number;
   maxlife: number;
   initialized: boolean;
+  needsClear: boolean;
 }
+
+/** Background color matching the original sketch */
+const BACKGROUND_COLOR = "hsl(40, 4%, 100%)";
 
 function createInitialState(): TreesState {
   return {
@@ -127,6 +131,7 @@ function createInitialState(): TreesState {
     height: 0,
     maxlife: 15,
     initialized: false,
+    needsClear: true,
   };
 }
 
@@ -228,6 +233,7 @@ export function createTrees(
 
   function reset() {
     state.initialized = false;
+    state.needsClear = true;
   }
 
   const generator = new ProceduralGenerator((p) => {
@@ -247,8 +253,13 @@ export function createTrees(
     // Set viewport to match canvas buffer dimensions
     p.viewport(halfWidth, halfHeight);
 
-    // Don't clear - shapes accumulate (like the original)
-    p.noBackground();
+    // Clear on first frame or after reset, then accumulate
+    if (state.needsClear) {
+      p.background(BACKGROUND_COLOR);
+      state.needsClear = false;
+    } else {
+      p.noBackground();
+    }
 
     // Grow and render all trees
     for (const tree of state.trees) {
