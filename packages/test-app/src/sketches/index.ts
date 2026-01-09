@@ -136,8 +136,8 @@ function setupRemotePendulumInteractions(
 function createRemotePendulum(
   _getCanvasSize: () => { width: number; height: number }
 ): SketchInstance {
-  const generator = RemoteFetchGenerator.fromUrl("/frame.json", {
-    pollInterval: 100, // Poll frequently for smooth animation
+  const generator = RemoteFetchGenerator.fromUrl("http://localhost:3001", {
+    pollInterval: 10, // Poll frequently for smooth animation
   });
 
   return {

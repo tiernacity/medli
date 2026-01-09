@@ -1,10 +1,20 @@
 /**
  * Double pendulum Frame generator.
- * Outputs Frame JSON to stdout.
+ * HTTP server that generates Frame JSON on-demand.
  * State derived from wall clock - deterministic, no persistence needed.
+ *
+ * Usage: generate-pendulum.ts [port]
  */
 
-import type { Frame, RootMaterial, ChildMaterial, Line, Circle } from "@medli/spec";
+import type { Frame } from "@medli/spec";
+import {
+  Scene,
+  Background,
+  Material,
+  Circle,
+  Line,
+} from "@medli/generator-object";
+import { createServer } from "http";
 
 // =============================================================================
 // Physics constants
@@ -150,6 +160,72 @@ function stateToPositions(state: PendulumState) {
   };
 }
 
+// Shapes are stored here so generateFrame can update their positions
+let arm1: Line;
+let arm2: Line;
+let pivotCircle: Circle;
+let bob1Circle: Circle;
+let bob2Circle: Circle;
+
+/**
+ * Initialize scene with materials and shapes.
+ */
+function initializeScene(): Scene {
+  const scene = new Scene({
+    halfWidth: 80,
+    halfHeight: 80,
+    scaleMode: "fit",
+  });
+
+  // Background
+  scene.add(new Background("#1a1a2e"));
+
+  // Materials
+  const armMaterial = new Material({
+    fill: "transparent",
+    stroke: "#333333",
+    strokeWidth: 2,
+  });
+
+  const pivotMaterial = new Material({
+    fill: "#666666",
+    stroke: "transparent",
+  });
+
+  const bobsMaterial = new Material({
+    fill: "#e74c3c",
+    stroke: "#c0392b",
+    strokeWidth: 2,
+  });
+
+  // Create shapes at initial positions
+  arm1 = new Line(0, 0, 0, 0);
+  arm1.material = armMaterial;
+
+  arm2 = new Line(0, 0, 0, 0);
+  arm2.material = armMaterial;
+
+  pivotCircle = new Circle(0, 0, 3);
+  pivotCircle.material = pivotMaterial;
+
+  bob1Circle = new Circle(0, 0, 6);
+  bob1Circle.material = bobsMaterial;
+
+  bob2Circle = new Circle(0, 0, 6);
+  bob2Circle.material = bobsMaterial;
+
+  scene.add(arm1);
+  scene.add(arm2);
+  scene.add(pivotCircle);
+  scene.add(bob1Circle);
+  scene.add(bob2Circle);
+
+  return scene;
+}
+
+// Create scene once at startup
+const scene = initializeScene();
+
 /**
  * Generate Frame for the current pendulum state.
  */
@@ -163,93 +239,42 @@ function generateFrame(): Frame {
   const state = simulate(elapsedSeconds);
   const pos = stateToPositions(state);
 
-  // Build shapes
-  const arm1: Line = {
-    type: "line",
-    start: pos.pivot,
-    end: pos.bob1,
-  };
+  // Update shape positions
+  arm1.x1 = pos.pivot.x;
+  arm1.y1 = pos.pivot.y;
+  arm1.x2 = pos.bob1.x;
+  arm1.y2 = pos.bob1.y;
 
-  const arm2: Line = {
-    type: "line",
-    start: pos.bob1,
-    end: pos.bob2,
-  };
+  arm2.x1 = pos.bob1.x;
+  arm2.y1 = pos.bob1.y;
+  arm2.x2 = pos.bob2.x;
+  arm2.y2 = pos.bob2.y;
 
-  const pivotCircle: Circle = {
-    type: "circle",
-    center: pos.pivot,
-    radius: 3,
-  };
+  pivotCircle.x = pos.pivot.x;
+  pivotCircle.y = pos.pivot.y;
 
-  const bob1Circle: Circle = {
-    type: "circle",
-    center: pos.bob1,
-    radius: 6,
-  };
+  bob1Circle.x = pos.bob1.x;
+  bob1Circle.y = pos.bob1.y;
 
-  const bob2Circle: Circle = {
-    type: "circle",
-    center: pos.bob2,
-    radius: 6,
-  };
+  bob2Circle.x = pos.bob2.x;
+  bob2Circle.y = pos.bob2.y;
 
-  // Material for arms (stroke only)
-  const armMaterial: ChildMaterial = {
-    type: "material",
-    id: "arms",
-    ref: "root",
-    fill: "transparent",
-    stroke: "#333333",
-    strokeWidth: 2,
-    children: [arm1, arm2],
-  };
-
-  // Material for pivot (small, dark)
-  const pivotMaterial: ChildMaterial = {
-    type: "material",
-    id: "pivot",
-    ref: "root",
-    fill: "#666666",
-    stroke: "transparent",
-    children: [pivotCircle],
-  };
-
-  // Material for bobs (colored)
-  const bobsMaterial: ChildMaterial = {
-    type: "material",
-    id: "bobs",
-    ref: "root",
-    fill: "#e74c3c",
-    stroke: "#c0392b",
-    strokeWidth: 2,
-    children: [bob1Circle, bob2Circle],
-  };
-
-  // Root material
-  const root: RootMaterial = {
-    type: "material",
-    id: "root",
-    fill: "#000000",
-    stroke: "#000000",
-    strokeWidth: 1,
-    children: [armMaterial, pivotMaterial, bobsMaterial],
-  };
-
-  return {
-    viewport: {
-      halfWidth: 80,
-      halfHeight: 80,
-      scaleMode: "fit",
-    },
-    background: "#1a1a2e",
-    root,
-  };
+  return scene.frame(now);
 }
 
 // =============================================================================
-// Main: generate frame and output to stdout
+// Main: HTTP server that serves current frame on-demand
 // =============================================================================
 
-const frame = generateFrame();
-console.log(JSON.stringify(frame));
+const port = parseInt(process.argv[2] ?? "3001", 10);
+
+const server = createServer((req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Cache-Control", "no-store");
+  res.end(JSON.stringify(generateFrame()));
+});
+
+server.listen(port, () => {
+  console.log(`Serving frames at http://localhost:${port}`);
+});

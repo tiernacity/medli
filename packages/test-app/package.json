@@ -6,6 +6,7 @@
   "description": "Visual test app for medli renderer verification",
   "scripts": {
     "dev": "vite",
+    "dev:generate": "npx tsx scripts/generate-pendulum.ts 3001",
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
@@ -24,6 +25,7 @@
     "@medli/spec": "*"
   },
   "devDependencies": {
+    "tsx": "^4.0.0",
     "vite": "^6.0.0"
   }
 }

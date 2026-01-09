@@ -12,7 +12,7 @@
   "scripts": {
     "build": "npm run build --workspaces",
     "dev": "npm run dev -w @medli/test-app",
-    "dev:generate": "while true; do npx tsx packages/test-app/scripts/generate-pendulum.ts > packages/test-app/public/frame.json; sleep 0.1; done",
+    "dev:generate": "npm run dev:generate -w @medli/test-app",
     "test": "jest",
     "lint": "eslint 'packages/**/src/**/*.ts' --ignore-pattern '**/__tests__/**'",
     "lint:fix": "eslint 'packages/**/src/**/*.ts' --ignore-pattern '**/__tests__/**' --fix",

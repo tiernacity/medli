@@ -1,28 +1,7 @@
-import { defineConfig, type Plugin } from "vite";
+import { defineConfig } from "vite";
 import { resolve } from "path";
 
-/**
- * Plugin to disable caching for frame.json (served from public/).
- * Enables the remote frame generator demo to show live updates.
- */
-function noCacheFrameJson(): Plugin {
-  return {
-    name: "no-cache-frame-json",
-    configureServer(server) {
-      server.middlewares.use((req, res, next) => {
-        if (req.url === "/frame.json") {
-          res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
-          res.setHeader("Pragma", "no-cache");
-          res.setHeader("Expires", "0");
-        }
-        next();
-      });
-    },
-  };
-}
-
 export default defineConfig({
-  plugins: [noCacheFrameJson()],
   resolve: {
     alias: {
       // Point workspace packages to source files for HMR during development
