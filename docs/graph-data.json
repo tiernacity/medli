@@ -3222,6 +3222,17 @@
       "created_at": "2026-01-09T10:59:13.425188+00:00",
       "updated_at": "2026-01-09T10:59:13.425188+00:00",
       "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":95}"
+    },
+    {
+      "id": 294,
+      "change_id": "2686e395-d9de-41b2-a5a6-3bb5eab6f82e",
+      "node_type": "observation",
+      "title": "SVG renderer has visibly lower frame-rate than Canvas for optional clear scene - likely due to base64 data URL snapshot overhead. Not addressing now.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-09T11:28:16.944423+00:00",
+      "updated_at": "2026-01-09T11:28:16.944423+00:00",
+      "metadata_json": "{\"branch\":\"feat/optional-clear\",\"confidence\":85}"
     }
   ],
   "edges": [
@@ -6513,6 +6524,17 @@
       "weight": 1.0,
       "rationale": "Goal achieved",
       "created_at": "2026-01-09T10:59:13.576612+00:00"
+    },
+    {
+      "id": 300,
+      "from_node_id": 288,
+      "to_node_id": 294,
+      "from_change_id": "5b4cc5c7-ff03-4c15-ba47-1effe3c7a083",
+      "to_change_id": "2686e395-d9de-41b2-a5a6-3bb5eab6f82e",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Known limitation of current approach",
+      "created_at": "2026-01-09T11:28:17.053390+00:00"
     }
   ]
 }
