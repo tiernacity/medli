@@ -207,10 +207,15 @@ function initializeScene(): Scene {
   const bob2 = new Circle(0, 0, 6);
   bob2.material = bobsMaterial;
 
+  // Overlay circle for bob2 (covers arm2 endpoint)
+  const bob2Overlay = new Circle(0, 0, 4);
+  bob2Overlay.material = bobsMaterial;
+
   // Group that translates to bob2 position (end of arm2)
   const translateToBob2 = new Group();
   translateToBob2.position = { x: L2, y: 0 };
   translateToBob2.add(bob2);
+  translateToBob2.add(bob2Overlay); // Added LAST to render on top
 
   // Arm2 extends from origin to L2 in local X direction
   const arm2 = new Line(0, 0, L2, 0);
@@ -220,11 +225,16 @@ function initializeScene(): Scene {
   const bob1 = new Circle(0, 0, 6);
   bob1.material = bobsMaterial;
 
+  // Overlay circle for bob1 (covers arm1 and arm2 endpoints)
+  const bob1Overlay = new Circle(0, 0, 4);
+  bob1Overlay.material = bobsMaterial;
+
   // Pendulum2 rotation group (rotates by relative angle theta2 - theta1)
   pendulum2Group = new Group();
   pendulum2Group.add(bob1);
   pendulum2Group.add(arm2);
   pendulum2Group.add(translateToBob2);
+  pendulum2Group.add(bob1Overlay); // Added LAST to render on top
 
   // Group that translates to end of arm1 (where pendulum2 attaches)
   const translateToEnd = new Group();
@@ -239,11 +249,16 @@ function initializeScene(): Scene {
   const pivot = new Circle(0, 0, 3);
   pivot.material = pivotMaterial;
 
+  // Overlay circle for pivot (covers arm1 endpoint)
+  const pivotOverlay = new Circle(0, 0, 2);
+  pivotOverlay.material = pivotMaterial;
+
   // Pendulum1 rotation group (rotates by theta1 from vertical)
   pendulum1Group = new Group();
   pendulum1Group.add(pivot);
   pendulum1Group.add(arm1);
   pendulum1Group.add(translateToEnd);
+  pendulum1Group.add(pivotOverlay); // Added LAST to render on top
 
   scene.add(pendulum1Group);
 
