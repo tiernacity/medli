@@ -4872,6 +4872,39 @@
       "created_at": "2026-01-09T23:45:06.886255+00:00",
       "updated_at": "2026-01-09T23:45:06.886255+00:00",
       "metadata_json": "{\"branch\":\"feat/render-context\",\"confidence\":100}"
+    },
+    {
+      "id": 444,
+      "change_id": "8ba8effa-c732-49e0-81a0-5dd7bc9e13f3",
+      "node_type": "goal",
+      "title": "Refactor pendulum to use hierarchical transforms instead of computed positions",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-10T11:27:46.491549+00:00",
+      "updated_at": "2026-01-10T11:27:46.491549+00:00",
+      "metadata_json": "{\"branch\":\"feat/pendulum-transforms\",\"confidence\":90,\"prompt\":\"Modify the generate-pendulum script so that it does not generate x,y position, but uses translations and rotations to position the shapes. Something like\\nrotation\\n - circle\\n - line\\n - translation\\n    - rotation\\n      - ciirle\\n      - line\\n      - translation\\n        - circle\"}"
+    },
+    {
+      "id": 445,
+      "change_id": "9b78ea55-1845-4263-8d1f-5b988385e8e5",
+      "node_type": "action",
+      "title": "Implemented hierarchical transform structure",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-10T11:35:48.788186+00:00",
+      "updated_at": "2026-01-10T11:35:48.788186+00:00",
+      "metadata_json": "{\"branch\":\"feat/pendulum-transforms\",\"confidence\":90}"
+    },
+    {
+      "id": 446,
+      "change_id": "23ef7b07-5a08-40fa-b05c-0ad03b9ec939",
+      "node_type": "outcome",
+      "title": "Pendulum refactored to hierarchical transforms - visual verification passed",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-10T11:46:56.693160+00:00",
+      "updated_at": "2026-01-10T11:46:56.693160+00:00",
+      "metadata_json": "{\"branch\":\"feat/pendulum-transforms\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -9802,6 +9835,28 @@
       "weight": 1.0,
       "rationale": "Refactoring complete and verified",
       "created_at": "2026-01-09T23:45:12.752528+00:00"
+    },
+    {
+      "id": 449,
+      "from_node_id": 444,
+      "to_node_id": 445,
+      "from_change_id": "8ba8effa-c732-49e0-81a0-5dd7bc9e13f3",
+      "to_change_id": "9b78ea55-1845-4263-8d1f-5b988385e8e5",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation",
+      "created_at": "2026-01-10T11:35:48.843015+00:00"
+    },
+    {
+      "id": 450,
+      "from_node_id": 445,
+      "to_node_id": 446,
+      "from_change_id": "9b78ea55-1845-4263-8d1f-5b988385e8e5",
+      "to_change_id": "23ef7b07-5a08-40fa-b05c-0ad03b9ec939",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation verified",
+      "created_at": "2026-01-10T11:46:56.752598+00:00"
     }
   ]
 }
