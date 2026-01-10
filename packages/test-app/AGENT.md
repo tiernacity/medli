@@ -5,10 +5,10 @@
 You maintain the **visual verification app** - confirms all generator/renderer combinations produce identical output.
 
 **Your job is to:**
-- Display all 4 combinations (2 generators x 2 renderers) side-by-side
+- Display generator/renderer combinations for visual comparison
 - Exercise all primitives and material features
 - Enable Playwright to screenshot and compare outputs
-- Keep examples comprehensive but not production code
+- Provide full-screen sketch demos
 
 **Visual parity is the goal.** If procedural and object generators don't match, something is wrong.
 
@@ -16,16 +16,18 @@ You maintain the **visual verification app** - confirms all generator/renderer c
 
 | File | Purpose |
 |------|---------|
-| `src/main.ts` | App setup, UI layout |
-| `src/generators/procedural.ts` | Procedural generator example |
-| `src/generators/object.ts` | Object generator example |
-| `src/harnesses/*.ts` | Renderer harness code |
+| `src/main.ts` | Main page setup, 2x2 grid layout |
+| `src/full-screen.ts` | Full-screen sketch selector and display |
+| `src/harnesses/*.ts` | Renderer harness wiring (proc-svg, proc-canvas, obj-svg, obj-canvas) |
+| `src/scenes/*.ts` | Scene definitions exercising features (materials, transforms, images, etc.) |
+| `src/sketches/*.ts` | Full-screen sketch demos (trees, particle-plotter, remote-pendulum) |
+| `scripts/*.ts` | Standalone scripts (e.g., generate-pendulum.ts for server-side Frame generation) |
 
 ## Constraints
 
 - **Testing only** - no production features
 - **Exercise all features** - every primitive, material property, nesting level
-- **Both generators must match** - identical visual output
+- **Both generators must match** - identical visual output in scenes
 - **Keep examples realistic** - show patterns users would actually write
 
 ## Visual Verification Workflow
@@ -37,19 +39,17 @@ npm run dev                     # Start dev server
 # Compare all 4 outputs - they should be identical
 ```
 
-## When Reviewing Changes
-
-- Do both generator examples exercise the same features?
-- Are all primitives represented?
-- Are material features (fill, stroke, strokeWidth, nesting) tested?
-- Would Playwright catch a regression?
-
 ## When Adding Primitives
 
-1. Add to `src/generators/procedural.ts` using sketch API
-2. Add to `src/generators/object.ts` using scene graph API
-3. Position identically in both
-4. Verify all 4 outputs match visually
+1. Add scene in `src/scenes/` exercising the primitive
+2. Update scene index to include the new scene
+3. Verify all 4 harness outputs match visually
+
+## When Adding Sketches
+
+1. Create sketch file in `src/sketches/`
+2. Export from `src/sketches/index.ts`
+3. Test via full-screen page dropdown
 
 ## After Changes
 

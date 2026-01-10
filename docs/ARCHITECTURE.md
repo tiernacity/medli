@@ -6,7 +6,7 @@ Medli separates concerns into three layers:
 
 | Layer | Role | Packages |
 |-------|------|----------|
-| Generators | Transform ergonomic API → Frame IR | generator-procedural, generator-object |
+| Generators | Transform ergonomic API → Frame IR | generator-procedural, generator-object, generator-remote |
 | Frame Spec | Intermediate representation (IR) | spec |
 | Renderers | Consume Frame IR → visual output | renderer-svg, renderer-canvas |
 
@@ -121,6 +121,8 @@ Generator APIs provide ergonomic `translate()`, `rotate()`, `scale()` that compo
 - **Own the user-facing API** - be opinionated, match inspiration library
 - **Emit valid Frame IR** - correctness is non-negotiable
 - **Do not validate own output** - separation of concerns
+
+**Note:** `generator-remote` is different - it fetches Frames from a URL rather than creating them. It still implements the Generator interface so renderers can use it interchangeably.
 
 ### Renderers
 - **Call validateFrame() first** - single point of validation

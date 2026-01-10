@@ -293,6 +293,21 @@ npm run typecheck && npm run lint && npm run format:check && npm run test
 | Multi-package feature | One Task agent PER package |
 | Verification | Main conversation (run tests, visual check) |
 
+### ⚠️ No Pattern Match? ASK First
+
+If a file doesn't match any pattern in `agents.toml`:
+
+1. **ASK the user** before editing - the file may need an agent entry added
+2. **Update agents.toml** if it's a new package or directory that should have an agent
+3. **Create AGENT.md** for new packages
+
+**Common gaps to watch for:**
+- New packages added without agents.toml entry
+- New subdirectories with distinct purposes
+- Scripts or tooling outside the main package structure
+
+**Workflow config files** (`.claude/`, `CLAUDE.md`, `AGENT.md`, `docs/`) may be edited directly - they are meta-level.
+
 ---
 
 ## Feature Parity Requirements

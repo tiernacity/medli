@@ -1,5 +1,13 @@
 [
   {
+    "hash": "2e50997d1a417ae70043ce3bb1d0b51bfa3964c5",
+    "short_hash": "2e50997",
+    "author": "Chris Tierney",
+    "date": "2026-01-10T13:14:13Z",
+    "message": "feat: add overlay circles to pendulum joints for cleaner visuals\n\nEach joint now renders a smaller overlay circle last in its group,\ncovering the line endpoints that previously overlapped the joint circles.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 1
+  },
+  {
     "hash": "6ed9fdac54cc4c1a69b0d4c4d10d5d9d029c7208",
     "short_hash": "6ed9fda",
     "author": "Chris Tierney",

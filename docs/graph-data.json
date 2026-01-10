@@ -3895,17 +3895,6 @@
       "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"commit\":\"b05ae64\",\"confidence\":95}"
     },
     {
-      "id": 355,
-      "change_id": "cbb52af8-02de-49fa-913c-35e938a3914b",
-      "node_type": "goal",
-      "title": "Remove noBackground() from procedural generator - use implicit 'was background called' logic instead",
-      "description": null,
-      "status": "pending",
-      "created_at": "2026-01-09T15:31:36.264614+00:00",
-      "updated_at": "2026-01-09T15:31:36.264614+00:00",
-      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":80,\"prompt\":\"I want to remove `noBackground` from the procedural generator (and anywhere else). In favour of \\\"did background get called, or not?\\\" logic. Then the procedural generator will need to modify how it stores the required background color (or not).\"}"
-    },
-    {
       "id": 356,
       "change_id": "1948228d-d5cd-4f6c-8c6a-e87512553cc1",
       "node_type": "observation",
@@ -4157,28 +4146,6 @@
       "created_at": "2026-01-09T17:42:38.987802+00:00",
       "updated_at": "2026-01-09T17:42:38.987802+00:00",
       "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":85,\"prompt\":\"User asked to systematically verify the SVG click problem now that HMR is fixed, stopping after investigation to review findings before implementing any fix\"}"
-    },
-    {
-      "id": 379,
-      "change_id": "361629bd-0368-497e-9947-63cbd676e1d7",
-      "node_type": "observation",
-      "title": "SVG click-to-reset WORKS - visual test confirms trees reset to sprouts on click. Earlier confusion was due to wrapper not intercepting original closure reference and fast tree regrowth.",
-      "description": null,
-      "status": "pending",
-      "created_at": "2026-01-09T17:56:56.718749+00:00",
-      "updated_at": "2026-01-09T17:56:56.718749+00:00",
-      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":95}"
-    },
-    {
-      "id": 380,
-      "change_id": "18080743-6272-4884-b1cf-fd7acbbaa8f2",
-      "node_type": "observation",
-      "title": "Node 379 incorrect - SVG clicks still broken. Symptoms: grown tree ignores clicks, growing tree only responds near bounding box, empty space clicks ignored",
-      "description": null,
-      "status": "pending",
-      "created_at": "2026-01-09T18:24:48.287801+00:00",
-      "updated_at": "2026-01-09T18:24:48.287801+00:00",
-      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":95}"
     },
     {
       "id": 381,
@@ -4905,6 +4872,94 @@
       "created_at": "2026-01-10T11:46:56.693160+00:00",
       "updated_at": "2026-01-10T11:46:56.693160+00:00",
       "metadata_json": "{\"branch\":\"feat/pendulum-transforms\",\"confidence\":95}"
+    },
+    {
+      "id": 447,
+      "change_id": "d5a6fd1c-d00e-41c4-a448-079f79a9143e",
+      "node_type": "goal",
+      "title": "Fix agent workflow gaps - add generator-remote, update stale docs, add fallback instruction",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-10T12:44:34.476380+00:00",
+      "updated_at": "2026-01-10T12:44:34.476380+00:00",
+      "metadata_json": "{\"branch\":\"feat/workflow-cleanup\",\"confidence\":90,\"prompt\":\"I'm looking at our workflow. We have been using an agents.toml file, and instructions in CLAUDE.md, to encourage the use of tasks agents for editing or working with specific packages. Each agent is given some information about the purpose of their package, constraints, considerations, etc.\\n\\nThis has worked really well most of the time.\\n\\nDuring some recent work though, I've noticed file edits happening in the main conversation. This is not a disaster but I'd like to discourage it.\\n\\n- Perhaps our codebase has outgrown the agents.toml file. New packages, files, etc. We were not updating our agents setup as we went along\\n- Perhaps the CLAUDE.md instructions got lost in other noise\\n- Perhaps something else\\n\\nRemember that CLAUDE.md must contain minimal instructions and very little about about the specific design of any package. The agents.toml must also be as compact as possible. And instructions for each agent should also be concise. We made use of AGENT.md files to help, here - agents are instructed to read the ones relevant to them, while the main conversation does not (always) need to\\n\\nPlease review. I'd suggest also looking at recent work to understand what changed or was added.\"}"
+    },
+    {
+      "id": 448,
+      "change_id": "5d1c93e1-675d-4460-abf9-c51d58725c60",
+      "node_type": "action",
+      "title": "Updating agent workflow configuration files",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-10T12:44:43.469086+00:00",
+      "updated_at": "2026-01-10T12:44:43.469086+00:00",
+      "metadata_json": "{\"branch\":\"feat/workflow-cleanup\",\"confidence\":85}"
+    },
+    {
+      "id": 449,
+      "change_id": "790492f6-9fed-49f6-b8f8-8b6cd9c8f241",
+      "node_type": "outcome",
+      "title": "Agent workflow gaps fixed - generator-remote added, test-app AGENT.md updated, fallback instruction added",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-10T12:46:13.952192+00:00",
+      "updated_at": "2026-01-10T12:46:13.952192+00:00",
+      "metadata_json": "{\"branch\":\"feat/workflow-cleanup\",\"confidence\":95}"
+    },
+    {
+      "id": 450,
+      "change_id": "41809a21-03b1-416c-ba77-86955b25dd97",
+      "node_type": "goal",
+      "title": "Add overlay circles to pendulum joints for cleaner line endings",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-10T13:01:30.077869+00:00",
+      "updated_at": "2026-01-10T13:01:30.077869+00:00",
+      "metadata_json": "{\"branch\":\"feat/workflow-cleanup\",\"confidence\":95,\"prompt\":\"Update pendulum generator so each joint displays two circles: existing circle for line endpoints, plus a smaller circle rendered last to cover line ends\"}"
+    },
+    {
+      "id": 451,
+      "change_id": "e52b6f83-c7db-4224-a284-10a50c24323c",
+      "node_type": "action",
+      "title": "Spawning test-app agent to add overlay circles to pendulum joints",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-10T13:02:02.269788+00:00",
+      "updated_at": "2026-01-10T13:02:02.269788+00:00",
+      "metadata_json": "{\"branch\":\"feat/workflow-cleanup\",\"confidence\":90}"
+    },
+    {
+      "id": 452,
+      "change_id": "cb8f3158-7ad2-4973-9248-7d0714389dbd",
+      "node_type": "outcome",
+      "title": "Overlay circles added - pivot (r=2), bob1 (r=4), bob2 (r=4) render last in their groups",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-10T13:03:03.491586+00:00",
+      "updated_at": "2026-01-10T13:03:03.491586+00:00",
+      "metadata_json": "{\"branch\":\"feat/workflow-cleanup\",\"confidence\":95}"
+    },
+    {
+      "id": 453,
+      "change_id": "700ae6aa-deb8-4a65-b32e-dd52f91aa205",
+      "node_type": "observation",
+      "title": "Visual verification passed - overlay circles cleanly cover line endpoints at all 3 joints",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-10T13:07:59.790188+00:00",
+      "updated_at": "2026-01-10T13:07:59.790188+00:00",
+      "metadata_json": "{\"branch\":\"feat/workflow-cleanup\",\"confidence\":100}"
+    },
+    {
+      "id": 454,
+      "change_id": "2b73a7ec-226d-49c5-a840-2ba34a0b2e21",
+      "node_type": "action",
+      "title": "Committed pendulum overlay circles",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-10T13:14:17.989188+00:00",
+      "updated_at": "2026-01-10T13:14:17.989188+00:00",
+      "metadata_json": "{\"branch\":\"feat/workflow-cleanup\",\"commit\":\"2e50997\",\"confidence\":100}"
     }
   ],
   "edges": [
@@ -9100,17 +9155,6 @@
       "created_at": "2026-01-09T17:42:43.898061+00:00"
     },
     {
-      "id": 382,
-      "from_node_id": 378,
-      "to_node_id": 379,
-      "from_change_id": "ff49de19-4191-4c2a-913d-123aa8adc562",
-      "to_change_id": "361629bd-0368-497e-9947-63cbd676e1d7",
-      "edge_type": "leads_to",
-      "weight": 1.0,
-      "rationale": "Investigation finding",
-      "created_at": "2026-01-09T17:57:35.075330+00:00"
-    },
-    {
       "id": 383,
       "from_node_id": 381,
       "to_node_id": 382,
@@ -9153,17 +9197,6 @@
       "weight": 1.0,
       "rationale": "Implementation complete",
       "created_at": "2026-01-09T18:41:59.536595+00:00"
-    },
-    {
-      "id": 387,
-      "from_node_id": 355,
-      "to_node_id": 384,
-      "from_change_id": "cbb52af8-02de-49fa-913c-35e938a3914b",
-      "to_change_id": "4fdcc787-bfd8-4f4e-9cdd-2367289c7373",
-      "edge_type": "leads_to",
-      "weight": 1.0,
-      "rationale": "Implementation complete",
-      "created_at": "2026-01-09T18:46:06.971739+00:00"
     },
     {
       "id": 388,
@@ -9857,6 +9890,83 @@
       "weight": 1.0,
       "rationale": "Implementation verified",
       "created_at": "2026-01-10T11:46:56.752598+00:00"
+    },
+    {
+      "id": 451,
+      "from_node_id": 447,
+      "to_node_id": 448,
+      "from_change_id": "d5a6fd1c-d00e-41c4-a448-079f79a9143e",
+      "to_change_id": "5d1c93e1-675d-4460-abf9-c51d58725c60",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation",
+      "created_at": "2026-01-10T12:44:50.290572+00:00"
+    },
+    {
+      "id": 452,
+      "from_node_id": 448,
+      "to_node_id": 449,
+      "from_change_id": "5d1c93e1-675d-4460-abf9-c51d58725c60",
+      "to_change_id": "790492f6-9fed-49f6-b8f8-8b6cd9c8f241",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation complete",
+      "created_at": "2026-01-10T12:46:14.003840+00:00"
+    },
+    {
+      "id": 453,
+      "from_node_id": 447,
+      "to_node_id": 449,
+      "from_change_id": "d5a6fd1c-d00e-41c4-a448-079f79a9143e",
+      "to_change_id": "790492f6-9fed-49f6-b8f8-8b6cd9c8f241",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Goal achieved",
+      "created_at": "2026-01-10T12:46:16.988355+00:00"
+    },
+    {
+      "id": 454,
+      "from_node_id": 450,
+      "to_node_id": 451,
+      "from_change_id": "41809a21-03b1-416c-ba77-86955b25dd97",
+      "to_change_id": "e52b6f83-c7db-4224-a284-10a50c24323c",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation approach",
+      "created_at": "2026-01-10T13:03:03.543465+00:00"
+    },
+    {
+      "id": 455,
+      "from_node_id": 451,
+      "to_node_id": 452,
+      "from_change_id": "e52b6f83-c7db-4224-a284-10a50c24323c",
+      "to_change_id": "cb8f3158-7ad2-4973-9248-7d0714389dbd",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation successful",
+      "created_at": "2026-01-10T13:03:03.566052+00:00"
+    },
+    {
+      "id": 456,
+      "from_node_id": 452,
+      "to_node_id": 453,
+      "from_change_id": "cb8f3158-7ad2-4973-9248-7d0714389dbd",
+      "to_change_id": "700ae6aa-deb8-4a65-b32e-dd52f91aa205",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Verified visually",
+      "created_at": "2026-01-10T13:07:59.814567+00:00"
+    },
+    {
+      "id": 457,
+      "from_node_id": 453,
+      "to_node_id": 454,
+      "from_change_id": "700ae6aa-deb8-4a65-b32e-dd52f91aa205",
+      "to_change_id": "2b73a7ec-226d-49c5-a840-2ba34a0b2e21",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Deployment",
+      "created_at": "2026-01-10T13:14:18.016334+00:00"
     }
   ]
 }
