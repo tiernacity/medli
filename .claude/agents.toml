@@ -16,6 +16,11 @@ patterns = ["packages/generators/object/**"]
 brief = "Opinionated, three.js-inspired declarative scene graph API. Transforms object references into Frame spec IR."
 reading_list = ["docs/ARCHITECTURE.md", "packages/generators/object/AGENT.md"]
 
+[agents.generator-remote]
+patterns = ["packages/generators/remote/**"]
+brief = "Remote Frame fetcher. Polls a URL for Frame JSON, implements Generator interface for use with renderers."
+reading_list = ["docs/ARCHITECTURE.md", "packages/generators/remote/AGENT.md"]
+
 [agents.renderer-common]
 patterns = ["packages/renderers/common/**"]
 brief = "Shared renderer functionality including animation loop management."
