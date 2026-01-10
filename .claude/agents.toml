@@ -36,6 +36,16 @@ patterns = ["packages/renderers/canvas/**"]
 brief = "Canvas 2D renderer. Consumes Frame spec, produces Canvas draw calls."
 reading_list = ["docs/ARCHITECTURE.md", "packages/renderers/canvas/AGENT.md"]
 
+[agents.renderer-webgl]
+patterns = ["packages/renderers/webgl/**"]
+brief = "WebGL 2 renderer. Consumes Frame spec, produces WebGL draw calls using TWGL.js and SDF shaders."
+reading_list = ["docs/ARCHITECTURE.md", "packages/renderers/webgl/AGENT.md", "packages/renderers/webgl/DESIGN.md"]
+
+[agents.renderer-webgpu]
+patterns = ["packages/renderers/webgpu/**"]
+brief = "WebGPU renderer. Consumes Frame spec, produces WebGPU render commands using TypeGPU."
+reading_list = ["docs/ARCHITECTURE.md", "packages/renderers/webgpu/AGENT.md", "packages/renderers/webgpu/DESIGN.md"]
+
 [agents.test-app]
 patterns = ["packages/test-app/**"]
 exclude = ["packages/test-app/dist/**"]

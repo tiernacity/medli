@@ -1,0 +1,15 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "lib": ["ES2022", "DOM"],
+    "types": ["@webgpu/types"]
+  },
+  "include": ["src"],
+  "exclude": ["src/__tests__"],
+  "references": [
+    { "path": "../../spec" },
+    { "path": "../common" }
+  ]
+}

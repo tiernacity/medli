@@ -8,7 +8,7 @@ Medli separates concerns into three layers:
 |-------|------|----------|
 | Generators | Transform ergonomic API → Frame IR | generator-procedural, generator-object, generator-remote |
 | Frame Spec | Intermediate representation (IR) | spec |
-| Renderers | Consume Frame IR → visual output | renderer-svg, renderer-canvas |
+| Renderers | Consume Frame IR → visual output | renderer-svg, renderer-canvas, renderer-webgl, renderer-webgpu |
 
 ## Processing Pipeline
 
@@ -114,6 +114,43 @@ Generator APIs provide ergonomic `translate()`, `rotate()`, `scale()` that compo
 3. ChildMaterial.ref must point to an ancestor
 4. Transform.matrix must have exactly 6 numbers
 5. Shapes cannot have children (type-enforced)
+
+## GPU Renderers
+
+The WebGL and WebGPU renderers share a common architecture:
+
+### Rendering Approach
+
+| Aspect | Approach |
+|--------|----------|
+| Primitives | SDF (Signed Distance Functions) in fragment shaders |
+| Instancing | One draw call per primitive type with instance data |
+| Transforms | Matrix accumulation during tree traversal |
+| Materials | Same `resolveMaterial()` as CPU renderers |
+
+### SDF-Based Primitives
+
+Rather than tessellating shapes into triangles, GPU renderers:
+1. Render each shape as a quad (2 triangles)
+2. Compute signed distance in fragment shader
+3. Anti-alias edges using `fwidth()` / `smoothstep()`
+
+**Benefits:**
+- Resolution-independent (sharp at any zoom)
+- Fewer vertices for complex shapes
+- Easy anti-aliasing
+- Uniform pipeline across shape types
+
+### Technology Choices
+
+| Renderer | Library | Purpose |
+|----------|---------|---------|
+| WebGL | TWGL.js | Thin WebGL wrapper, reduces boilerplate |
+| WebGL | gl-matrix | Matrix math |
+| WebGPU | TypeGPU | Type-safe WebGPU with TypeScript integration |
+| WebGPU | gl-matrix | Matrix math (shared with WebGL) |
+
+See `packages/renderers/webgl/DESIGN.md` and `packages/renderers/webgpu/DESIGN.md` for detailed design documentation.
 
 ## Component Contracts
 

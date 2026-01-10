@@ -1,0 +1,30 @@
+{
+  "name": "@medli/renderer-webgl",
+  "version": "0.0.1",
+  "type": "module",
+  "description": "WebGL 2 renderer for medli",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist"
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@medli/spec": "*",
+    "@medli/renderer-common": "*",
+    "twgl.js": "^7.0.0",
+    "gl-matrix": "^3.4.3"
+  },
+  "devDependencies": {
+    "@types/offscreencanvas": "^2019.7.3"
+  }
+}

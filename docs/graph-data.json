@@ -4960,6 +4960,50 @@
       "created_at": "2026-01-10T13:14:17.989188+00:00",
       "updated_at": "2026-01-10T13:14:17.989188+00:00",
       "metadata_json": "{\"branch\":\"feat/workflow-cleanup\",\"commit\":\"2e50997\",\"confidence\":100}"
+    },
+    {
+      "id": 455,
+      "change_id": "b8fa29f9-a892-4944-8534-28a3ea9fdf9f",
+      "node_type": "goal",
+      "title": "Bootstrap WebGL and WebGPU renderer packages with design exploration",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-10T14:09:47.777659+00:00",
+      "updated_at": "2026-01-10T14:09:47.777659+00:00",
+      "metadata_json": "{\"branch\":\"feat/bootstrap-webgl-webgpu-renderers\",\"confidence\":85,\"prompt\":\"I don't want to implement these two packages now. I want to:\\n- bootstrap two new packages\\n- in each, install dependencies (see below)\\n- add the AGENT.md file, and the agents.toml entries\\n- update the architecture documentation\\n\\nAnd I want to examine the requirements, constraints, potential high-level design, choices for supporting technologies and libraries. For each package. There will need to be some consideration of managing gpu resources and we may decide to implement some shared support for that. But we need to explore the design first. We may decide to NOT take the simplest routes to drawing, in some cases, in anticipation of future features. But we should strive to keep it simple.\\n\\nWe should develop designs that will support all primitives in both packages. We will document these in design files and plans for each package. Do not capture detailed design decisions in the decision graph - record them in the packages. The goal will be complete when we have identified the correct designs, 3rd party library choices, and plan for implementation... and documented all of this.\\n\\nWe will then close this branch, and open new ones for implementation of each package.\\n\\nDevelop a list of questions to answer, searches and research to do, and dispatch some task agents to gather information. We want to support 2d drawing primitives in both webgl and webgpu. There may be prior art to discover and inspect. There is one library I'd like to evaluate - typegpu for webgpu looks promising. Beyond that I have no preconceptions, so show me the options. Use context7 liberally. Use task agents liberally\"}"
+    },
+    {
+      "id": 456,
+      "change_id": "9f0f3a97-71c6-402f-9838-5eb0457b4bd4",
+      "node_type": "action",
+      "title": "Bootstrapped WebGL and WebGPU renderer packages",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-10T14:22:06.478840+00:00",
+      "updated_at": "2026-01-10T14:22:06.478840+00:00",
+      "metadata_json": "{\"branch\":\"feat/bootstrap-webgl-webgpu-renderers\",\"confidence\":95}"
+    },
+    {
+      "id": 457,
+      "change_id": "a4282f90-22a8-45c5-bc54-bf5b2ae0f3c1",
+      "node_type": "outcome",
+      "title": "WebGL and WebGPU packages bootstrapped with designs documented",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-10T14:22:11.012059+00:00",
+      "updated_at": "2026-01-10T14:22:11.012059+00:00",
+      "metadata_json": "{\"branch\":\"feat/bootstrap-webgl-webgpu-renderers\",\"confidence\":95}"
+    },
+    {
+      "id": 458,
+      "change_id": "18dfebe4-6126-4f62-ad0e-53891407d020",
+      "node_type": "observation",
+      "title": "Design review identified: context/device loss, buffer growth, transparency, future features",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-10T15:18:28.802316+00:00",
+      "updated_at": "2026-01-10T15:18:28.802316+00:00",
+      "metadata_json": "{\"branch\":\"feat/bootstrap-webgl-webgpu-renderers\",\"confidence\":90}"
     }
   ],
   "edges": [
@@ -9967,6 +10011,39 @@
       "weight": 1.0,
       "rationale": "Deployment",
       "created_at": "2026-01-10T13:14:18.016334+00:00"
+    },
+    {
+      "id": 458,
+      "from_node_id": 455,
+      "to_node_id": 456,
+      "from_change_id": "b8fa29f9-a892-4944-8534-28a3ea9fdf9f",
+      "to_change_id": "9f0f3a97-71c6-402f-9838-5eb0457b4bd4",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation of goal",
+      "created_at": "2026-01-10T14:22:10.984961+00:00"
+    },
+    {
+      "id": 459,
+      "from_node_id": 456,
+      "to_node_id": 457,
+      "from_change_id": "9f0f3a97-71c6-402f-9838-5eb0457b4bd4",
+      "to_change_id": "a4282f90-22a8-45c5-bc54-bf5b2ae0f3c1",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation complete",
+      "created_at": "2026-01-10T14:22:14.668982+00:00"
+    },
+    {
+      "id": 460,
+      "from_node_id": 456,
+      "to_node_id": 458,
+      "from_change_id": "9f0f3a97-71c6-402f-9838-5eb0457b4bd4",
+      "to_change_id": "18dfebe4-6126-4f62-ad0e-53891407d020",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Review findings",
+      "created_at": "2026-01-10T15:18:28.850823+00:00"
     }
   ]
 }

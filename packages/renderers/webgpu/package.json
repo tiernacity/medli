@@ -1,0 +1,30 @@
+{
+  "name": "@medli/renderer-webgpu",
+  "version": "0.0.1",
+  "type": "module",
+  "description": "WebGPU renderer for medli",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist"
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@medli/spec": "*",
+    "@medli/renderer-common": "*",
+    "typegpu": "^0.9.0",
+    "gl-matrix": "^3.4.3"
+  },
+  "devDependencies": {
+    "@webgpu/types": "^0.1.52"
+  }
+}
