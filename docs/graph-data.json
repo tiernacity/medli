@@ -4872,6 +4872,39 @@
       "created_at": "2026-01-10T11:46:56.693160+00:00",
       "updated_at": "2026-01-10T11:46:56.693160+00:00",
       "metadata_json": "{\"branch\":\"feat/pendulum-transforms\",\"confidence\":95}"
+    },
+    {
+      "id": 447,
+      "change_id": "d5a6fd1c-d00e-41c4-a448-079f79a9143e",
+      "node_type": "goal",
+      "title": "Fix agent workflow gaps - add generator-remote, update stale docs, add fallback instruction",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-10T12:44:34.476380+00:00",
+      "updated_at": "2026-01-10T12:44:34.476380+00:00",
+      "metadata_json": "{\"branch\":\"feat/workflow-cleanup\",\"confidence\":90,\"prompt\":\"I'm looking at our workflow. We have been using an agents.toml file, and instructions in CLAUDE.md, to encourage the use of tasks agents for editing or working with specific packages. Each agent is given some information about the purpose of their package, constraints, considerations, etc.\\n\\nThis has worked really well most of the time.\\n\\nDuring some recent work though, I've noticed file edits happening in the main conversation. This is not a disaster but I'd like to discourage it.\\n\\n- Perhaps our codebase has outgrown the agents.toml file. New packages, files, etc. We were not updating our agents setup as we went along\\n- Perhaps the CLAUDE.md instructions got lost in other noise\\n- Perhaps something else\\n\\nRemember that CLAUDE.md must contain minimal instructions and very little about about the specific design of any package. The agents.toml must also be as compact as possible. And instructions for each agent should also be concise. We made use of AGENT.md files to help, here - agents are instructed to read the ones relevant to them, while the main conversation does not (always) need to\\n\\nPlease review. I'd suggest also looking at recent work to understand what changed or was added.\"}"
+    },
+    {
+      "id": 448,
+      "change_id": "5d1c93e1-675d-4460-abf9-c51d58725c60",
+      "node_type": "action",
+      "title": "Updating agent workflow configuration files",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-10T12:44:43.469086+00:00",
+      "updated_at": "2026-01-10T12:44:43.469086+00:00",
+      "metadata_json": "{\"branch\":\"feat/workflow-cleanup\",\"confidence\":85}"
+    },
+    {
+      "id": 449,
+      "change_id": "790492f6-9fed-49f6-b8f8-8b6cd9c8f241",
+      "node_type": "outcome",
+      "title": "Agent workflow gaps fixed - generator-remote added, test-app AGENT.md updated, fallback instruction added",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-10T12:46:13.952192+00:00",
+      "updated_at": "2026-01-10T12:46:13.952192+00:00",
+      "metadata_json": "{\"branch\":\"feat/workflow-cleanup\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -9802,6 +9835,39 @@
       "weight": 1.0,
       "rationale": "Implementation verified",
       "created_at": "2026-01-10T11:46:56.752598+00:00"
+    },
+    {
+      "id": 451,
+      "from_node_id": 447,
+      "to_node_id": 448,
+      "from_change_id": "d5a6fd1c-d00e-41c4-a448-079f79a9143e",
+      "to_change_id": "5d1c93e1-675d-4460-abf9-c51d58725c60",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation",
+      "created_at": "2026-01-10T12:44:50.290572+00:00"
+    },
+    {
+      "id": 452,
+      "from_node_id": 448,
+      "to_node_id": 449,
+      "from_change_id": "5d1c93e1-675d-4460-abf9-c51d58725c60",
+      "to_change_id": "790492f6-9fed-49f6-b8f8-8b6cd9c8f241",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation complete",
+      "created_at": "2026-01-10T12:46:14.003840+00:00"
+    },
+    {
+      "id": 453,
+      "from_node_id": 447,
+      "to_node_id": 449,
+      "from_change_id": "d5a6fd1c-d00e-41c4-a448-079f79a9143e",
+      "to_change_id": "790492f6-9fed-49f6-b8f8-8b6cd9c8f241",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Goal achieved",
+      "created_at": "2026-01-10T12:46:16.988355+00:00"
     }
   ]
 }
