@@ -3895,17 +3895,6 @@
       "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"commit\":\"b05ae64\",\"confidence\":95}"
     },
     {
-      "id": 355,
-      "change_id": "cbb52af8-02de-49fa-913c-35e938a3914b",
-      "node_type": "goal",
-      "title": "Remove noBackground() from procedural generator - use implicit 'was background called' logic instead",
-      "description": null,
-      "status": "pending",
-      "created_at": "2026-01-09T15:31:36.264614+00:00",
-      "updated_at": "2026-01-09T15:31:36.264614+00:00",
-      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":80,\"prompt\":\"I want to remove `noBackground` from the procedural generator (and anywhere else). In favour of \\\"did background get called, or not?\\\" logic. Then the procedural generator will need to modify how it stores the required background color (or not).\"}"
-    },
-    {
       "id": 356,
       "change_id": "1948228d-d5cd-4f6c-8c6a-e87512553cc1",
       "node_type": "observation",
@@ -4157,28 +4146,6 @@
       "created_at": "2026-01-09T17:42:38.987802+00:00",
       "updated_at": "2026-01-09T17:42:38.987802+00:00",
       "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":85,\"prompt\":\"User asked to systematically verify the SVG click problem now that HMR is fixed, stopping after investigation to review findings before implementing any fix\"}"
-    },
-    {
-      "id": 379,
-      "change_id": "361629bd-0368-497e-9947-63cbd676e1d7",
-      "node_type": "observation",
-      "title": "SVG click-to-reset WORKS - visual test confirms trees reset to sprouts on click. Earlier confusion was due to wrapper not intercepting original closure reference and fast tree regrowth.",
-      "description": null,
-      "status": "pending",
-      "created_at": "2026-01-09T17:56:56.718749+00:00",
-      "updated_at": "2026-01-09T17:56:56.718749+00:00",
-      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":95}"
-    },
-    {
-      "id": 380,
-      "change_id": "18080743-6272-4884-b1cf-fd7acbbaa8f2",
-      "node_type": "observation",
-      "title": "Node 379 incorrect - SVG clicks still broken. Symptoms: grown tree ignores clicks, growing tree only responds near bounding box, empty space clicks ignored",
-      "description": null,
-      "status": "pending",
-      "created_at": "2026-01-09T18:24:48.287801+00:00",
-      "updated_at": "2026-01-09T18:24:48.287801+00:00",
-      "metadata_json": "{\"branch\":\"feat/p5-example-2\",\"confidence\":95}"
     },
     {
       "id": 381,
@@ -9100,17 +9067,6 @@
       "created_at": "2026-01-09T17:42:43.898061+00:00"
     },
     {
-      "id": 382,
-      "from_node_id": 378,
-      "to_node_id": 379,
-      "from_change_id": "ff49de19-4191-4c2a-913d-123aa8adc562",
-      "to_change_id": "361629bd-0368-497e-9947-63cbd676e1d7",
-      "edge_type": "leads_to",
-      "weight": 1.0,
-      "rationale": "Investigation finding",
-      "created_at": "2026-01-09T17:57:35.075330+00:00"
-    },
-    {
       "id": 383,
       "from_node_id": 381,
       "to_node_id": 382,
@@ -9153,17 +9109,6 @@
       "weight": 1.0,
       "rationale": "Implementation complete",
       "created_at": "2026-01-09T18:41:59.536595+00:00"
-    },
-    {
-      "id": 387,
-      "from_node_id": 355,
-      "to_node_id": 384,
-      "from_change_id": "cbb52af8-02de-49fa-913c-35e938a3914b",
-      "to_change_id": "4fdcc787-bfd8-4f4e-9cdd-2367289c7373",
-      "edge_type": "leads_to",
-      "weight": 1.0,
-      "rationale": "Implementation complete",
-      "created_at": "2026-01-09T18:46:06.971739+00:00"
     },
     {
       "id": 388,
