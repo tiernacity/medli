@@ -11,9 +11,7 @@ import type { SketchModule, SketchInstance } from "./types";
  * Create a remote pendulum sketch instance.
  * No interactions - the animation is driven by the server.
  */
-function create(
-  _element: HTMLCanvasElement | SVGSVGElement
-): SketchInstance {
+function create(_element: HTMLCanvasElement | SVGSVGElement): SketchInstance {
   const generator = RemoteFetchGenerator.fromUrl("http://localhost:3001", {
     pollInterval: 10, // Poll frequently for smooth animation
   });

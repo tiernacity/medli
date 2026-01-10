@@ -71,7 +71,9 @@ if (!element) {
 // Create Sketch Instance
 // ============================================================================
 
-const instance = sketchModule.create(element as HTMLCanvasElement | SVGSVGElement);
+const instance = sketchModule.create(
+  element as HTMLCanvasElement | SVGSVGElement
+);
 
 // ============================================================================
 // Create Renderer

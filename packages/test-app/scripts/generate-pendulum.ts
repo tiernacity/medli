@@ -13,6 +13,7 @@ import {
   Material,
   Circle,
   Line,
+  Group,
 } from "@medli/generator-object";
 import { createServer } from "http";
 
@@ -147,36 +148,30 @@ function simulate(durationSeconds: number): PendulumState {
   return state;
 }
 
-/**
- * Convert pendulum state to Cartesian coordinates.
- * Origin at pivot point, Y-up coordinate system.
- */
-function stateToPositions(state: PendulumState) {
-  // First bob position (from pivot)
-  // Note: theta is measured from vertical (down), so we use -cos for y and sin for x
-  const x1 = L1 * Math.sin(state.theta1);
-  const y1 = -L1 * Math.cos(state.theta1);
-
-  // Second bob position (from first bob)
-  const x2 = x1 + L2 * Math.sin(state.theta2);
-  const y2 = y1 - L2 * Math.cos(state.theta2);
-
-  return {
-    pivot: { x: 0, y: 0 },
-    bob1: { x: x1, y: y1 },
-    bob2: { x: x2, y: y2 },
-  };
-}
-
-// Shapes are stored here so generateFrame can update their positions
-let arm1: Line;
-let arm2: Line;
-let pivotCircle: Circle;
-let bob1Circle: Circle;
-let bob2Circle: Circle;
+// Groups that control rotation - stored for animation updates
+let pendulum1Group: Group; // Rotates by theta1
+let pendulum2Group: Group; // Rotates by (theta2 - theta1) relative to parent
 
 /**
- * Initialize scene with materials and shapes.
+ * Initialize scene with materials and shapes using hierarchical transforms.
+ *
+ * The pendulum uses a nested Group hierarchy where rotations and translations
+ * position the shapes automatically:
+ *
+ * pendulum1Group (rotation = theta1 - PI/2, at pivot origin)
+ *   ├─ Circle (pivot point at 0,0)
+ *   ├─ Line (arm1 from [0,0] to [L1,0] in local coords)
+ *   └─ translateToEndGroup (position = {x: L1, y: 0})
+ *        └─ pendulum2Group (rotation = theta2 - theta1, relative angle)
+ *             ├─ Circle (bob1 at 0,0)
+ *             ├─ Line (arm2 from [0,0] to [L2,0])
+ *             └─ translateToBob2Group (position = {x: L2, y: 0})
+ *                  └─ Circle (bob2 at 0,0)
+ *
+ * Physics angles (theta1, theta2) are measured from vertical (down).
+ * To convert to Group rotation (where 0 = right, PI/2 = up):
+ * - A pendulum hanging straight down (theta=0) should point in -Y direction
+ * - rotation = theta - PI/2 converts from "angle from down" to standard rotation
  */
 function initializeScene(): Scene {
   const scene = new Scene({
@@ -206,27 +201,51 @@ function initializeScene(): Scene {
     strokeWidth: 2,
   });
 
-  // Create shapes at initial positions
-  arm1 = new Line(0, 0, 0, 0);
-  arm1.material = armMaterial;
+  // Build hierarchy from inside out
 
-  arm2 = new Line(0, 0, 0, 0);
+  // Bob2 at the end of arm2 (at local origin of its group)
+  const bob2 = new Circle(0, 0, 6);
+  bob2.material = bobsMaterial;
+
+  // Group that translates to bob2 position (end of arm2)
+  const translateToBob2 = new Group();
+  translateToBob2.position = { x: L2, y: 0 };
+  translateToBob2.add(bob2);
+
+  // Arm2 extends from origin to L2 in local X direction
+  const arm2 = new Line(0, 0, L2, 0);
   arm2.material = armMaterial;
 
-  pivotCircle = new Circle(0, 0, 3);
-  pivotCircle.material = pivotMaterial;
+  // Bob1 at the joint (at local origin of pendulum2Group)
+  const bob1 = new Circle(0, 0, 6);
+  bob1.material = bobsMaterial;
 
-  bob1Circle = new Circle(0, 0, 6);
-  bob1Circle.material = bobsMaterial;
+  // Pendulum2 rotation group (rotates by relative angle theta2 - theta1)
+  pendulum2Group = new Group();
+  pendulum2Group.add(bob1);
+  pendulum2Group.add(arm2);
+  pendulum2Group.add(translateToBob2);
 
-  bob2Circle = new Circle(0, 0, 6);
-  bob2Circle.material = bobsMaterial;
+  // Group that translates to end of arm1 (where pendulum2 attaches)
+  const translateToEnd = new Group();
+  translateToEnd.position = { x: L1, y: 0 };
+  translateToEnd.add(pendulum2Group);
 
-  scene.add(arm1);
-  scene.add(arm2);
-  scene.add(pivotCircle);
-  scene.add(bob1Circle);
-  scene.add(bob2Circle);
+  // Arm1 extends from origin to L1 in local X direction
+  const arm1 = new Line(0, 0, L1, 0);
+  arm1.material = armMaterial;
+
+  // Pivot circle at origin
+  const pivot = new Circle(0, 0, 3);
+  pivot.material = pivotMaterial;
+
+  // Pendulum1 rotation group (rotates by theta1 from vertical)
+  pendulum1Group = new Group();
+  pendulum1Group.add(pivot);
+  pendulum1Group.add(arm1);
+  pendulum1Group.add(translateToEnd);
+
+  scene.add(pendulum1Group);
 
   return scene;
 }
@@ -241,6 +260,9 @@ const BASE_HALF_WIDTH = 80;
 /**
  * Generate Frame for the current pendulum state.
  * Optionally adapts viewport to match target aspect ratio.
+ *
+ * Uses hierarchical transforms: only the Group rotations need updating.
+ * The nested structure handles all positioning automatically.
  */
 function generateFrame(targetWidth?: number, targetHeight?: number): Frame {
   // Derive elapsed time from wall clock (cyclic)
@@ -250,27 +272,14 @@ function generateFrame(targetWidth?: number, targetHeight?: number): Frame {
 
   // Simulate to current state
   const state = simulate(elapsedSeconds);
-  const pos = stateToPositions(state);
 
-  // Update shape positions
-  arm1.x1 = pos.pivot.x;
-  arm1.y1 = pos.pivot.y;
-  arm1.x2 = pos.bob1.x;
-  arm1.y2 = pos.bob1.y;
+  // Update Group rotations only - transforms handle positioning
+  // theta is measured from vertical (down), rotation 0 = right in standard coords
+  // So theta=0 (hanging down) needs rotation = -PI/2 to point downward (-Y)
+  pendulum1Group.rotation = state.theta1 - Math.PI / 2;
 
-  arm2.x1 = pos.bob1.x;
-  arm2.y1 = pos.bob1.y;
-  arm2.x2 = pos.bob2.x;
-  arm2.y2 = pos.bob2.y;
-
-  pivotCircle.x = pos.pivot.x;
-  pivotCircle.y = pos.pivot.y;
-
-  bob1Circle.x = pos.bob1.x;
-  bob1Circle.y = pos.bob1.y;
-
-  bob2Circle.x = pos.bob2.x;
-  bob2Circle.y = pos.bob2.y;
+  // pendulum2Group uses relative angle since it's nested inside pendulum1
+  pendulum2Group.rotation = state.theta2 - state.theta1;
 
   // Adapt viewport if both target dimensions are provided
   if (targetWidth !== undefined && targetHeight !== undefined) {
