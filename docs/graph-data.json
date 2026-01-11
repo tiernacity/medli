@@ -4960,6 +4960,138 @@
       "created_at": "2026-01-10T13:14:17.989188+00:00",
       "updated_at": "2026-01-10T13:14:17.989188+00:00",
       "metadata_json": "{\"branch\":\"feat/workflow-cleanup\",\"commit\":\"2e50997\",\"confidence\":100}"
+    },
+    {
+      "id": 455,
+      "change_id": "b8fa29f9-a892-4944-8534-28a3ea9fdf9f",
+      "node_type": "goal",
+      "title": "Bootstrap WebGL and WebGPU renderer packages with design exploration",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-10T14:09:47.777659+00:00",
+      "updated_at": "2026-01-10T14:09:47.777659+00:00",
+      "metadata_json": "{\"branch\":\"feat/bootstrap-webgl-webgpu-renderers\",\"confidence\":85,\"prompt\":\"I don't want to implement these two packages now. I want to:\\n- bootstrap two new packages\\n- in each, install dependencies (see below)\\n- add the AGENT.md file, and the agents.toml entries\\n- update the architecture documentation\\n\\nAnd I want to examine the requirements, constraints, potential high-level design, choices for supporting technologies and libraries. For each package. There will need to be some consideration of managing gpu resources and we may decide to implement some shared support for that. But we need to explore the design first. We may decide to NOT take the simplest routes to drawing, in some cases, in anticipation of future features. But we should strive to keep it simple.\\n\\nWe should develop designs that will support all primitives in both packages. We will document these in design files and plans for each package. Do not capture detailed design decisions in the decision graph - record them in the packages. The goal will be complete when we have identified the correct designs, 3rd party library choices, and plan for implementation... and documented all of this.\\n\\nWe will then close this branch, and open new ones for implementation of each package.\\n\\nDevelop a list of questions to answer, searches and research to do, and dispatch some task agents to gather information. We want to support 2d drawing primitives in both webgl and webgpu. There may be prior art to discover and inspect. There is one library I'd like to evaluate - typegpu for webgpu looks promising. Beyond that I have no preconceptions, so show me the options. Use context7 liberally. Use task agents liberally\"}"
+    },
+    {
+      "id": 456,
+      "change_id": "9f0f3a97-71c6-402f-9838-5eb0457b4bd4",
+      "node_type": "action",
+      "title": "Bootstrapped WebGL and WebGPU renderer packages",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-10T14:22:06.478840+00:00",
+      "updated_at": "2026-01-10T14:22:06.478840+00:00",
+      "metadata_json": "{\"branch\":\"feat/bootstrap-webgl-webgpu-renderers\",\"confidence\":95}"
+    },
+    {
+      "id": 457,
+      "change_id": "a4282f90-22a8-45c5-bc54-bf5b2ae0f3c1",
+      "node_type": "outcome",
+      "title": "WebGL and WebGPU packages bootstrapped with designs documented",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-10T14:22:11.012059+00:00",
+      "updated_at": "2026-01-10T14:22:11.012059+00:00",
+      "metadata_json": "{\"branch\":\"feat/bootstrap-webgl-webgpu-renderers\",\"confidence\":95}"
+    },
+    {
+      "id": 458,
+      "change_id": "18dfebe4-6126-4f62-ad0e-53891407d020",
+      "node_type": "observation",
+      "title": "Design review identified: context/device loss, buffer growth, transparency, future features",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-10T15:18:28.802316+00:00",
+      "updated_at": "2026-01-10T15:18:28.802316+00:00",
+      "metadata_json": "{\"branch\":\"feat/bootstrap-webgl-webgpu-renderers\",\"confidence\":90}"
+    },
+    {
+      "id": 459,
+      "change_id": "29bda093-d931-4b04-a4f4-656d98734d39",
+      "node_type": "action",
+      "title": "Committed WebGL/WebGPU bootstrap with design docs",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-10T15:23:44.812972+00:00",
+      "updated_at": "2026-01-10T15:23:44.812972+00:00",
+      "metadata_json": "{\"branch\":\"feat/bootstrap-webgl-webgpu-renderers\",\"commit\":\"a9a7cb7\",\"confidence\":95}"
+    },
+    {
+      "id": 460,
+      "change_id": "024af9d1-ea5f-4124-aa16-6e5f3db86f25",
+      "node_type": "goal",
+      "title": "Update test harness: generator unit tests + flexible renderer testing",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-10T16:07:39.885390+00:00",
+      "updated_at": "2026-01-10T16:07:39.885390+00:00",
+      "metadata_json": "{\"branch\":\"feat/bootstrap-webgl-webgpu-renderers\",\"confidence\":85,\"prompt\":\"I want to discuss a new goal first. We should record it, agree the plan. It will need to be implemented before we work on packages - so this next goal is the highest priority. We can implement in this branch, I think. Then merge and open new feature branches for the two packages.\\n\\nThe goal is: update the test-app test harness for more flexible renderer testing, and rework generator testing to be more self-contained using unit tests.\\n\\nI suggest that we:\\n- update generator testing so that we verify the **Frame** that is output, against expectations. Each type of test (for primitives, etc) will have a well-defined expected frame. This test spec will be SHARED. It will become the spec for generators to be compliant with. It should live in the spec package. Generators should test against it and must provide a way to meet the spec.\\n- Update test-app so that we use a set of reference Frames. These could be hard-coded - but I think choosing a reference generator implementation will be easier to maintain. I'd suggest the procedural generator.\\n- the test-app can then drop it's requirement to use the object generator\\n- the test-app main page needs to be configurable. Our strategy, at the moment, is to compare renderer implementations and look for difference. Later, we will probably use reference image snapshots, but for now let's stick with the current setup. So our renderer test page should be adapted to: default to a known scene and a pair of renderers (say, SVG and canvas); accept query params to modify these settings.\\n- then when testing new primitives, renderers, etc - we can try different combinations of scene and a pair of renderers, and look for differences\"}"
+    },
+    {
+      "id": 461,
+      "change_id": "620093ec-2a28-4072-aec7-1940a57e5a0c",
+      "node_type": "observation",
+      "title": "Analysis: generator parity gap, reference frame source, test coverage separation",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-10T16:09:13.317908+00:00",
+      "updated_at": "2026-01-10T16:09:13.317908+00:00",
+      "metadata_json": "{\"branch\":\"feat/bootstrap-webgl-webgpu-renderers\",\"confidence\":85}"
+    },
+    {
+      "id": 462,
+      "change_id": "25e2175a-f09f-45ac-88a6-c2cfd9b22bd7",
+      "node_type": "decision",
+      "title": "Scale back: flexible test-app only, defer reference frame spec",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-10T18:37:37.751238+00:00",
+      "updated_at": "2026-01-10T18:37:37.751238+00:00",
+      "metadata_json": "{\"branch\":\"feat/bootstrap-webgl-webgpu-renderers\",\"confidence\":90}"
+    },
+    {
+      "id": 463,
+      "change_id": "c79fe59b-785d-492f-8bd3-c53745e52749",
+      "node_type": "option",
+      "title": "Grid layout: generators × renderers, single collapsible code panel, configurable harness",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-10T18:41:49.777594+00:00",
+      "updated_at": "2026-01-10T18:41:49.777594+00:00",
+      "metadata_json": "{\"branch\":\"feat/bootstrap-webgl-webgpu-renderers\",\"confidence\":95}"
+    },
+    {
+      "id": 464,
+      "change_id": "3d39859d-c38c-43e5-9788-44e5a49caf88",
+      "node_type": "action",
+      "title": "Implementing flexible test-app with configurable grid",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-10T18:47:17.364200+00:00",
+      "updated_at": "2026-01-10T18:47:17.364200+00:00",
+      "metadata_json": "{\"branch\":\"feat/bootstrap-webgl-webgpu-renderers\",\"confidence\":90}"
+    },
+    {
+      "id": 465,
+      "change_id": "91337e14-e8ae-4893-b82c-49dac8e18f17",
+      "node_type": "outcome",
+      "title": "Flexible test-app implemented: configurable grid, query params, unified harness",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-10T18:55:15.451838+00:00",
+      "updated_at": "2026-01-10T18:55:15.451838+00:00",
+      "metadata_json": "{\"branch\":\"feat/bootstrap-webgl-webgpu-renderers\",\"confidence\":95}"
+    },
+    {
+      "id": 466,
+      "change_id": "aa87220e-ec7b-4acd-ab4c-cd0d320bbad8",
+      "node_type": "action",
+      "title": "Committed flexible test-app",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T00:20:20.134409+00:00",
+      "updated_at": "2026-01-11T00:20:20.134409+00:00",
+      "metadata_json": "{\"branch\":\"feat/bootstrap-webgl-webgpu-renderers\",\"commit\":\"b72400c\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -9967,6 +10099,116 @@
       "weight": 1.0,
       "rationale": "Deployment",
       "created_at": "2026-01-10T13:14:18.016334+00:00"
+    },
+    {
+      "id": 458,
+      "from_node_id": 455,
+      "to_node_id": 456,
+      "from_change_id": "b8fa29f9-a892-4944-8534-28a3ea9fdf9f",
+      "to_change_id": "9f0f3a97-71c6-402f-9838-5eb0457b4bd4",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation of goal",
+      "created_at": "2026-01-10T14:22:10.984961+00:00"
+    },
+    {
+      "id": 459,
+      "from_node_id": 456,
+      "to_node_id": 457,
+      "from_change_id": "9f0f3a97-71c6-402f-9838-5eb0457b4bd4",
+      "to_change_id": "a4282f90-22a8-45c5-bc54-bf5b2ae0f3c1",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation complete",
+      "created_at": "2026-01-10T14:22:14.668982+00:00"
+    },
+    {
+      "id": 460,
+      "from_node_id": 456,
+      "to_node_id": 458,
+      "from_change_id": "9f0f3a97-71c6-402f-9838-5eb0457b4bd4",
+      "to_change_id": "18dfebe4-6126-4f62-ad0e-53891407d020",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Review findings",
+      "created_at": "2026-01-10T15:18:28.850823+00:00"
+    },
+    {
+      "id": 461,
+      "from_node_id": 457,
+      "to_node_id": 459,
+      "from_change_id": "a4282f90-22a8-45c5-bc54-bf5b2ae0f3c1",
+      "to_change_id": "29bda093-d931-4b04-a4f4-656d98734d39",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Deployment",
+      "created_at": "2026-01-10T15:23:44.861990+00:00"
+    },
+    {
+      "id": 462,
+      "from_node_id": 460,
+      "to_node_id": 461,
+      "from_change_id": "024af9d1-ea5f-4124-aa16-6e5f3db86f25",
+      "to_change_id": "620093ec-2a28-4072-aec7-1940a57e5a0c",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Analysis of proposal",
+      "created_at": "2026-01-10T16:09:13.372768+00:00"
+    },
+    {
+      "id": 463,
+      "from_node_id": 460,
+      "to_node_id": 462,
+      "from_change_id": "024af9d1-ea5f-4124-aa16-6e5f3db86f25",
+      "to_change_id": "25e2175a-f09f-45ac-88a6-c2cfd9b22bd7",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "User scaled back scope",
+      "created_at": "2026-01-10T18:37:41.451168+00:00"
+    },
+    {
+      "id": 464,
+      "from_node_id": 462,
+      "to_node_id": 463,
+      "from_change_id": "25e2175a-f09f-45ac-88a6-c2cfd9b22bd7",
+      "to_change_id": "c79fe59b-785d-492f-8bd3-c53745e52749",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Selected design approach",
+      "created_at": "2026-01-10T18:41:49.828707+00:00"
+    },
+    {
+      "id": 465,
+      "from_node_id": 463,
+      "to_node_id": 464,
+      "from_change_id": "c79fe59b-785d-492f-8bd3-c53745e52749",
+      "to_change_id": "3d39859d-c38c-43e5-9788-44e5a49caf88",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementing selected design",
+      "created_at": "2026-01-10T18:47:17.410875+00:00"
+    },
+    {
+      "id": 466,
+      "from_node_id": 464,
+      "to_node_id": 465,
+      "from_change_id": "3d39859d-c38c-43e5-9788-44e5a49caf88",
+      "to_change_id": "91337e14-e8ae-4893-b82c-49dac8e18f17",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation successful",
+      "created_at": "2026-01-10T18:55:15.503366+00:00"
+    },
+    {
+      "id": 467,
+      "from_node_id": 465,
+      "to_node_id": 466,
+      "from_change_id": "91337e14-e8ae-4893-b82c-49dac8e18f17",
+      "to_change_id": "aa87220e-ec7b-4acd-ab4c-cd0d320bbad8",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Deployment",
+      "created_at": "2026-01-11T00:20:20.191472+00:00"
     }
   ]
 }
