@@ -7,6 +7,7 @@ import type {
   Transform,
   Image,
   RenderContext,
+  BaseRendererMetrics,
 } from "@medli/spec";
 import { validateFrame, resolveMaterial } from "@medli/spec";
 import {
@@ -19,7 +20,14 @@ import {
   type ViewportTransformResult,
 } from "@medli/renderer-common";
 
-export class CanvasRenderer extends BaseRenderer {
+/**
+ * Metrics specific to Canvas 2D rendering.
+ * Canvas uses immediate mode - no batching, no GPU timing.
+ * Uses base metrics only (frameTime, generatorTime, etc.).
+ */
+export type CanvasRendererMetrics = BaseRendererMetrics;
+
+export class CanvasRenderer extends BaseRenderer<CanvasRendererMetrics> {
   private element: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
   private resourceManager: ResourceManager<ImageBitmap>;
@@ -27,7 +35,17 @@ export class CanvasRenderer extends BaseRenderer {
   private resizeObserver: ResizeObserver;
 
   constructor(element: HTMLCanvasElement, generator: Generator) {
-    super(generator);
+    super(generator, {
+      frameTime: 0,
+      generatorTime: 0,
+      traversalTime: 0,
+      resourceTime: 0,
+      renderTime: 0,
+      frameCount: 0,
+      fps: undefined,
+      shapeCount: 0,
+      lastFrameTimestamp: 0,
+    });
     this.element = element;
 
     const ctx = this.element.getContext("2d");
@@ -63,34 +81,49 @@ export class CanvasRenderer extends BaseRenderer {
   }
 
   async render(time: number = 0): Promise<void> {
+    // Start metrics collection
+    this.startMetricsFrame(time);
+
     // Build RenderContext with CSS pixel dimensions
     const rect = this.element.getBoundingClientRect();
     const context: RenderContext = {
       time,
       targetDimensions: [rect.width, rect.height],
     };
+
+    // Time generator.frame() call
+    const genStart = performance.now();
     const frame = this.generator.frame(context);
+    this.recordGeneratorTime(performance.now() - genStart);
 
     // Validate frame structure
     const result = validateFrame(frame);
     if (!result.valid) {
       console.error("Invalid frame:", result.error);
+      this.endMetricsFrame();
       return;
     }
 
-    // Extract and load resources
+    // Time resource resolution
+    const resourceStart = performance.now();
     const urls = extractResourceUrls(frame);
     let resourceMap: Map<string, ImageBitmap>;
     try {
       resourceMap = await this.resourceManager.resolveResources(urls);
     } catch (error) {
       console.error("Failed to load resources:", error);
+      this.recordResourceTime(performance.now() - resourceStart);
+      this.endMetricsFrame();
       return;
     }
+    this.recordResourceTime(performance.now() - resourceStart);
 
     // Query element size
     const elementWidth = this.element.width;
     const elementHeight = this.element.height;
+
+    // Time actual Canvas rendering
+    const renderStart = performance.now();
 
     // Only clear if background is defined
     if (frame.background !== undefined) {
@@ -121,10 +154,28 @@ export class CanvasRenderer extends BaseRenderer {
       );
     }
 
-    // Render all shapes (they're now in viewport coords)
-    this.renderNode(frame.root, [frame.root], resourceMap);
+    // Time tree traversal.
+    // NOTE: For Canvas (immediate mode), traversalTime includes both traversal AND drawing
+    // since they're interleaved. This differs from WebGL where traversal (data collection)
+    // and drawing (GPU submission) are separate phases.
+    const traversalStart = performance.now();
+    let shapeCount = 0;
+    this.renderNode(frame.root, [frame.root], resourceMap, () => shapeCount++);
+    const traversalTime = performance.now() - traversalStart;
+    this.recordTraversalTime(traversalTime);
 
     this.context.restore();
+
+    // Calculate renderTime as total render phase minus traversal to avoid double-counting.
+    // renderTime = setup (clearRect, transforms, background) + teardown (restore)
+    const totalRenderPhaseTime = performance.now() - renderStart;
+    this.recordRenderTime(totalRenderPhaseTime - traversalTime);
+
+    // Record shape count (Canvas has no batching concept)
+    this.recordShapeCount(shapeCount);
+
+    // Finalize metrics
+    this.endMetricsFrame();
   }
 
   destroy(): void {
@@ -205,7 +256,8 @@ export class CanvasRenderer extends BaseRenderer {
   private renderNode(
     node: FrameNode,
     ancestors: Material[],
-    resourceMap: Map<string, ImageBitmap>
+    resourceMap: Map<string, ImageBitmap>,
+    onShape: () => void
   ): void {
     if (node.type === "material") {
       // Material node - recurse into children with updated ancestors
@@ -215,10 +267,11 @@ export class CanvasRenderer extends BaseRenderer {
           this.renderNode(
             child,
             [...ancestors, child as Material],
-            resourceMap
+            resourceMap,
+            onShape
           );
         } else {
-          this.renderNode(child, ancestors, resourceMap);
+          this.renderNode(child, ancestors, resourceMap, onShape);
         }
       }
     } else if (node.type === "transform") {
@@ -235,16 +288,18 @@ export class CanvasRenderer extends BaseRenderer {
           this.renderNode(
             child,
             [...ancestors, child as Material],
-            resourceMap
+            resourceMap,
+            onShape
           );
         } else {
-          this.renderNode(child, ancestors, resourceMap);
+          this.renderNode(child, ancestors, resourceMap, onShape);
         }
       }
 
       this.context.restore();
     } else {
       // Shape node - render with resolved material
+      onShape();
       const resolved = resolveMaterial(ancestors);
       this.renderShape(node as Shape, resolved, resourceMap);
     }

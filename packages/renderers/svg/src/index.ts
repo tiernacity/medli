@@ -7,6 +7,7 @@ import type {
   ResolvedMaterial,
   Transform,
   Image,
+  BaseRendererMetrics,
 } from "@medli/spec";
 import { validateFrame, resolveMaterial } from "@medli/spec";
 import {
@@ -18,6 +19,15 @@ import {
   type Point,
   type ViewportTransformResult,
 } from "@medli/renderer-common";
+
+/**
+ * Metrics specific to SVG rendering.
+ * SVG uses retained mode DOM - tracks DOM operations and snapshot capture.
+ */
+export interface SvgRendererMetrics extends BaseRendererMetrics {
+  /** Time spent capturing background snapshots in milliseconds (for optional clear) */
+  snapshotTime: number;
+}
 
 /**
  * Processed image resource containing blob URL and source dimensions.
@@ -51,7 +61,7 @@ function processImageBlob(blob: Blob): Promise<ImageResource> {
   });
 }
 
-export class SvgRenderer extends BaseRenderer {
+export class SvgRenderer extends BaseRenderer<SvgRendererMetrics> {
   private svg: SVGSVGElement;
   private rootGroup: SVGGElement;
   private rect: SVGRectElement;
@@ -63,7 +73,18 @@ export class SvgRenderer extends BaseRenderer {
   private lastTransform: ViewportTransformResult | null = null;
 
   constructor(element: SVGSVGElement, generator: Generator) {
-    super(generator);
+    super(generator, {
+      frameTime: 0,
+      generatorTime: 0,
+      traversalTime: 0,
+      resourceTime: 0,
+      renderTime: 0,
+      frameCount: 0,
+      fps: undefined,
+      shapeCount: 0,
+      lastFrameTimestamp: 0,
+      snapshotTime: 0, // SVG-specific
+    });
     this.svg = element;
 
     // Create root group for Y-flip transform (converts Y-up to SVG's Y-down)
@@ -85,6 +106,9 @@ export class SvgRenderer extends BaseRenderer {
   }
 
   async render(time: number = 0): Promise<void> {
+    // Start metrics collection
+    this.startMetricsFrame(time);
+
     // Get CSS pixel dimensions for RenderContext
     const rect = this.svg.getBoundingClientRect();
     const context: RenderContext = {
@@ -92,24 +116,34 @@ export class SvgRenderer extends BaseRenderer {
       targetDimensions: [rect.width || 100, rect.height || 100],
     };
 
+    // Time generator.frame() call
+    const genStart = performance.now();
     const frame = this.generator.frame(context);
+    this.recordGeneratorTime(performance.now() - genStart);
 
     // Validate frame structure
     const result = validateFrame(frame);
     if (!result.valid) {
       console.error("Invalid frame:", result.error);
+      this.endMetricsFrame();
       return;
     }
 
-    // Extract and load resources
+    // Extract and load resources (timed)
+    const resourceStart = performance.now();
     const urls = extractResourceUrls(frame);
     let resourceMap: Map<string, ImageResource>;
     try {
       resourceMap = await this.resourceManager.resolveResources(urls);
     } catch (error) {
       console.error("Failed to load resources:", error);
+      this.endMetricsFrame();
       return;
     }
+    this.recordResourceTime(performance.now() - resourceStart);
+
+    // Start timing render phase (all DOM manipulation)
+    const renderStart = performance.now();
 
     // Configure viewport from frame
     const vp = frame.viewport;
@@ -146,11 +180,17 @@ export class SvgRenderer extends BaseRenderer {
     this.rect.setAttribute("width", String(vp.halfWidth * 2));
     this.rect.setAttribute("height", String(vp.halfHeight * 2));
 
+    // Track snapshot time separately - it's async and shouldn't be in renderTime
+    let snapshotTime = 0;
+
     if (frame.background === undefined) {
       // No background - preserve previous content via snapshot
       if (this.shapeElements.length > 0 || this.snapshotImage) {
         // Capture snapshot BEFORE removing previous snapshot (to include accumulated history)
+        // Time this separately since captureSnapshot() is async and can take 10-100ms
+        const snapshotStart = performance.now();
         const snapshotUrl = await this.captureSnapshot();
+        snapshotTime = performance.now() - snapshotStart;
         // NOW remove previous snapshot image (data URLs don't need revocation)
         if (this.snapshotImage) {
           this.snapshotImage.remove();
@@ -196,8 +236,39 @@ export class SvgRenderer extends BaseRenderer {
     // Reset clip ID counter for this render
     this.clipIdCounter = 0;
 
+    // Track shape count separately from shapeElements array
+    // (shapeElements includes both shapes AND transform groups for DOM management,
+    // but shapeCount should only count actual rendered shapes for metrics)
+    let shapeCount = 0;
+
     // Traverse material tree and render shapes
-    this.renderNode(frame.root, [frame.root], this.rootGroup, resourceMap);
+    // Note: SVG renderer combines traversal and DOM creation in one pass,
+    // so traversalTime represents both tree traversal AND element creation.
+    // This differs from Canvas where these are separate phases.
+    const traversalStart = performance.now();
+    shapeCount = this.renderNode(
+      frame.root,
+      [frame.root],
+      this.rootGroup,
+      resourceMap
+    );
+    const traversalTime = performance.now() - traversalStart;
+    this.recordTraversalTime(traversalTime);
+
+    // Record shape count
+    this.recordShapeCount(shapeCount);
+
+    // Record snapshot time (SVG-specific metric)
+    this._metrics = { ...this._metrics, snapshotTime };
+
+    // Record total render time (DOM manipulation), excluding traversal time
+    // since traversal is measured separately
+    this.recordRenderTime(
+      performance.now() - renderStart - traversalTime - snapshotTime
+    );
+
+    // Finalize metrics
+    this.endMetricsFrame();
   }
 
   destroy(): void {
@@ -207,6 +278,15 @@ export class SvgRenderer extends BaseRenderer {
     if (this.snapshotImage) {
       this.snapshotImage.remove();
     }
+  }
+
+  /**
+   * Override to reset SVG-specific metrics fields.
+   */
+  protected override startMetricsFrame(timestamp: DOMHighResTimeStamp): void {
+    super.startMetricsFrame(timestamp);
+    // Reset SVG-specific fields
+    this._metrics = { ...this._metrics, snapshotTime: 0 };
   }
 
   /**
@@ -306,48 +386,57 @@ export class SvgRenderer extends BaseRenderer {
     this.snapshotImage = image;
   }
 
+  /**
+   * Recursively render a node and its children.
+   * @returns The count of actual shapes rendered (excludes transform groups)
+   */
   private renderNode(
     node: FrameNode,
     ancestors: Material[],
     parent: SVGElement,
     resourceMap: Map<string, ImageResource>
-  ): void {
+  ): number {
+    let shapeCount = 0;
+
     if (node.type === "material") {
       // Material node - recurse into children with updated ancestors
       const material = node as Material;
       for (const child of material.children) {
         if (child.type === "material") {
-          this.renderNode(
+          shapeCount += this.renderNode(
             child,
             [...ancestors, child as Material],
             parent,
             resourceMap
           );
         } else {
-          this.renderNode(child, ancestors, parent, resourceMap);
+          shapeCount += this.renderNode(child, ancestors, parent, resourceMap);
         }
       }
     } else if (node.type === "transform") {
       // Transform node - create a group with the transform matrix
+      // Note: Transform groups are NOT counted as shapes - they're structural elements
+      // for applying CSS transforms, not rendered geometry
       const transform = node as Transform;
       const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
       const [a, b, c, d, e, f] = transform.matrix;
       group.setAttribute("transform", `matrix(${a},${b},${c},${d},${e},${f})`);
       parent.appendChild(group);
+      // Still track in shapeElements for DOM cleanup, but don't increment shapeCount
       this.shapeElements.push(group);
 
       // Recurse into children with the group as parent
       // Material ancestors continue through transforms unchanged
       for (const child of transform.children) {
         if (child.type === "material") {
-          this.renderNode(
+          shapeCount += this.renderNode(
             child,
             [...ancestors, child as Material],
             group,
             resourceMap
           );
         } else {
-          this.renderNode(child, ancestors, group, resourceMap);
+          shapeCount += this.renderNode(child, ancestors, group, resourceMap);
         }
       }
     } else {
@@ -357,8 +446,11 @@ export class SvgRenderer extends BaseRenderer {
       if (el) {
         parent.appendChild(el);
         this.shapeElements.push(el);
+        shapeCount = 1; // Count this as one shape
       }
     }
+
+    return shapeCount;
   }
 
   private renderShape(

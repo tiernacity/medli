@@ -1,5 +1,13 @@
 [
   {
+    "hash": "d8181efc6ba631113f1146da47318a0fb53c13ef",
+    "short_hash": "d8181ef",
+    "author": "Chris Tierney",
+    "date": "2026-01-11T12:45:04Z",
+    "message": "feat: implement WebGL renderer with full Frame spec support\n\n- Complete WebGL 2 renderer using TWGL.js and SDF shaders\n- All shapes: circles, rectangles, lines with visual parity\n- Image support with correct positioning and transforms\n- Tree-order rendering with smart consecutive batching\n- Proper transparency with premultiplied alpha blending\n- Sharp corners/line endings matching Canvas/SVG defaults\n- Optional clear (preserveDrawingBuffer) for accumulation mode\n- Test-app integration with WebGL renderer option\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 13
+  },
+  {
     "hash": "b72400c7fa891141d883c8d9c562378e913ecfaa",
     "short_hash": "b72400c",
     "author": "Chris Tierney",

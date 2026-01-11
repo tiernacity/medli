@@ -17,6 +17,7 @@ import type {
   Line,
   Image,
   RenderContext,
+  BaseRendererMetrics,
 } from "@medli/spec";
 import { validateFrame, resolveMaterial } from "@medli/spec";
 import {
@@ -463,6 +464,23 @@ interface TextureWithDimensions {
 }
 
 /**
+ * Metrics specific to WebGL 2 rendering.
+ * WebGL uses GPU-accelerated batch rendering with SDF shaders.
+ */
+export interface WebGLRendererMetrics extends BaseRendererMetrics {
+  /**
+   * GPU execution time from previous frame in milliseconds.
+   * Uses EXT_disjoint_timer_query_webgl2 (1-frame delayed).
+   * undefined if extension unavailable or timing invalid.
+   */
+  gpuTime: number | undefined;
+  /** Number of instanced draw calls issued this frame */
+  batchCount: number;
+  /** Whether the GPU timer extension is available */
+  gpuTimerAvailable: boolean;
+}
+
+/**
  * Parse a CSS color string to normalized RGBA values (0-1 range).
  * Supports: hex (#rgb, #rrggbb, #rgba, #rrggbbaa), rgb(), rgba(), named colors.
  */
@@ -520,7 +538,7 @@ function expandMatrix(
  * Renders Frame spec IR using SDF-based primitives for resolution-independent
  * rendering with anti-aliased edges.
  */
-export class WebGLRenderer extends BaseRenderer {
+export class WebGLRenderer extends BaseRenderer<WebGLRendererMetrics> {
   private canvas: HTMLCanvasElement;
   private gl: WebGL2RenderingContext;
   private resizeObserver: ResizeObserver;
@@ -535,11 +553,32 @@ export class WebGLRenderer extends BaseRenderer {
   private quadBufferInfo: twgl.BufferInfo | null = null;
   private imageQuadBufferInfo: twgl.BufferInfo | null = null;
 
+  // GPU timing via EXT_disjoint_timer_query_webgl2
+  private timerQueryExt: {
+    TIME_ELAPSED_EXT: number;
+    GPU_DISJOINT_EXT: number;
+  } | null = null;
+  private pendingQuery: WebGLQuery | null = null;
+
   // Texture resource manager (stores textures with dimensions)
   private resourceManager: ResourceManager<TextureWithDimensions>;
 
   constructor(element: HTMLCanvasElement, generator: Generator) {
-    super(generator);
+    super(generator, {
+      frameTime: 0,
+      generatorTime: 0,
+      traversalTime: 0,
+      resourceTime: 0,
+      renderTime: 0,
+      frameCount: 0,
+      fps: undefined,
+      shapeCount: 0,
+      lastFrameTimestamp: 0,
+      // WebGL-specific
+      gpuTime: undefined,
+      batchCount: 0,
+      gpuTimerAvailable: false, // Set true after extension check
+    });
     this.canvas = element;
 
     const gl = this.canvas.getContext("webgl2", {
@@ -662,6 +701,18 @@ export class WebGLRenderer extends BaseRenderer {
     // Use premultiplied alpha blending: shaders output RGB*A, so source factor is ONE (not SRC_ALPHA)
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+
+    // Try to get timer query extension for GPU timing metrics
+    // This extension may not be available on all hardware/drivers
+    const ext = gl.getExtension("EXT_disjoint_timer_query_webgl2");
+    if (ext) {
+      this.timerQueryExt = {
+        TIME_ELAPSED_EXT: ext.TIME_ELAPSED_EXT,
+        GPU_DISJOINT_EXT: ext.GPU_DISJOINT_EXT,
+      };
+      // Update metrics to reflect that GPU timing is available
+      this._metrics = { ...this._metrics, gpuTimerAvailable: true };
+    }
   }
 
   /**
@@ -679,10 +730,21 @@ export class WebGLRenderer extends BaseRenderer {
   }
 
   async render(time: number = 0): Promise<void> {
+    // Start metrics collection
+    this.startMetricsFrame(time);
+    // Reset WebGL-specific metrics for this frame
+    this._metrics = { ...this._metrics, batchCount: 0 };
+
     // Skip rendering if context is lost
-    if (this.contextLost) return;
+    if (this.contextLost) {
+      this.endMetricsFrame();
+      return;
+    }
 
     const gl = this.gl;
+
+    // Check for GPU timing result from previous frame (1-frame delayed)
+    this.pollPendingGpuTime();
 
     // Build RenderContext with CSS pixel dimensions
     const rect = this.canvas.getBoundingClientRect();
@@ -690,24 +752,33 @@ export class WebGLRenderer extends BaseRenderer {
       time,
       targetDimensions: [rect.width, rect.height],
     };
+
+    // Time generator.frame()
+    const genStart = performance.now();
     const frame = this.generator.frame(context);
+    this.recordGeneratorTime(performance.now() - genStart);
 
     // Validate frame structure (fail fast)
     const result = validateFrame(frame);
     if (!result.valid) {
       console.error("Invalid frame:", result.error);
+      this.endMetricsFrame();
       return;
     }
 
-    // Extract and load resources
+    // Extract and load resources (timed)
     const urls = extractResourceUrls(frame);
     let resourceMap: Map<string, TextureWithDimensions>;
+    const resourceStart = performance.now();
     try {
       resourceMap = await this.resourceManager.resolveResources(urls);
     } catch (error) {
       console.error("Failed to load resources:", error);
+      this.recordResourceTime(performance.now() - resourceStart);
+      this.endMetricsFrame();
       return;
     }
+    this.recordResourceTime(performance.now() - resourceStart);
 
     // Set viewport to canvas size
     gl.viewport(0, 0, this.canvas.width, this.canvas.height);
@@ -745,12 +816,127 @@ export class WebGLRenderer extends BaseRenderer {
 
     mat3.set(viewportMatrix, scaleX, 0, 0, 0, scaleY, 0, 0, 0, 1);
 
-    // Collect shape instances from frame tree in traversal order
+    // Collect shape instances from frame tree in traversal order (timed)
+    const traversalStart = performance.now();
     const orderedShapes: OrderedShape[] = [];
     this.traverseNode(frame.root, [frame.root], mat3.create(), orderedShapes);
+    this.recordTraversalTime(performance.now() - traversalStart);
 
-    // Render shapes in tree order with smart batching
-    this.renderOrderedShapes(orderedShapes, viewportMatrix, resourceMap);
+    // Render shapes in tree order with smart batching (timed)
+    // Note: renderTime measures CPU time to submit WebGL draw calls, not actual GPU
+    // execution time. gpuTime (when available) measures actual GPU execution time
+    // from the previous frame via EXT_disjoint_timer_query_webgl2.
+    const renderStart = performance.now();
+
+    // Begin GPU timer query if extension is available
+    const query = this.beginGpuTimer();
+
+    const batchCount = this.renderOrderedShapes(
+      orderedShapes,
+      viewportMatrix,
+      resourceMap
+    );
+
+    // End GPU timer query
+    this.endGpuTimer(query);
+
+    this.recordRenderTime(performance.now() - renderStart);
+
+    // Record shape and batch counts
+    this.recordShapeCount(orderedShapes.length);
+    this._metrics = { ...this._metrics, batchCount };
+
+    // Finalize metrics
+    this.endMetricsFrame();
+  }
+
+  /**
+   * Poll the pending GPU timer query for results from the previous frame.
+   * Results are 1-frame delayed since GPU work is asynchronous.
+   */
+  private pollPendingGpuTime(): void {
+    const gl = this.gl;
+
+    if (!this.timerQueryExt || !this.pendingQuery) {
+      // No extension or no pending query - gpuTime stays undefined
+      return;
+    }
+
+    // Check if the query result is available
+    const available = gl.getQueryParameter(
+      this.pendingQuery,
+      gl.QUERY_RESULT_AVAILABLE
+    );
+
+    if (!available) {
+      // Result not ready yet - will try again next frame
+      return;
+    }
+
+    // Check for GPU disjoint (timing may be invalid due to power management, etc.)
+    const disjoint = gl.getParameter(this.timerQueryExt.GPU_DISJOINT_EXT);
+    if (disjoint) {
+      // Timing data is invalid - delete query and record undefined
+      gl.deleteQuery(this.pendingQuery);
+      this.pendingQuery = null;
+      this._metrics = { ...this._metrics, gpuTime: undefined };
+      return;
+    }
+
+    // Get the query result (in nanoseconds) and convert to milliseconds
+    const timeNanos = gl.getQueryParameter(
+      this.pendingQuery,
+      gl.QUERY_RESULT
+    ) as number;
+    const timeMs = timeNanos / 1_000_000;
+
+    // Clean up query and record the GPU time
+    gl.deleteQuery(this.pendingQuery);
+    this.pendingQuery = null;
+    this._metrics = { ...this._metrics, gpuTime: timeMs };
+  }
+
+  /**
+   * Begin a GPU timer query for measuring draw call execution time.
+   * @returns The query object, or null if extension unavailable
+   */
+  private beginGpuTimer(): WebGLQuery | null {
+    const gl = this.gl;
+
+    if (!this.timerQueryExt) {
+      return null;
+    }
+
+    // Create and begin the timer query
+    const query = gl.createQuery();
+    if (!query) {
+      return null;
+    }
+
+    gl.beginQuery(this.timerQueryExt.TIME_ELAPSED_EXT, query);
+    return query;
+  }
+
+  /**
+   * End the GPU timer query and store it for reading next frame.
+   * @param query The query object from beginGpuTimer, or null
+   */
+  private endGpuTimer(query: WebGLQuery | null): void {
+    const gl = this.gl;
+
+    if (!this.timerQueryExt || !query) {
+      return;
+    }
+
+    gl.endQuery(this.timerQueryExt.TIME_ELAPSED_EXT);
+
+    // Delete previous pending query if it exists (shouldn't happen normally)
+    if (this.pendingQuery) {
+      gl.deleteQuery(this.pendingQuery);
+    }
+
+    // Store query for reading next frame
+    this.pendingQuery = query;
   }
 
   /**
@@ -892,16 +1078,19 @@ export class WebGLRenderer extends BaseRenderer {
    * 3. renderLines([line, line, line])
    * 4. renderCircles([circle])
    * 5. renderRectangles([rect])
+   *
+   * @returns The number of batches (draw calls) issued
    */
   private renderOrderedShapes(
     shapes: OrderedShape[],
     viewportMatrix: mat3,
     resourceMap: Map<string, TextureWithDimensions>
-  ): void {
-    if (shapes.length === 0) return;
+  ): number {
+    if (shapes.length === 0) return 0;
 
     let batchStart = 0;
     let currentType = shapes[0].type;
+    let batchCount = 0;
 
     for (let i = 1; i <= shapes.length; i++) {
       // Check if we've reached the end or a type change
@@ -911,7 +1100,12 @@ export class WebGLRenderer extends BaseRenderer {
       if (isEnd || typeChanged) {
         // Render the batch from batchStart to i (exclusive)
         const batch = shapes.slice(batchStart, i);
-        this.renderBatch(batch, currentType, viewportMatrix, resourceMap);
+        batchCount += this.renderBatch(
+          batch,
+          currentType,
+          viewportMatrix,
+          resourceMap
+        );
 
         // Start new batch if not at end
         if (!isEnd) {
@@ -920,45 +1114,47 @@ export class WebGLRenderer extends BaseRenderer {
         }
       }
     }
+
+    return batchCount;
   }
 
   /**
    * Render a batch of shapes of the same type.
+   * @returns The number of draw calls issued
    */
   private renderBatch(
     batch: OrderedShape[],
     type: OrderedShape["type"],
     viewportMatrix: mat3,
     resourceMap: Map<string, TextureWithDimensions>
-  ): void {
+  ): number {
     switch (type) {
       case "rectangle": {
         const instances = batch.map(
           (s) => (s as { type: "rectangle"; instance: RectInstance }).instance
         );
         this.renderRectangles(instances, viewportMatrix);
-        break;
+        return 1; // Single instanced draw call
       }
       case "circle": {
         const instances = batch.map(
           (s) => (s as { type: "circle"; instance: CircleInstance }).instance
         );
         this.renderCircles(instances, viewportMatrix);
-        break;
+        return 1; // Single instanced draw call
       }
       case "line": {
         const instances = batch.map(
           (s) => (s as { type: "line"; instance: LineInstance }).instance
         );
         this.renderLines(instances, viewportMatrix);
-        break;
+        return 1; // Single instanced draw call
       }
       case "image": {
         const instances = batch.map(
           (s) => (s as { type: "image"; instance: ImageInstance }).instance
         );
-        this.renderImages(instances, viewportMatrix, resourceMap);
-        break;
+        return this.renderImages(instances, viewportMatrix, resourceMap);
       }
     }
   }
@@ -1400,14 +1596,15 @@ export class WebGLRenderer extends BaseRenderer {
    * Render all images.
    * Images are rendered one at a time since each may have a different texture.
    * For better performance with many images sharing textures, batching could be added.
+   * @returns The number of draw calls issued
    */
   private renderImages(
     instances: ImageInstance[],
     viewportMatrix: mat3,
     resourceMap: Map<string, TextureWithDimensions>
-  ): void {
-    if (instances.length === 0) return;
-    if (!this.imageProgramInfo || !this.imageQuadBufferInfo) return;
+  ): number {
+    if (instances.length === 0) return 0;
+    if (!this.imageProgramInfo || !this.imageQuadBufferInfo) return 0;
 
     const gl = this.gl;
 
@@ -1427,6 +1624,9 @@ export class WebGLRenderer extends BaseRenderer {
     gl.enableVertexAttribArray(a_position);
     gl.vertexAttribPointer(a_position, 2, gl.FLOAT, false, 0, 0);
     gl.vertexAttribDivisor(a_position, 0); // Per-vertex
+
+    // Count draw calls for metrics
+    let drawCallCount = 0;
 
     // Render each image
     for (const inst of instances) {
@@ -1501,6 +1701,7 @@ export class WebGLRenderer extends BaseRenderer {
 
       // Draw single image instance
       gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, 1);
+      drawCallCount++;
 
       // Clean up buffers
       gl.deleteBuffer(transformBuffer);
@@ -1523,6 +1724,8 @@ export class WebGLRenderer extends BaseRenderer {
     gl.disableVertexAttribArray(a_imageSize);
     gl.vertexAttribDivisor(a_uvRect, 0);
     gl.disableVertexAttribArray(a_uvRect);
+
+    return drawCallCount;
   }
 
   destroy(): void {
@@ -1538,6 +1741,12 @@ export class WebGLRenderer extends BaseRenderer {
 
     // Clean up texture resources
     this.resourceManager.destroy();
+
+    // Clean up pending GPU timer query
+    if (this.pendingQuery) {
+      this.gl.deleteQuery(this.pendingQuery);
+      this.pendingQuery = null;
+    }
 
     // Clean up WebGL resources
     const gl = this.gl;

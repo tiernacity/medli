@@ -436,13 +436,58 @@ export interface Generator {
 }
 
 /**
+ * Base performance metrics common to ALL renderers.
+ * Represents timing and counts that are universally measurable.
+ * All timing values are in milliseconds.
+ */
+export interface BaseRendererMetrics {
+  /** Total time for render() call in milliseconds */
+  frameTime: number;
+  /** Time for generator.frame() execution in milliseconds */
+  generatorTime: number;
+  /** Time to traverse frame tree and collect shapes in milliseconds */
+  traversalTime: number;
+  /** Time for resource loading/resolution in milliseconds */
+  resourceTime: number;
+  /** Time for actual rendering (DOM/GPU submission) in milliseconds */
+  renderTime: number;
+  /** Total frames rendered since renderer creation */
+  frameCount: number;
+  /** Rolling average FPS (undefined when not looping) */
+  fps: number | undefined;
+  /** Total shapes in current frame */
+  shapeCount: number;
+  /** DOMHighResTimeStamp of last render start */
+  lastFrameTimestamp: DOMHighResTimeStamp;
+}
+
+/**
+ * @deprecated Use BaseRendererMetrics or renderer-specific metrics types.
+ * This type includes GPU-specific fields that don't apply to all renderers.
+ * Maintained for Phase 1 backwards compatibility.
+ */
+export type RendererMetrics = BaseRendererMetrics & {
+  /** @deprecated Use renderer-specific metrics type for GPU timing */
+  gpuTime: number | undefined;
+  /** @deprecated Use renderer-specific metrics type for batch counts */
+  batchCount: number;
+};
+
+/**
  * Renderer displays frames to the screen.
  * Renders content in the Frame's viewport coordinate system.
  * Queries element size on each render and maps viewport to element based on scaleMode.
  * Constructors accept HTML elements of the relevant type.
  * Expects requestAnimationFrame support.
+ *
+ * Generic on metrics type to allow renderer-specific metrics.
+ * Uses BaseRendererMetrics as default for backwards compatibility.
+ *
+ * @typeParam M - Metrics type extending BaseRendererMetrics
  */
-export interface Renderer {
+export interface Renderer<M extends BaseRendererMetrics = BaseRendererMetrics> {
+  /** Performance metrics for the last rendered frame */
+  readonly metrics: M;
   render(time: number): Promise<void>;
   loop(): void;
   stop(): void;
