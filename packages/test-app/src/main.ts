@@ -97,6 +97,10 @@ const selectedRenderers = validRenderers;
 const demosSelect = document.getElementById(
   "demos-select"
 ) as HTMLSelectElement;
+// Reset demos dropdown when page is shown (including back-button navigation via bfcache)
+window.addEventListener("pageshow", () => {
+  demosSelect.selectedIndex = 0;
+});
 const colorInput = document.getElementById("bg-color") as HTMLInputElement;
 const colorValue = document.getElementById("color-value") as HTMLSpanElement;
 const sceneCode = document.getElementById("scene-code") as HTMLPreElement;
