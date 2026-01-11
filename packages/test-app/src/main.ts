@@ -1,25 +1,28 @@
 // Import scene registry
-import { scenes, defaultSceneId, type SceneId } from "./scenes";
+import {
+  scenes,
+  defaultSceneId,
+  type SceneId,
+  setCirclePosition,
+} from "./scenes";
 
-// Import harnesses
-import { createRenderer as createProcSvg } from "./harnesses/proc-svg";
-import { createRenderer as createProcCanvas } from "./harnesses/proc-canvas";
-import { createRenderer as createObjSvg } from "./harnesses/obj-svg";
-import { createRenderer as createObjCanvas } from "./harnesses/obj-canvas";
-
-import { setCirclePosition } from "./scenes/interaction";
+// Import unified harness
+import {
+  createHarness,
+  type RendererType,
+  type GeneratorType,
+  type HarnessInstance,
+} from "./harnesses";
 
 // Import source code as raw text
 import fullDemoSource from "./scenes/full-demo.ts?raw";
 import materialsSource from "./scenes/materials.ts?raw";
 import transformsSource from "./scenes/transforms.ts?raw";
 import imageTransformsSource from "./scenes/image-transforms.ts?raw";
+import imageCropSource from "./scenes/image-crop.ts?raw";
+import optionalClearSource from "./scenes/optional-clear.ts?raw";
 import transparencySource from "./scenes/transparency.ts?raw";
 import interactionSource from "./scenes/interaction.ts?raw";
-import harnessProcSvgSource from "./harnesses/proc-svg.ts?raw";
-import harnessProcCanvasSource from "./harnesses/proc-canvas.ts?raw";
-import harnessObjSvgSource from "./harnesses/obj-svg.ts?raw";
-import harnessObjCanvasSource from "./harnesses/obj-canvas.ts?raw";
 
 // Map scene IDs to their source code
 const sceneSources: Record<string, string> = {
@@ -27,46 +30,203 @@ const sceneSources: Record<string, string> = {
   materials: materialsSource,
   transforms: transformsSource,
   "image-transforms": imageTransformsSource,
+  "image-crop": imageCropSource,
+  "optional-clear": optionalClearSource,
   transparency: transparencySource,
   interaction: interactionSource,
 };
 
-// Get scene from URL parameter, fallback to default
+// Parse query parameters
 const params = new URLSearchParams(window.location.search);
 const sceneParam = params.get("scene");
-const sceneId: SceneId =
-  sceneParam && sceneParam in scenes ? (sceneParam as SceneId) : defaultSceneId;
+const generatorParams = params.getAll("generator");
+const rendererParams = params.getAll("renderer");
+
+// Validate params
+const validGenerators = generatorParams.filter(
+  (g): g is GeneratorType => g === "procedural" || g === "object"
+);
+const validRenderers = rendererParams.filter(
+  (r): r is RendererType => r === "svg" || r === "canvas"
+);
+
+// Redirect to explicit URL if any params are missing or invalid
+const needsRedirect =
+  !sceneParam ||
+  !(sceneParam in scenes) ||
+  validGenerators.length === 0 ||
+  validRenderers.length === 0;
+
+if (needsRedirect) {
+  const url = new URL(window.location.href);
+  url.searchParams.set("scene", sceneParam && sceneParam in scenes ? sceneParam : defaultSceneId);
+
+  if (validGenerators.length === 0) {
+    url.searchParams.append("generator", "procedural");
+    url.searchParams.append("generator", "object");
+  }
+  if (validRenderers.length === 0) {
+    url.searchParams.append("renderer", "svg");
+    url.searchParams.append("renderer", "canvas");
+  }
+
+  window.location.replace(url.toString());
+  throw new Error("Redirecting..."); // Stop execution during redirect
+}
+
+const sceneId = sceneParam as SceneId;
 const scene = scenes[sceneId];
+const selectedGenerators = validGenerators;
+const selectedRenderers = validRenderers;
 
 // DOM elements
-const sceneSelect = document.getElementById(
-  "scene-select"
-) as HTMLSelectElement;
 const demosSelect = document.getElementById(
   "demos-select"
 ) as HTMLSelectElement;
 const colorInput = document.getElementById("bg-color") as HTMLInputElement;
 const colorValue = document.getElementById("color-value") as HTMLSpanElement;
+const sceneCode = document.getElementById("scene-code") as HTMLPreElement;
+const rendererGrid = document.getElementById("renderer-grid") as HTMLDivElement;
 
-// Populate scene selector dropdown
+// Custom dropdown elements
+const sceneDropdown = document.getElementById("scene-dropdown") as HTMLDivElement;
+const sceneButton = document.getElementById("scene-button") as HTMLButtonElement;
+const sceneMenu = document.getElementById("scene-menu") as HTMLDivElement;
+const generatorDropdown = document.getElementById("generator-dropdown") as HTMLDivElement;
+const generatorButton = document.getElementById("generator-button") as HTMLButtonElement;
+const generatorMenu = document.getElementById("generator-menu") as HTMLDivElement;
+const rendererDropdown = document.getElementById("renderer-dropdown") as HTMLDivElement;
+const rendererButton = document.getElementById("renderer-button") as HTMLButtonElement;
+const rendererMenu = document.getElementById("renderer-menu") as HTMLDivElement;
+
+// Populate scene dropdown menu
 for (const [id, sceneData] of Object.entries(scenes)) {
-  const option = document.createElement("option");
-  option.value = id;
-  option.textContent = sceneData.name;
-  if (id === sceneId) option.selected = true;
-  sceneSelect.appendChild(option);
+  const item = document.createElement("div");
+  item.className = "dropdown-item" + (id === sceneId ? " selected" : "");
+  item.dataset.value = id;
+  item.textContent = sceneData.name;
+  sceneMenu.appendChild(item);
+}
+sceneButton.textContent = scenes[sceneId].name;
+
+// Set selected state on generator items
+const generatorItems = generatorMenu.querySelectorAll<HTMLDivElement>(".dropdown-item");
+for (const item of generatorItems) {
+  if (selectedGenerators.includes(item.dataset.value as GeneratorType)) {
+    item.classList.add("selected");
+  }
+}
+generatorButton.textContent = selectedGenerators.length === 2 ? "All" :
+  selectedGenerators.map(g => g === "procedural" ? "Procedural" : "Object").join(", ");
+
+// Set selected state on renderer items
+const rendererItems = rendererMenu.querySelectorAll<HTMLDivElement>(".dropdown-item");
+for (const item of rendererItems) {
+  if (selectedRenderers.includes(item.dataset.value as RendererType)) {
+    item.classList.add("selected");
+  }
+}
+rendererButton.textContent = selectedRenderers.length === 2 ? "All" :
+  selectedRenderers.map(r => r.toUpperCase()).join(", ");
+
+// Build URL with current selections (always explicit, no defaults)
+function buildUrl(
+  newSceneId: string,
+  generators: GeneratorType[],
+  renderers: RendererType[]
+): string {
+  const url = new URL(window.location.href);
+  url.searchParams.delete("scene");
+  url.searchParams.delete("generator");
+  url.searchParams.delete("renderer");
+
+  url.searchParams.set("scene", newSceneId);
+
+  for (const g of generators) {
+    url.searchParams.append("generator", g);
+  }
+
+  for (const r of renderers) {
+    url.searchParams.append("renderer", r);
+  }
+
+  return url.toString();
 }
 
-// Handle scene selection change
-sceneSelect.addEventListener("change", () => {
-  const newSceneId = sceneSelect.value;
-  const url = new URL(window.location.href);
-  if (newSceneId === defaultSceneId) {
-    url.searchParams.delete("scene");
+// Dropdown toggle behavior
+function setupDropdown(
+  dropdown: HTMLDivElement,
+  button: HTMLButtonElement,
+  menu: HTMLDivElement,
+  onSelect: (value: string, item: HTMLDivElement) => void
+) {
+  button.addEventListener("click", (e) => {
+    e.stopPropagation();
+    // Close other dropdowns
+    document.querySelectorAll(".dropdown.open").forEach((d) => {
+      if (d !== dropdown) d.classList.remove("open");
+    });
+    dropdown.classList.toggle("open");
+  });
+
+  menu.addEventListener("click", (e) => {
+    const item = (e.target as HTMLElement).closest(".dropdown-item") as HTMLDivElement | null;
+    if (item) {
+      onSelect(item.dataset.value!, item);
+    }
+  });
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener("click", () => {
+  document.querySelectorAll(".dropdown.open").forEach((d) => d.classList.remove("open"));
+});
+
+// Scene dropdown (single-select)
+setupDropdown(sceneDropdown, sceneButton, sceneMenu, (value) => {
+  window.location.href = buildUrl(value, selectedGenerators, selectedRenderers);
+});
+
+// Generator dropdown (multi-select with toggle)
+setupDropdown(generatorDropdown, generatorButton, generatorMenu, (value, item) => {
+  const isSelected = item.classList.contains("selected");
+  const currentSelected = Array.from(generatorItems)
+    .filter((i) => i.classList.contains("selected"))
+    .map((i) => i.dataset.value as GeneratorType);
+
+  let newSelected: GeneratorType[];
+  if (isSelected && currentSelected.length > 1) {
+    // Deselect (but keep at least one)
+    newSelected = currentSelected.filter((v) => v !== value);
+  } else if (!isSelected) {
+    // Select
+    newSelected = [...currentSelected, value as GeneratorType];
   } else {
-    url.searchParams.set("scene", newSceneId);
+    // Can't deselect the last one
+    return;
   }
-  window.location.href = url.toString();
+  window.location.href = buildUrl(sceneId, newSelected, selectedRenderers);
+});
+
+// Renderer dropdown (multi-select with toggle)
+setupDropdown(rendererDropdown, rendererButton, rendererMenu, (value, item) => {
+  const isSelected = item.classList.contains("selected");
+  const currentSelected = Array.from(rendererItems)
+    .filter((i) => i.classList.contains("selected"))
+    .map((i) => i.dataset.value as RendererType);
+
+  let newSelected: RendererType[];
+  if (isSelected && currentSelected.length > 1) {
+    // Deselect (but keep at least one)
+    newSelected = currentSelected.filter((v) => v !== value);
+  } else if (!isSelected) {
+    // Select
+    newSelected = [...currentSelected, value as RendererType];
+  } else {
+    // Can't deselect the last one
+    return;
+  }
+  window.location.href = buildUrl(sceneId, selectedGenerators, newSelected);
 });
 
 // Handle demos dropdown - navigate to full-screen demo pages
@@ -77,97 +237,97 @@ demosSelect.addEventListener("change", () => {
   }
 });
 
-// Create all renderers with scene's generators
-// Note: CanvasRenderer handles buffer size sync internally via ResizeObserver
-const renderers = [
-  createProcSvg(
-    document.querySelector<SVGSVGElement>("#proc-svg")!,
-    scene.procedural
-  ),
-  createProcCanvas(
-    document.querySelector<HTMLCanvasElement>("#proc-canvas")!,
-    scene.procedural
-  ),
-  createObjSvg(
-    document.querySelector<SVGSVGElement>("#obj-svg")!,
-    scene.object
-  ),
-  createObjCanvas(
-    document.querySelector<HTMLCanvasElement>("#obj-canvas")!,
-    scene.object
-  ),
-];
+// Display scene source code
+const currentSceneSource = sceneSources[sceneId] || fullDemoSource;
+sceneCode.textContent = currentSceneSource;
+
+// Build the dynamic renderer grid
+// Layout: generators as rows, renderers as columns
+rendererGrid.style.display = "grid";
+rendererGrid.style.gridTemplateColumns = `repeat(${selectedRenderers.length}, 1fr)`;
+rendererGrid.style.gap = "20px";
+
+interface GridCell {
+  element: HTMLCanvasElement | SVGSVGElement;
+  harness: HarnessInstance;
+  generator: GeneratorType;
+  renderer: RendererType;
+}
+
+const gridCells: GridCell[] = [];
+
+for (const generatorType of selectedGenerators) {
+  for (const rendererType of selectedRenderers) {
+    const generator =
+      generatorType === "procedural" ? scene.procedural : scene.object;
+
+    // Create the cell card
+    const card = document.createElement("div");
+    card.className = "renderer-card";
+
+    // Header
+    const header = document.createElement("div");
+    header.className = "renderer-header";
+    const generatorLabel =
+      generatorType === "procedural" ? "Procedural" : "Object";
+    const rendererLabel = rendererType === "svg" ? "SVG" : "Canvas";
+    header.innerHTML = `<span>${generatorLabel} / ${rendererLabel}</span>`;
+    card.appendChild(header);
+
+    // Output container
+    const output = document.createElement("div");
+    output.className = "renderer-output";
+
+    // Create the appropriate element
+    let element: HTMLCanvasElement | SVGSVGElement;
+    const testId = `${generatorType}-${rendererType}`;
+
+    if (rendererType === "svg") {
+      element = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      element.setAttribute("data-testid", testId);
+    } else {
+      element = document.createElement("canvas");
+      element.setAttribute("data-testid", testId);
+    }
+
+    output.appendChild(element);
+    card.appendChild(output);
+
+    rendererGrid.appendChild(card);
+
+    // Create harness and wire up
+    const harness = createHarness(element, generator, rendererType);
+
+    gridCells.push({
+      element,
+      harness,
+      generator: generatorType,
+      renderer: rendererType,
+    });
+  }
+}
 
 // Set up native pointer events for interaction scene
 if (sceneId === "interaction") {
-  // Get the canvas and svg elements
-  const procSvg = document.querySelector<SVGSVGElement>("#proc-svg")!;
-  const procCanvas = document.querySelector<HTMLCanvasElement>("#proc-canvas")!;
-  const objSvg = document.querySelector<SVGSVGElement>("#obj-svg")!;
-  const objCanvas = document.querySelector<HTMLCanvasElement>("#obj-canvas")!;
-
-  // The renderers array matches: [proc-svg, proc-canvas, obj-svg, obj-canvas]
-  const elements = [procSvg, procCanvas, objSvg, objCanvas];
-
-  elements.forEach((el, i) => {
-    el.addEventListener("pointerup", (e) => {
+  for (const cell of gridCells) {
+    cell.element.addEventListener("pointerup", (e) => {
       const event = e as PointerEvent;
-      const renderer = renderers[i];
-      // Get element-relative coordinates (CSS pixels)
-      const rect = el.getBoundingClientRect();
+      const rect = cell.element.getBoundingClientRect();
       const elementX = event.clientX - rect.left;
       const elementY = event.clientY - rect.top;
 
       // Transform to viewport coordinates
-      // (Canvas renderer handles DPR internally, SVG doesn't need it)
-      const [x, y] = renderer.toViewportCoords([elementX, elementY]);
+      const [x, y] = cell.harness.toViewportCoords([elementX, elementY]);
 
       // Update the circle position
       setCirclePosition(x, y);
     });
-  });
-}
-
-// Populate source code displays with current scene's source
-const currentSceneSource = sceneSources[sceneId] || fullDemoSource;
-const sourceMap: Record<string, string> = {
-  "gen-procedural-code": currentSceneSource,
-  "gen-object-code": currentSceneSource,
-  "harness-proc-svg": harnessProcSvgSource,
-  "harness-proc-canvas": harnessProcCanvasSource,
-  "harness-obj-svg": harnessObjSvgSource,
-  "harness-obj-canvas": harnessObjCanvasSource,
-};
-
-for (const [id, source] of Object.entries(sourceMap)) {
-  const container = document.getElementById(id);
-  if (container) {
-    const pre = container.querySelector("pre");
-    if (pre) pre.textContent = source;
   }
 }
 
-// Toggle code visibility
-document.querySelectorAll<HTMLButtonElement>("[data-toggle]").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    const targetId = btn.dataset.toggle;
-    if (!targetId) return;
-    const codeContainer = document.getElementById(targetId);
-    if (!codeContainer) return;
-    const isVisible = codeContainer.classList.toggle("visible");
-    btn.textContent = isVisible
-      ? btn.textContent?.includes("Harness")
-        ? "Hide Harness"
-        : "Hide Code"
-      : btn.textContent?.includes("Harness")
-        ? "Show Harness"
-        : "Show Code";
-  });
-});
-
 // Initial setup
 scene.setBackground(colorInput.value);
-renderers.forEach((r) => r.start());
+gridCells.forEach((cell) => cell.harness.start());
 
 // Update on color change
 colorInput.addEventListener("input", () => {
