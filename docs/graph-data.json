@@ -6357,6 +6357,39 @@
       "created_at": "2026-01-11T17:23:12.758564+00:00",
       "updated_at": "2026-01-11T17:23:12.758564+00:00",
       "metadata_json": "{\"branch\":\"feat/webgpu-renderer\",\"confidence\":85}"
+    },
+    {
+      "id": 582,
+      "change_id": "0237a76d-6d70-489f-961c-22e16bbe6927",
+      "node_type": "action",
+      "title": "Add WebGPU variants to full-screen demos and dropdown",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T17:26:35.964724+00:00",
+      "updated_at": "2026-01-11T17:26:35.964724+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgpu-renderer\",\"confidence\":90}"
+    },
+    {
+      "id": 583,
+      "change_id": "425ca3f7-62d9-4bd1-a0ea-73f3afcbc998",
+      "node_type": "outcome",
+      "title": "WebGPU variants added to full-screen demos - full-screen.ts now supports webgpu renderer, index.html has WebGPU options for all 3 sketches",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T17:28:15.233776+00:00",
+      "updated_at": "2026-01-11T17:28:15.233776+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgpu-renderer\",\"confidence\":95}"
+    },
+    {
+      "id": 584,
+      "change_id": "0b6f2244-ade7-4655-9005-967e98f4dd91",
+      "node_type": "outcome",
+      "title": "WebGPU renderer v1 complete - full implementation with SDF primitives, test-app integration, full-screen demos, all visual parity verified",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T17:39:00.635262+00:00",
+      "updated_at": "2026-01-11T17:39:00.635262+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgpu-renderer\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -12717,6 +12750,39 @@
       "weight": 1.0,
       "rationale": "Implementation complete, pending manual verification",
       "created_at": "2026-01-11T17:23:17.025529+00:00"
+    },
+    {
+      "id": 581,
+      "from_node_id": 570,
+      "to_node_id": 582,
+      "from_change_id": "0f94e3cf-7610-45f6-a799-9c21f1038c19",
+      "to_change_id": "0237a76d-6d70-489f-961c-22e16bbe6927",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Completing WebGPU renderer integration",
+      "created_at": "2026-01-11T17:26:39.520861+00:00"
+    },
+    {
+      "id": 582,
+      "from_node_id": 582,
+      "to_node_id": 583,
+      "from_change_id": "0237a76d-6d70-489f-961c-22e16bbe6927",
+      "to_change_id": "425ca3f7-62d9-4bd1-a0ea-73f3afcbc998",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation complete, all checks pass",
+      "created_at": "2026-01-11T17:28:18.831122+00:00"
+    },
+    {
+      "id": 583,
+      "from_node_id": 570,
+      "to_node_id": 584,
+      "from_change_id": "0f94e3cf-7610-45f6-a799-9c21f1038c19",
+      "to_change_id": "0b6f2244-ade7-4655-9005-967e98f4dd91",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "WebGPU renderer goal achieved",
+      "created_at": "2026-01-11T17:39:08.423926+00:00"
     }
   ]
 }
