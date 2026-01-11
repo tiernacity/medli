@@ -5972,6 +5972,138 @@
       "created_at": "2026-01-11T15:11:01.223347+00:00",
       "updated_at": "2026-01-11T15:11:01.223347+00:00",
       "metadata_json": "{\"branch\":\"feat/webgl-renderer\",\"commit\":\"009f7dd\",\"confidence\":95}"
+    },
+    {
+      "id": 547,
+      "change_id": "25f85f4c-dc65-492b-82a3-25a1a5f7945e",
+      "node_type": "goal",
+      "title": "Investigate WebGL renderer performance - identify bottlenecks causing slowdown in particle plotter and tree scenes",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T15:16:26.044786+00:00",
+      "updated_at": "2026-01-11T15:16:26.044786+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgl-renderer\",\"confidence\":85,\"prompt\":\"Yes, let's understand where the webgl renderer is slow. I noticed symptoms in the particle plotter, and tree, scenes. So look for stress tests that might be representative of those demos.\\n\\nUse task agents to do the testing and profiling. Use task agents to analyse the codebase. Tasks for proposing design changes, etc\"}"
+    },
+    {
+      "id": 548,
+      "change_id": "f2b216c8-131c-4d9c-ae15-309d0bdbff1b",
+      "node_type": "observation",
+      "title": "Key bottlenecks identified in WebGL renderer: (1) HIGH: Color parsing creates canvas+getImageData per color per shape per frame, (2) HIGH: GPU buffer create/delete per batch per frame, (3) MEDIUM-HIGH: TypedArray allocation churn every frame",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T15:17:53.840469+00:00",
+      "updated_at": "2026-01-11T15:17:53.840469+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgl-renderer\",\"confidence\":95}"
+    },
+    {
+      "id": 549,
+      "change_id": "d8d79287-5657-49cf-ab0c-67812df23ca3",
+      "node_type": "observation",
+      "title": "Particle plotter characteristics: 20+ particles/frame, varying stroke widths 1-5px, 5-color palette, no canvas clear. Trees: 24 trees with exponential branching up to thousands of lines, 4 lines/branch with unique color+width. Both impossible to batch effectively.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T15:17:53.902841+00:00",
+      "updated_at": "2026-01-11T15:17:53.902841+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgl-renderer\",\"confidence\":90}"
+    },
+    {
+      "id": 550,
+      "change_id": "299ecd99-3176-4d0b-9826-4b82188c87b3",
+      "node_type": "observation",
+      "title": "Stress tests for profiling: stress-animation (shapes=500+) matches particle plotter patterns, stress-transforms (depth=8, shapes=5) matches tree hierarchical patterns, stress-batch tests worst-case batching",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T15:17:53.960292+00:00",
+      "updated_at": "2026-01-11T15:17:53.960292+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgl-renderer\",\"confidence\":90}"
+    },
+    {
+      "id": 551,
+      "change_id": "3df69929-504f-46f2-af11-2db15da40206",
+      "node_type": "outcome",
+      "title": "PROFILING CONFIRMS: traversalTime is 99%+ of WebGL frame time. 200 shapes: 183.8ms traversal vs 0.14ms GPU. 500 shapes: 473.8ms traversal. Per-shape cost ~0.9ms. Canvas frameTime only 0.2ms for same workload. Root cause: color parsing in traverseNode() creates canvas+getImageData per color per shape per frame.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T15:21:57.287003+00:00",
+      "updated_at": "2026-01-11T15:21:57.287003+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgl-renderer\",\"confidence\":99}"
+    },
+    {
+      "id": 552,
+      "change_id": "6e2977f0-48cc-4632-99ba-1aebd8b70e78",
+      "node_type": "decision",
+      "title": "Choose WebGL color parsing fix approach",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T15:24:22.160902+00:00",
+      "updated_at": "2026-01-11T15:24:22.160902+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgl-renderer\",\"confidence\":95}"
+    },
+    {
+      "id": 553,
+      "change_id": "f40d8be6-cdc9-49d8-bce0-1ee38e6e7eb4",
+      "node_type": "option",
+      "title": "Three-tier color parsing: instance cache + fast-path regex + reused canvas fallback",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T15:24:27.467557+00:00",
+      "updated_at": "2026-01-11T15:24:27.467557+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgl-renderer\",\"confidence\":95}"
+    },
+    {
+      "id": 554,
+      "change_id": "e7992355-bb31-49f5-b6fb-8260835197ff",
+      "node_type": "option",
+      "title": "Normalize colors at Frame creation time (spec change)",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T15:24:27.528164+00:00",
+      "updated_at": "2026-01-11T15:24:27.528164+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgl-renderer\",\"confidence\":40}"
+    },
+    {
+      "id": 555,
+      "change_id": "068ae4ad-5e7f-4bfe-b352-e25e2cae6514",
+      "node_type": "option",
+      "title": "Global color cache (module-level)",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T15:24:27.589181+00:00",
+      "updated_at": "2026-01-11T15:24:27.589181+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgl-renderer\",\"confidence\":50}"
+    },
+    {
+      "id": 556,
+      "change_id": "41e17203-024c-46bc-b417-c8ef7762d823",
+      "node_type": "outcome",
+      "title": "Refined approach: use es-toolkit memoize + single reusable canvas for parseColor. Simpler than manual cache management.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T16:03:35.178513+00:00",
+      "updated_at": "2026-01-11T16:03:35.178513+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgl-renderer\",\"confidence\":95}"
+    },
+    {
+      "id": 557,
+      "change_id": "d22f2c09-4c0a-4d28-b1e2-aa6257352614",
+      "node_type": "action",
+      "title": "Implemented memoized parseColor with es-toolkit + reusable canvas",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T16:06:14.683851+00:00",
+      "updated_at": "2026-01-11T16:06:14.683851+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgl-renderer\",\"confidence\":95,\"files\":[\"packages/renderers/webgl/src/index.ts\",\"packages/renderers/webgl/package.json\"]}"
+    },
+    {
+      "id": 558,
+      "change_id": "3842c688-a05b-400d-9853-99d06c454abb",
+      "node_type": "outcome",
+      "title": "PERFORMANCE FIX VERIFIED: 200 shapes: 184.9ms→0.2ms (925x faster). 500 shapes: 474.8ms→0.4ms (1187x faster). stress-batch 100: 94.8ms→0.3ms (316x faster). All checks pass.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T16:06:20.018031+00:00",
+      "updated_at": "2026-01-11T16:06:20.018031+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgl-renderer\",\"confidence\":99}"
     }
   ],
   "edges": [
@@ -12013,6 +12145,127 @@
       "weight": 1.0,
       "rationale": "Code committed",
       "created_at": "2026-01-11T15:11:06.101345+00:00"
+    },
+    {
+      "id": 552,
+      "from_node_id": 547,
+      "to_node_id": 548,
+      "from_change_id": "25f85f4c-dc65-492b-82a3-25a1a5f7945e",
+      "to_change_id": "f2b216c8-131c-4d9c-ae15-309d0bdbff1b",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Code analysis revealed bottlenecks",
+      "created_at": "2026-01-11T15:18:00.783558+00:00"
+    },
+    {
+      "id": 553,
+      "from_node_id": 547,
+      "to_node_id": 549,
+      "from_change_id": "25f85f4c-dc65-492b-82a3-25a1a5f7945e",
+      "to_change_id": "d8d79287-5657-49cf-ab0c-67812df23ca3",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Demo analysis",
+      "created_at": "2026-01-11T15:18:00.808554+00:00"
+    },
+    {
+      "id": 554,
+      "from_node_id": 547,
+      "to_node_id": 550,
+      "from_change_id": "25f85f4c-dc65-492b-82a3-25a1a5f7945e",
+      "to_change_id": "299ecd99-3176-4d0b-9826-4b82188c87b3",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Test mapping",
+      "created_at": "2026-01-11T15:18:00.830836+00:00"
+    },
+    {
+      "id": 555,
+      "from_node_id": 547,
+      "to_node_id": 551,
+      "from_change_id": "25f85f4c-dc65-492b-82a3-25a1a5f7945e",
+      "to_change_id": "3df69929-504f-46f2-af11-2db15da40206",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Profiling results confirm root cause",
+      "created_at": "2026-01-11T15:22:01.843270+00:00"
+    },
+    {
+      "id": 556,
+      "from_node_id": 547,
+      "to_node_id": 552,
+      "from_change_id": "25f85f4c-dc65-492b-82a3-25a1a5f7945e",
+      "to_change_id": "6e2977f0-48cc-4632-99ba-1aebd8b70e78",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Fix approach decision",
+      "created_at": "2026-01-11T15:24:33.206935+00:00"
+    },
+    {
+      "id": 557,
+      "from_node_id": 552,
+      "to_node_id": 553,
+      "from_change_id": "6e2977f0-48cc-4632-99ba-1aebd8b70e78",
+      "to_change_id": "f40d8be6-cdc9-49d8-bce0-1ee38e6e7eb4",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Recommended: no API changes, 100-500x improvement",
+      "created_at": "2026-01-11T15:24:33.230024+00:00"
+    },
+    {
+      "id": 558,
+      "from_node_id": 552,
+      "to_node_id": 554,
+      "from_change_id": "6e2977f0-48cc-4632-99ba-1aebd8b70e78",
+      "to_change_id": "e7992355-bb31-49f5-b6fb-8260835197ff",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Rejected: breaking spec change, only benefits WebGL",
+      "created_at": "2026-01-11T15:24:33.252998+00:00"
+    },
+    {
+      "id": 559,
+      "from_node_id": 552,
+      "to_node_id": 555,
+      "from_change_id": "6e2977f0-48cc-4632-99ba-1aebd8b70e78",
+      "to_change_id": "068ae4ad-5e7f-4bfe-b352-e25e2cae6514",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Rejected: memory leak risk, global state",
+      "created_at": "2026-01-11T15:24:33.276013+00:00"
+    },
+    {
+      "id": 560,
+      "from_node_id": 553,
+      "to_node_id": 556,
+      "from_change_id": "f40d8be6-cdc9-49d8-bce0-1ee38e6e7eb4",
+      "to_change_id": "41e17203-024c-46bc-b417-c8ef7762d823",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Simplified implementation",
+      "created_at": "2026-01-11T16:03:40.107007+00:00"
+    },
+    {
+      "id": 561,
+      "from_node_id": 556,
+      "to_node_id": 557,
+      "from_change_id": "41e17203-024c-46bc-b417-c8ef7762d823",
+      "to_change_id": "d22f2c09-4c0a-4d28-b1e2-aa6257352614",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation of refined approach",
+      "created_at": "2026-01-11T16:06:25.003079+00:00"
+    },
+    {
+      "id": 562,
+      "from_node_id": 557,
+      "to_node_id": 558,
+      "from_change_id": "d22f2c09-4c0a-4d28-b1e2-aa6257352614",
+      "to_change_id": "3842c688-a05b-400d-9853-99d06c454abb",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Profiling confirms fix",
+      "created_at": "2026-01-11T16:06:25.027505+00:00"
     }
   ]
 }
