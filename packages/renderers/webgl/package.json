@@ -24,10 +24,11 @@
     "dist"
   ],
   "dependencies": {
-    "@medli/spec": "*",
     "@medli/renderer-common": "*",
-    "twgl.js": "^7.0.0",
-    "gl-matrix": "^3.4.3"
+    "@medli/spec": "*",
+    "es-toolkit": "^1.43.0",
+    "gl-matrix": "^3.4.3",
+    "twgl.js": "^7.0.0"
   },
   "devDependencies": {
     "@types/offscreencanvas": "^2019.7.3"

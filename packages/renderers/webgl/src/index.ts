@@ -31,6 +31,7 @@ import {
 } from "@medli/renderer-common";
 import * as twgl from "twgl.js";
 import { mat3 } from "gl-matrix";
+import { memoize } from "es-toolkit";
 
 // Shader sources as inline strings
 const RECT_VERT = `#version 300 es
@@ -480,16 +481,26 @@ export interface WebGLRendererMetrics extends BaseRendererMetrics {
   gpuTimerAvailable: boolean;
 }
 
+// Lazy-initialized canvas for color parsing (reused across all calls)
+let colorParserCanvas: HTMLCanvasElement | null = null;
+let colorParserCtx: CanvasRenderingContext2D | null = null;
+
+function getColorParserContext(): CanvasRenderingContext2D | null {
+  if (!colorParserCtx) {
+    colorParserCanvas = document.createElement("canvas");
+    colorParserCanvas.width = 1;
+    colorParserCanvas.height = 1;
+    colorParserCtx = colorParserCanvas.getContext("2d");
+  }
+  return colorParserCtx;
+}
+
 /**
  * Parse a CSS color string to normalized RGBA values (0-1 range).
  * Supports: hex (#rgb, #rrggbb, #rgba, #rrggbbaa), rgb(), rgba(), named colors.
  */
-function parseColor(color: string): [number, number, number, number] {
-  // Use a canvas to parse the color (works for all CSS color formats)
-  const canvas = document.createElement("canvas");
-  canvas.width = 1;
-  canvas.height = 1;
-  const ctx = canvas.getContext("2d");
+function parseColorImpl(color: string): [number, number, number, number] {
+  const ctx = getColorParserContext();
   if (!ctx) {
     return [0, 0, 0, 1]; // Fallback to black
   }
@@ -500,6 +511,8 @@ function parseColor(color: string): [number, number, number, number] {
 
   return [data[0] / 255, data[1] / 255, data[2] / 255, data[3] / 255];
 }
+
+const parseColor = memoize(parseColorImpl);
 
 /**
  * Expand 6-value 2D affine matrix to gl-matrix mat3 (column-major).
