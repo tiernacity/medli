@@ -1,6 +1,7 @@
 import type {
   Generator,
   Renderer,
+  BaseRendererMetrics,
   Viewport,
   Frame,
   FrameNode,
@@ -155,18 +156,54 @@ export function extractResourceUrls(frame: Frame): Set<string> {
   return urls;
 }
 
+/** Default size for the rolling FPS window */
+const FPS_WINDOW_SIZE = 60;
+
 /**
  * Base class for renderers providing common animation loop functionality.
  *
  * Subclasses must implement the `render(time)` method to draw the frame.
  * The `loop()` and `stop()` methods handle requestAnimationFrame management.
+ *
+ * Generic on metrics type to allow renderer-specific metrics.
+ * Uses BaseRendererMetrics as default for backwards compatibility.
+ *
+ * @typeParam M - Metrics type extending BaseRendererMetrics
  */
-export abstract class BaseRenderer implements Renderer {
+export abstract class BaseRenderer<
+  M extends BaseRendererMetrics = BaseRendererMetrics,
+> implements Renderer<M> {
   protected generator: Generator;
   private animationId: number | null = null;
 
-  constructor(generator: Generator) {
+  /** Performance metrics for the current/last frame */
+  protected _metrics: M;
+
+  /** Total frames rendered since renderer creation */
+  protected _frameCount: number = 0;
+
+  /** Whether the animation loop is currently active */
+  protected _isLooping: boolean = false;
+
+  /** Rolling window of frame times for FPS calculation */
+  private _frameTimes: number[] = [];
+
+  /** Timestamp when current frame started (for frameTime calculation) */
+  private _frameStartTime: number = 0;
+
+  /**
+   * Create a new BaseRenderer.
+   * @param generator - The generator providing frames to render
+   * @param initialMetrics - Initial metrics object (subclasses provide their own type)
+   */
+  constructor(generator: Generator, initialMetrics: M) {
     this.generator = generator;
+    this._metrics = initialMetrics;
+  }
+
+  /** Get performance metrics for the last rendered frame */
+  get metrics(): M {
+    return this._metrics;
   }
 
   /** Render a single frame. Subclasses implement this. */
@@ -177,6 +214,7 @@ export abstract class BaseRenderer implements Renderer {
 
   /** Start the animation loop. */
   loop(): void {
+    this._isLooping = true;
     const animate = async (time: number) => {
       await this.render(time);
       this.animationId = requestAnimationFrame(animate);
@@ -186,10 +224,87 @@ export abstract class BaseRenderer implements Renderer {
 
   /** Stop the animation loop. */
   stop(): void {
+    this._isLooping = false;
+    this._metrics = { ...this._metrics, fps: undefined };
+    this._frameTimes = [];
     if (this.animationId !== null) {
       cancelAnimationFrame(this.animationId);
       this.animationId = null;
     }
+  }
+
+  /**
+   * Call at the start of render() to begin metrics collection.
+   * Records the frame start timestamp and resets base timing fields.
+   * Subclasses should reset their own renderer-specific metrics fields.
+   */
+  protected startMetricsFrame(timestamp: DOMHighResTimeStamp): void {
+    this._frameStartTime = performance.now();
+    this._metrics = {
+      ...this._metrics,
+      lastFrameTimestamp: timestamp,
+      generatorTime: 0,
+      traversalTime: 0,
+      resourceTime: 0,
+      renderTime: 0,
+      shapeCount: 0,
+    };
+  }
+
+  /** Record time spent in generator.frame() */
+  protected recordGeneratorTime(ms: number): void {
+    this._metrics = { ...this._metrics, generatorTime: ms };
+  }
+
+  /** Record time spent traversing the frame tree */
+  protected recordTraversalTime(ms: number): void {
+    this._metrics = { ...this._metrics, traversalTime: ms };
+  }
+
+  /** Record time spent loading/resolving resources */
+  protected recordResourceTime(ms: number): void {
+    this._metrics = { ...this._metrics, resourceTime: ms };
+  }
+
+  /** Record time spent in actual rendering (GPU/DOM) */
+  protected recordRenderTime(ms: number): void {
+    this._metrics = { ...this._metrics, renderTime: ms };
+  }
+
+  /** Record shape count for the current frame */
+  protected recordShapeCount(count: number): void {
+    this._metrics = { ...this._metrics, shapeCount: count };
+  }
+
+  /**
+   * Call at the end of render() to finalize metrics.
+   * Calculates total frameTime and updates FPS if looping.
+   */
+  protected endMetricsFrame(): void {
+    this._frameCount++;
+    const frameTime = performance.now() - this._frameStartTime;
+
+    let fps: number | undefined = undefined;
+    if (this._isLooping) {
+      // Add current frame time to rolling window
+      this._frameTimes.push(frameTime);
+      if (this._frameTimes.length > FPS_WINDOW_SIZE) {
+        this._frameTimes.shift();
+      }
+      // Calculate average FPS from rolling window
+      if (this._frameTimes.length > 0) {
+        const avgFrameTime =
+          this._frameTimes.reduce((a, b) => a + b, 0) / this._frameTimes.length;
+        fps = avgFrameTime > 0 ? 1000 / avgFrameTime : 0;
+      }
+    }
+
+    this._metrics = {
+      ...this._metrics,
+      frameTime,
+      frameCount: this._frameCount,
+      fps,
+    };
   }
 }
 

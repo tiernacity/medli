@@ -65,16 +65,33 @@ fn sd_circle(p: vec2<f32>, r: f32) -> f32 {
     return length(p) - r;
 }
 
-// Rectangle SDF in WGSL
+// Rectangle SDF in WGSL - use Chebyshev distance for sharp corners
+// > Lesson from WebGL: The standard box SDF produces slightly rounded corners.
+// > Use max(d.x, d.y) (Chebyshev/L∞ distance) for pixel-perfect sharp corners
+// > matching Canvas/SVG rendering.
 fn sd_box(p: vec2<f32>, b: vec2<f32>) -> f32 {
     let d = abs(p) - b;
-    return length(max(d, vec2(0.0))) + min(max(d.x, d.y), 0.0);
+    return max(d.x, d.y);  // Chebyshev distance for sharp corners
+}
+
+// Line SDF - use box SDF for square/butt caps
+// > Lesson from WebGL: Capsule SDF (rounded ends) doesn't match Canvas/SVG
+// > line rendering which uses square/butt caps. Use oriented box SDF instead.
+fn sd_line(p: vec2<f32>, a: vec2<f32>, b: vec2<f32>, width: f32) -> f32 {
+    let pa = p - a;
+    let ba = b - a;
+    let h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
+    let d = pa - ba * h;
+    // Use box distance (max of components) for square ends
+    return max(abs(d.x), abs(d.y)) - width * 0.5;
 }
 
 // Anti-aliased edge
 let aa = fwidth(d);
 let alpha = 1.0 - smoothstep(-aa, aa, d);
 ```
+
+> **Visual Parity Note:** SDF choices directly affect whether output matches Canvas/SVG. Test each primitive against all renderers in the test-app to verify parity.
 
 ### Instancing Strategy
 
@@ -292,36 +309,64 @@ WebGPU buffers are **immutable in size/usage**. Strategy:
 
 ## Draw Order and Transparency
 
-### Z-Buffer Approach
+> **Lesson from WebGL:** Z-buffer/depth testing is **problematic** with SDF-based transparent shapes. SDF anti-aliased edges produce fragments with varying alpha (0.0 to 1.0) - these are intrinsically transparent. Depth test + alpha blending creates a fundamental conflict: the depth buffer doesn't understand transparency.
 
-Assign z-values based on Frame tree traversal order:
+### Recommended Approach: Tree-Order Rendering (No Depth Buffer)
 
-```wgsl
-@vertex
-fn main(...) -> VertexOutput {
-  // z from instance data, normalized to 0-1 range
-  let z = in.drawOrder / 10000.0;
-  return VertexOutput(vec4f(clipPos.xy, z, 1.0), ...);
+Based on WebGL implementation experience, the correct approach for 2D SDF rendering is:
+
+1. **No depth buffer** - disable depth testing entirely
+2. **Render in Frame tree traversal order** - painter's algorithm
+3. **Smart consecutive batching** - batch shapes of the same type that appear consecutively in traversal order
+
+This matches Canvas and SVG behavior exactly, which is critical for visual parity.
+
+```typescript
+// Pipeline configuration - NO depth buffer
+{
+  // No depthStencil configuration needed
+  primitive: { topology: 'triangle-strip' },
 }
 ```
 
-Pipeline configuration:
+### Why Not Z-Buffer?
+
+The original design proposed z-buffer with two-pass rendering. WebGL implementation revealed why this fails:
+
+| Approach | Problem |
+|----------|---------|
+| Pure depth testing | SDF AA edges have fragments with alpha 0.0-1.0. Depth test passes/fails entire fragment, causing hard edges or missing pixels |
+| Depth test + depthMask(false) for transparent | Requires back-to-front sorting AND knowing which shapes are transparent. Every SDF shape has transparent edge pixels |
+| Two-pass (opaque then transparent) | All SDF shapes have transparent edge fragments - there are no truly "opaque" shapes |
+
+### Transparency and Alpha Blending
+
+> **Lesson from WebGL:** Shaders must premultiply RGB by the color's own alpha BEFORE applying SDF alpha. Otherwise causes double-premultiplication and washed-out colors.
+
+Correct alpha handling in fragment shader:
+```wgsl
+// Premultiply RGB by color alpha FIRST
+let premultiplied = vec4f(color.rgb * color.a, color.a);
+
+// THEN apply SDF alpha for anti-aliasing
+let sdfAlpha = 1.0 - smoothstep(-aa, aa, d);
+return vec4f(premultiplied.rgb * sdfAlpha, premultiplied.a * sdfAlpha);
+```
+
+Blend state for premultiplied alpha:
 ```typescript
 {
-  depthStencil: {
-    depthWriteEnabled: true,
-    depthCompare: 'less',
-    format: 'depth24plus',
+  color: {
+    srcFactor: 'one',  // NOT 'src-alpha' - already premultiplied
+    dstFactor: 'one-minus-src-alpha',
+    operation: 'add',
+  },
+  alpha: {
+    srcFactor: 'one',
+    dstFactor: 'one-minus-src-alpha',
+    operation: 'add',
   },
 }
-```
-
-### Transparency
-
-For shapes with alpha < 1:
-1. Render opaque shapes first (depth write ON)
-2. Sort transparent shapes back-to-front
-3. Render transparent shapes (depth write OFF, blend ON)
 
 ## WebGPU-Specific Considerations
 
@@ -377,12 +422,14 @@ if (error) {
 ### Phase 4: Performance
 1. Instanced rendering
 2. Batching by primitive type
-3. Draw order handling (depth buffer)
+3. Tree-order rendering with smart consecutive batching (no depth buffer - see "Draw Order" section)
 
 ### Phase 5: Images
 1. Texture loading via ResourceManager
 2. Image primitive rendering
 3. Cropping via texture coordinates
+
+> **Lesson from WebGL:** Image Y-coordinate handling requires care. WebGPU (like WebGL) has Y-axis pointing up, but Frame spec uses top-left origin (Y down). For images, subtract height from position.y when computing texture coordinates to match Canvas/SVG positioning.
 
 ### Phase 6: Polish
 1. toViewportCoords() for interaction
@@ -406,17 +453,69 @@ src/
 └── types.ts           # TypeGPU struct definitions
 ```
 
+## Color Parsing Performance
+
+> **Critical Lesson from WebGL:** CSS color parsing was the #1 performance bottleneck, consuming 99%+ of frame time in stress tests (200 shapes: 184ms for color parsing vs 0.14ms for GPU rendering).
+
+### The Problem
+
+Parsing CSS color strings (hex, rgb(), rgba(), named colors) to normalized RGBA values requires canvas 2D context:
+
+```typescript
+// SLOW: Creates canvas per call, no caching
+function parseColor(color: string): [number, number, number, number] {
+  const canvas = document.createElement('canvas');  // Allocation
+  canvas.width = 1; canvas.height = 1;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, 1, 1);
+  const data = ctx.getImageData(0, 0, 1, 1).data;  // Expensive readback
+  return [data[0]/255, data[1]/255, data[2]/255, data[3]/255];
+}
+```
+
+### The Solution
+
+**Memoize + Reuse Canvas:**
+```typescript
+import { memoize } from 'es-toolkit';
+
+let colorCtx: CanvasRenderingContext2D | null = null;
+function getColorContext() {
+  if (!colorCtx) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1; canvas.height = 1;
+    colorCtx = canvas.getContext('2d');
+  }
+  return colorCtx;
+}
+
+function parseColorImpl(color: string): [number, number, number, number] {
+  const ctx = getColorContext();
+  ctx.clearRect(0, 0, 1, 1);  // CRITICAL: Clear before each parse!
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, 1, 1);
+  const data = ctx.getImageData(0, 0, 1, 1).data;
+  return [data[0]/255, data[1]/255, data[2]/255, data[3]/255];
+}
+
+const parseColor = memoize(parseColorImpl);  // Cache results
+```
+
+**Results:** 900x+ speedup (200 shapes: 184ms → 0.2ms)
+
+> **Warning:** The `clearRect()` call is essential. Without it, semi-transparent colors blend with previously parsed colors on the reused canvas, producing incorrect RGBA values.
+
 ## Known Limitations
 
 ### Transparency and Draw Order
 
-The current design renders shapes in Frame tree traversal order without depth sorting. For scenes with overlapping transparent shapes, this means:
+The design renders shapes in Frame tree traversal order (painter's algorithm), matching Canvas and SVG behavior. This is intentional based on WebGL implementation experience - see "Draw Order and Transparency" section for rationale.
 
-- Draw order is determined by position in the Frame tree
-- No back-to-front sorting for correct alpha blending
-- No order-independent transparency (OIT)
-
-**Future consideration:** Implement separate opaque/transparent passes with sorting when transparency becomes a priority.
+For complex overlapping transparent scenes:
+- Draw order is determined by position in the Frame tree (same as Canvas/SVG)
+- This is correct behavior for visual parity
+- Order-independent transparency (OIT) is a future consideration for advanced use cases
 
 ### Future Features
 

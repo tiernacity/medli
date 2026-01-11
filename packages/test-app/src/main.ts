@@ -23,6 +23,10 @@ import imageCropSource from "./scenes/image-crop.ts?raw";
 import optionalClearSource from "./scenes/optional-clear.ts?raw";
 import transparencySource from "./scenes/transparency.ts?raw";
 import interactionSource from "./scenes/interaction.ts?raw";
+import stressShapesSource from "./scenes/stress-shapes.ts?raw";
+import stressAnimationSource from "./scenes/stress-animation.ts?raw";
+import stressBatchSource from "./scenes/stress-batch.ts?raw";
+import stressTransformsSource from "./scenes/stress-transforms.ts?raw";
 
 // Map scene IDs to their source code
 const sceneSources: Record<string, string> = {
@@ -34,6 +38,10 @@ const sceneSources: Record<string, string> = {
   "optional-clear": optionalClearSource,
   transparency: transparencySource,
   interaction: interactionSource,
+  "stress-shapes": stressShapesSource,
+  "stress-animation": stressAnimationSource,
+  "stress-batch": stressBatchSource,
+  "stress-transforms": stressTransformsSource,
 };
 
 // Parse query parameters
@@ -47,7 +55,7 @@ const validGenerators = generatorParams.filter(
   (g): g is GeneratorType => g === "procedural" || g === "object"
 );
 const validRenderers = rendererParams.filter(
-  (r): r is RendererType => r === "svg" || r === "canvas"
+  (r): r is RendererType => r === "svg" || r === "canvas" || r === "webgl"
 );
 
 // Redirect to explicit URL if any params are missing or invalid
@@ -59,7 +67,10 @@ const needsRedirect =
 
 if (needsRedirect) {
   const url = new URL(window.location.href);
-  url.searchParams.set("scene", sceneParam && sceneParam in scenes ? sceneParam : defaultSceneId);
+  url.searchParams.set(
+    "scene",
+    sceneParam && sceneParam in scenes ? sceneParam : defaultSceneId
+  );
 
   if (validGenerators.length === 0) {
     url.searchParams.append("generator", "procedural");
@@ -68,6 +79,7 @@ if (needsRedirect) {
   if (validRenderers.length === 0) {
     url.searchParams.append("renderer", "svg");
     url.searchParams.append("renderer", "canvas");
+    url.searchParams.append("renderer", "webgl");
   }
 
   window.location.replace(url.toString());
@@ -89,14 +101,28 @@ const sceneCode = document.getElementById("scene-code") as HTMLPreElement;
 const rendererGrid = document.getElementById("renderer-grid") as HTMLDivElement;
 
 // Custom dropdown elements
-const sceneDropdown = document.getElementById("scene-dropdown") as HTMLDivElement;
-const sceneButton = document.getElementById("scene-button") as HTMLButtonElement;
+const sceneDropdown = document.getElementById(
+  "scene-dropdown"
+) as HTMLDivElement;
+const sceneButton = document.getElementById(
+  "scene-button"
+) as HTMLButtonElement;
 const sceneMenu = document.getElementById("scene-menu") as HTMLDivElement;
-const generatorDropdown = document.getElementById("generator-dropdown") as HTMLDivElement;
-const generatorButton = document.getElementById("generator-button") as HTMLButtonElement;
-const generatorMenu = document.getElementById("generator-menu") as HTMLDivElement;
-const rendererDropdown = document.getElementById("renderer-dropdown") as HTMLDivElement;
-const rendererButton = document.getElementById("renderer-button") as HTMLButtonElement;
+const generatorDropdown = document.getElementById(
+  "generator-dropdown"
+) as HTMLDivElement;
+const generatorButton = document.getElementById(
+  "generator-button"
+) as HTMLButtonElement;
+const generatorMenu = document.getElementById(
+  "generator-menu"
+) as HTMLDivElement;
+const rendererDropdown = document.getElementById(
+  "renderer-dropdown"
+) as HTMLDivElement;
+const rendererButton = document.getElementById(
+  "renderer-button"
+) as HTMLButtonElement;
 const rendererMenu = document.getElementById("renderer-menu") as HTMLDivElement;
 
 // Populate scene dropdown menu
@@ -110,24 +136,32 @@ for (const [id, sceneData] of Object.entries(scenes)) {
 sceneButton.textContent = scenes[sceneId].name;
 
 // Set selected state on generator items
-const generatorItems = generatorMenu.querySelectorAll<HTMLDivElement>(".dropdown-item");
+const generatorItems =
+  generatorMenu.querySelectorAll<HTMLDivElement>(".dropdown-item");
 for (const item of generatorItems) {
   if (selectedGenerators.includes(item.dataset.value as GeneratorType)) {
     item.classList.add("selected");
   }
 }
-generatorButton.textContent = selectedGenerators.length === 2 ? "All" :
-  selectedGenerators.map(g => g === "procedural" ? "Procedural" : "Object").join(", ");
+generatorButton.textContent =
+  selectedGenerators.length === 2
+    ? "All"
+    : selectedGenerators
+        .map((g) => (g === "procedural" ? "Procedural" : "Object"))
+        .join(", ");
 
 // Set selected state on renderer items
-const rendererItems = rendererMenu.querySelectorAll<HTMLDivElement>(".dropdown-item");
+const rendererItems =
+  rendererMenu.querySelectorAll<HTMLDivElement>(".dropdown-item");
 for (const item of rendererItems) {
   if (selectedRenderers.includes(item.dataset.value as RendererType)) {
     item.classList.add("selected");
   }
 }
-rendererButton.textContent = selectedRenderers.length === 2 ? "All" :
-  selectedRenderers.map(r => r.toUpperCase()).join(", ");
+rendererButton.textContent =
+  selectedRenderers.length === 3
+    ? "All"
+    : selectedRenderers.map((r) => r.toUpperCase()).join(", ");
 
 // Build URL with current selections (always explicit, no defaults)
 function buildUrl(
@@ -170,7 +204,9 @@ function setupDropdown(
   });
 
   menu.addEventListener("click", (e) => {
-    const item = (e.target as HTMLElement).closest(".dropdown-item") as HTMLDivElement | null;
+    const item = (e.target as HTMLElement).closest(
+      ".dropdown-item"
+    ) as HTMLDivElement | null;
     if (item) {
       onSelect(item.dataset.value!, item);
     }
@@ -179,7 +215,9 @@ function setupDropdown(
 
 // Close dropdowns when clicking outside
 document.addEventListener("click", () => {
-  document.querySelectorAll(".dropdown.open").forEach((d) => d.classList.remove("open"));
+  document
+    .querySelectorAll(".dropdown.open")
+    .forEach((d) => d.classList.remove("open"));
 });
 
 // Scene dropdown (single-select)
@@ -188,25 +226,30 @@ setupDropdown(sceneDropdown, sceneButton, sceneMenu, (value) => {
 });
 
 // Generator dropdown (multi-select with toggle)
-setupDropdown(generatorDropdown, generatorButton, generatorMenu, (value, item) => {
-  const isSelected = item.classList.contains("selected");
-  const currentSelected = Array.from(generatorItems)
-    .filter((i) => i.classList.contains("selected"))
-    .map((i) => i.dataset.value as GeneratorType);
+setupDropdown(
+  generatorDropdown,
+  generatorButton,
+  generatorMenu,
+  (value, item) => {
+    const isSelected = item.classList.contains("selected");
+    const currentSelected = Array.from(generatorItems)
+      .filter((i) => i.classList.contains("selected"))
+      .map((i) => i.dataset.value as GeneratorType);
 
-  let newSelected: GeneratorType[];
-  if (isSelected && currentSelected.length > 1) {
-    // Deselect (but keep at least one)
-    newSelected = currentSelected.filter((v) => v !== value);
-  } else if (!isSelected) {
-    // Select
-    newSelected = [...currentSelected, value as GeneratorType];
-  } else {
-    // Can't deselect the last one
-    return;
+    let newSelected: GeneratorType[];
+    if (isSelected && currentSelected.length > 1) {
+      // Deselect (but keep at least one)
+      newSelected = currentSelected.filter((v) => v !== value);
+    } else if (!isSelected) {
+      // Select
+      newSelected = [...currentSelected, value as GeneratorType];
+    } else {
+      // Can't deselect the last one
+      return;
+    }
+    window.location.href = buildUrl(sceneId, newSelected, selectedRenderers);
   }
-  window.location.href = buildUrl(sceneId, newSelected, selectedRenderers);
-});
+);
 
 // Renderer dropdown (multi-select with toggle)
 setupDropdown(rendererDropdown, rendererButton, rendererMenu, (value, item) => {
@@ -270,7 +313,12 @@ for (const generatorType of selectedGenerators) {
     header.className = "renderer-header";
     const generatorLabel =
       generatorType === "procedural" ? "Procedural" : "Object";
-    const rendererLabel = rendererType === "svg" ? "SVG" : "Canvas";
+    const rendererLabel =
+      rendererType === "svg"
+        ? "SVG"
+        : rendererType === "webgl"
+          ? "WebGL"
+          : "Canvas";
     header.innerHTML = `<span>${generatorLabel} / ${rendererLabel}</span>`;
     card.appendChild(header);
 
@@ -286,6 +334,7 @@ for (const generatorType of selectedGenerators) {
       element = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       element.setAttribute("data-testid", testId);
     } else {
+      // Both Canvas and WebGL use HTMLCanvasElement
       element = document.createElement("canvas");
       element.setAttribute("data-testid", testId);
     }
@@ -306,6 +355,74 @@ for (const generatorType of selectedGenerators) {
     });
   }
 }
+
+/**
+ * Expose metrics API for performance analysis.
+ * - window.medli.reportMetrics() - logs formatted metrics to console
+ * - window.medli.getMetrics() - returns structured metrics object
+ */
+declare global {
+  interface Window {
+    medli?: {
+      reportMetrics: () => void;
+      getMetrics: () => Record<
+        string,
+        ReturnType<HarnessInstance["getMetrics"]>
+      >;
+    };
+  }
+}
+
+window.medli = {
+  reportMetrics: () => {
+    console.log("\n=== Medli Renderer Metrics ===");
+    for (const cell of gridCells) {
+      const label = `${cell.generator}/${cell.renderer}`;
+      const m = cell.harness.getMetrics();
+      console.log(`\n[${label}]`);
+      console.log(`  FPS: ${m.fps?.toFixed(1) ?? "calculating..."}`);
+      console.log(`  Frame time: ${m.frameTime.toFixed(2)}ms`);
+      console.log(`  Generator: ${m.generatorTime.toFixed(2)}ms`);
+      console.log(`  Traversal: ${m.traversalTime.toFixed(2)}ms`);
+      console.log(`  Resource: ${m.resourceTime.toFixed(2)}ms`);
+      console.log(`  Render: ${m.renderTime.toFixed(2)}ms`);
+      console.log(`  Shapes: ${m.shapeCount}`);
+      console.log(`  Frame count: ${m.frameCount}`);
+      // WebGL-specific metrics
+      if ("batchCount" in m) {
+        console.log(`  Batch count: ${m.batchCount}`);
+      }
+      if ("gpuTime" in m) {
+        const gpuTime = m.gpuTime as number | undefined;
+        console.log(
+          `  GPU time: ${gpuTime !== undefined ? gpuTime.toFixed(2) + "ms" : "N/A"}`
+        );
+      }
+      if ("gpuTimerAvailable" in m) {
+        console.log(`  GPU timer available: ${m.gpuTimerAvailable}`);
+      }
+      // SVG-specific metrics
+      if ("snapshotTime" in m) {
+        const snapshotTime = m.snapshotTime as number | undefined;
+        console.log(
+          `  Snapshot time: ${snapshotTime !== undefined ? snapshotTime.toFixed(2) + "ms" : "N/A"}`
+        );
+      }
+    }
+    console.log("\n==============================\n");
+  },
+  getMetrics: () => {
+    const result: Record<
+      string,
+      ReturnType<HarnessInstance["getMetrics"]>
+    > = {};
+    for (const cell of gridCells) {
+      const label = `${cell.generator}/${cell.renderer}`;
+      result[label] = cell.harness.getMetrics();
+    }
+    return result;
+  },
+};
 
 // Set up native pointer events for interaction scene
 if (sceneId === "interaction") {

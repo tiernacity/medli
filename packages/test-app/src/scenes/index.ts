@@ -7,6 +7,10 @@ import { scene as imageCrop } from "./image-crop";
 import { scene as optionalClear } from "./optional-clear";
 import { scene as transparency } from "./transparency";
 import { scene as interaction, setCirclePosition } from "./interaction";
+import { scene as stressShapes } from "./stress-shapes";
+import { scene as stressBatch } from "./stress-batch";
+import { scene as stressAnimation } from "./stress-animation";
+import { scene as stressTransforms } from "./stress-transforms";
 
 export const scenes: Record<string, TestScene> = {
   "full-demo": fullDemo,
@@ -17,6 +21,10 @@ export const scenes: Record<string, TestScene> = {
   "optional-clear": optionalClear,
   transparency: transparency,
   interaction: interaction,
+  "stress-shapes": stressShapes,
+  "stress-batch": stressBatch,
+  "stress-animation": stressAnimation,
+  "stress-transforms": stressTransforms,
 };
 
 export type SceneId = keyof typeof scenes;

@@ -6,13 +6,15 @@
  * Usage:
  *   /full-screen.html?sketch=particle-plotter&renderer=canvas
  *   /full-screen.html?sketch=trees&renderer=svg
+ *   /full-screen.html?sketch=particle-plotter&renderer=webgl
  *
  * Parameters:
  *   - sketch: Sketch ID (required, defaults to "particle-plotter")
- *   - renderer: "canvas" or "svg" (optional, defaults to "canvas")
+ *   - renderer: "canvas", "svg", or "webgl" (optional, defaults to "canvas")
  */
 import { CanvasRenderer } from "@medli/renderer-canvas";
 import { SvgRenderer } from "@medli/renderer-svg";
+import { WebGLRenderer } from "@medli/renderer-webgl";
 import { getSketch, getSketchIds } from "./sketches";
 
 // ============================================================================
@@ -21,7 +23,8 @@ import { getSketch, getSketchIds } from "./sketches";
 
 const params = new URLSearchParams(window.location.search);
 const sketchId = params.get("sketch") ?? "particle-plotter";
-const rendererType = (params.get("renderer") as "canvas" | "svg") ?? "canvas";
+const rendererType =
+  (params.get("renderer") as "canvas" | "svg" | "webgl") ?? "canvas";
 
 // ============================================================================
 // Validate Sketch
@@ -57,6 +60,7 @@ if (rendererType === "svg") {
   if (canvas) canvas.style.display = "none";
   if (svgElement) svgElement.style.display = "block";
 } else {
+  // Both Canvas and WebGL use the canvas element
   if (canvas) canvas.style.display = "block";
   if (svgElement) svgElement.style.display = "none";
 }
@@ -79,10 +83,12 @@ const instance = sketchModule.create(
 // Create Renderer
 // ============================================================================
 
-let renderer: CanvasRenderer | SvgRenderer;
+let renderer: CanvasRenderer | SvgRenderer | WebGLRenderer;
 
 if (rendererType === "svg" && svgElement) {
   renderer = new SvgRenderer(svgElement, instance.generator);
+} else if (rendererType === "webgl" && canvas) {
+  renderer = new WebGLRenderer(canvas, instance.generator);
 } else if (canvas) {
   renderer = new CanvasRenderer(canvas, instance.generator);
 } else {

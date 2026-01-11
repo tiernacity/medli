@@ -13,16 +13,22 @@
   },
   "scripts": {
     "build": "tsc",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo 'Linted by root eslint'",
+    "format": "echo 'Formatted by root prettier'",
+    "format:check": "echo 'Checked by root prettier'",
+    "test": "echo 'No tests yet'"
   },
   "files": [
     "dist"
   ],
   "dependencies": {
-    "@medli/spec": "*",
     "@medli/renderer-common": "*",
-    "twgl.js": "^7.0.0",
-    "gl-matrix": "^3.4.3"
+    "@medli/spec": "*",
+    "es-toolkit": "^1.43.0",
+    "gl-matrix": "^3.4.3",
+    "twgl.js": "^7.0.0"
   },
   "devDependencies": {
     "@types/offscreencanvas": "^2019.7.3"

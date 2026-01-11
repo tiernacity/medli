@@ -1,29 +1,5 @@
 [
   {
-    "hash": "009f7dda501b4ab90a3f2e0f4b83bf66af517e6c",
-    "short_hash": "009f7dd",
-    "author": "Chris Tierney",
-    "date": "2026-01-11T15:10:55Z",
-    "message": "feat: add performance stress test scenes\n\nAdd 4 dedicated stress test scenes for controlled renderer comparison:\n- stress-shapes: configurable shape count (?shapes=N) in grid pattern\n- stress-animation: animated orbiting circles for per-frame stress\n- stress-batch: alternating circles/rectangles to test batching efficiency\n- stress-transforms: deeply nested Groups with accumulated transforms\n\nAll scenes support URL parameters for tuning intensity and produce\nidentical output across Canvas and WebGL renderers.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
-    "files_changed": 6
-  },
-  {
-    "hash": "5aea83fe46007dd9cfa538f84e7403c1e8fd6f52",
-    "short_hash": "5aea83f",
-    "author": "Chris Tierney",
-    "date": "2026-01-11T14:11:49Z",
-    "message": "feat: make Renderer generic on metrics type\n\nEach renderer now defines its own metrics type extending BaseRendererMetrics:\n- CanvasRendererMetrics: base metrics only (no GPU, no batching)\n- SvgRendererMetrics: adds snapshotTime (previously hidden 10-100ms cost)\n- WebGLRendererMetrics: adds gpuTime, batchCount, gpuTimerAvailable\n\nThis provides type-safe access to renderer-specific metrics and removes\nmeaningless fields (e.g., batchCount was always 1 for Canvas/SVG).\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
-    "files_changed": 8
-  },
-  {
-    "hash": "d8181efc6ba631113f1146da47318a0fb53c13ef",
-    "short_hash": "d8181ef",
-    "author": "Chris Tierney",
-    "date": "2026-01-11T12:45:04Z",
-    "message": "feat: implement WebGL renderer with full Frame spec support\n\n- Complete WebGL 2 renderer using TWGL.js and SDF shaders\n- All shapes: circles, rectangles, lines with visual parity\n- Image support with correct positioning and transforms\n- Tree-order rendering with smart consecutive batching\n- Proper transparency with premultiplied alpha blending\n- Sharp corners/line endings matching Canvas/SVG defaults\n- Optional clear (preserveDrawingBuffer) for accumulation mode\n- Test-app integration with WebGL renderer option\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
-    "files_changed": 13
-  },
-  {
     "hash": "b72400c7fa891141d883c8d9c562378e913ecfaa",
     "short_hash": "b72400c",
     "author": "Chris Tierney",
