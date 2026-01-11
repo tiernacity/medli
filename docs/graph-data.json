@@ -5906,6 +5906,17 @@
       "created_at": "2026-01-11T14:11:24.642005+00:00",
       "updated_at": "2026-01-11T14:11:24.642005+00:00",
       "metadata_json": "{\"branch\":\"feat/webgl-renderer\",\"confidence\":100}"
+    },
+    {
+      "id": 541,
+      "change_id": "8f6433e4-5454-439b-b7eb-e83071e4c313",
+      "node_type": "action",
+      "title": "Committed generic RendererMetrics implementation",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T14:11:55.924251+00:00",
+      "updated_at": "2026-01-11T14:11:55.924251+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgl-renderer\",\"commit\":\"5aea83f\",\"confidence\":100}"
     }
   ],
   "edges": [
@@ -11881,6 +11892,17 @@
       "weight": 1.0,
       "rationale": "Playwright visual verification",
       "created_at": "2026-01-11T14:11:30.959269+00:00"
+    },
+    {
+      "id": 546,
+      "from_node_id": 540,
+      "to_node_id": 541,
+      "from_change_id": "5fd86ee2-c361-4b82-a830-5f31b4ebe7b4",
+      "to_change_id": "8f6433e4-5454-439b-b7eb-e83071e4c313",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Commit after verification",
+      "created_at": "2026-01-11T14:11:55.946370+00:00"
     }
   ]
 }
