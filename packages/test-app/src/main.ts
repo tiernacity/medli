@@ -55,7 +55,8 @@ const validGenerators = generatorParams.filter(
   (g): g is GeneratorType => g === "procedural" || g === "object"
 );
 const validRenderers = rendererParams.filter(
-  (r): r is RendererType => r === "svg" || r === "canvas" || r === "webgl"
+  (r): r is RendererType =>
+    r === "svg" || r === "canvas" || r === "webgl" || r === "webgpu"
 );
 
 // Redirect to explicit URL if any params are missing or invalid
@@ -80,6 +81,7 @@ if (needsRedirect) {
     url.searchParams.append("renderer", "svg");
     url.searchParams.append("renderer", "canvas");
     url.searchParams.append("renderer", "webgl");
+    url.searchParams.append("renderer", "webgpu");
   }
 
   window.location.replace(url.toString());
@@ -95,6 +97,10 @@ const selectedRenderers = validRenderers;
 const demosSelect = document.getElementById(
   "demos-select"
 ) as HTMLSelectElement;
+// Reset demos dropdown when page is shown (including back-button navigation via bfcache)
+window.addEventListener("pageshow", () => {
+  demosSelect.selectedIndex = 0;
+});
 const colorInput = document.getElementById("bg-color") as HTMLInputElement;
 const colorValue = document.getElementById("color-value") as HTMLSpanElement;
 const sceneCode = document.getElementById("scene-code") as HTMLPreElement;
@@ -159,7 +165,7 @@ for (const item of rendererItems) {
   }
 }
 rendererButton.textContent =
-  selectedRenderers.length === 3
+  selectedRenderers.length === 4
     ? "All"
     : selectedRenderers.map((r) => r.toUpperCase()).join(", ");
 
@@ -318,7 +324,9 @@ for (const generatorType of selectedGenerators) {
         ? "SVG"
         : rendererType === "webgl"
           ? "WebGL"
-          : "Canvas";
+          : rendererType === "webgpu"
+            ? "WebGPU"
+            : "Canvas";
     header.innerHTML = `<span>${generatorLabel} / ${rendererLabel}</span>`;
     card.appendChild(header);
 

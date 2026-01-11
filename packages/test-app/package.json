@@ -23,9 +23,11 @@
     "@medli/renderer-common": "*",
     "@medli/renderer-svg": "*",
     "@medli/renderer-webgl": "*",
+    "@medli/renderer-webgpu": "*",
     "@medli/spec": "*"
   },
   "devDependencies": {
+    "@webgpu/types": "^0.1.52",
     "tsx": "^4.0.0",
     "vite": "^6.0.0"
   }
