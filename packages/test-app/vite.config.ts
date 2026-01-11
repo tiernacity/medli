@@ -34,6 +34,10 @@ export default defineConfig({
         __dirname,
         "../renderers/webgl/src/index.ts"
       ),
+      "@medli/renderer-webgpu": resolve(
+        __dirname,
+        "../renderers/webgpu/src/index.ts"
+      ),
     },
   },
   optimizeDeps: {
@@ -47,6 +51,7 @@ export default defineConfig({
       "@medli/renderer-svg",
       "@medli/renderer-canvas",
       "@medli/renderer-webgl",
+      "@medli/renderer-webgpu",
     ],
   },
   build: {

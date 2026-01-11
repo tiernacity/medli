@@ -6225,6 +6225,138 @@
       "created_at": "2026-01-11T16:42:49.110230+00:00",
       "updated_at": "2026-01-11T16:42:49.110230+00:00",
       "metadata_json": "{\"branch\":\"main\",\"confidence\":95}"
+    },
+    {
+      "id": 570,
+      "change_id": "0f94e3cf-7610-45f6-a799-9c21f1038c19",
+      "node_type": "goal",
+      "title": "Implement WebGPU renderer",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T16:49:02.157213+00:00",
+      "updated_at": "2026-01-11T16:49:02.157213+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgpu-renderer\",\"confidence\":85,\"prompt\":\"Please implement the webgpu renderer as per the design and plan. There is a lot of work, so use task agents liberally. When appropriate, use playwright to verify functionality\"}"
+    },
+    {
+      "id": 571,
+      "change_id": "329f44ac-92fe-4b16-a3cc-e6b0b7217a71",
+      "node_type": "action",
+      "title": "Implementing Phase 1: Foundation - WebGPURenderer class skeleton with TypeGPU init",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T16:49:46.008194+00:00",
+      "updated_at": "2026-01-11T16:49:46.008194+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgpu-renderer\",\"confidence\":85}"
+    },
+    {
+      "id": 572,
+      "change_id": "18ca5f9e-6b59-488b-ba24-caabae5db57d",
+      "node_type": "outcome",
+      "title": "Phase 1 Foundation complete - WebGPURenderer skeleton with TypeGPU init, canvas config, metrics, color parsing",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T16:53:01.253403+00:00",
+      "updated_at": "2026-01-11T16:53:01.253403+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgpu-renderer\",\"confidence\":90}"
+    },
+    {
+      "id": 573,
+      "change_id": "1df6a076-ab5b-4c19-8167-b8212598ace1",
+      "node_type": "action",
+      "title": "Implementing Phase 2: Rectangle, Circle, Line SDF shaders with TypeGPU",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T16:53:09.459156+00:00",
+      "updated_at": "2026-01-11T16:53:09.459156+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgpu-renderer\",\"confidence\":85}"
+    },
+    {
+      "id": 574,
+      "change_id": "416a98a8-cb8e-43e7-85be-feac64a1a9eb",
+      "node_type": "outcome",
+      "title": "Phase 2-4 complete - SDF shaders for rect/circle/line, tree traversal with transforms, instanced batching",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T16:58:32.066444+00:00",
+      "updated_at": "2026-01-11T16:58:32.066444+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgpu-renderer\",\"confidence\":90}"
+    },
+    {
+      "id": 575,
+      "change_id": "44dc96d4-7789-4bb9-bfdb-5d530cff089d",
+      "node_type": "action",
+      "title": "Implementing Phase 5: Image texture rendering with crop support",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T16:59:15.810994+00:00",
+      "updated_at": "2026-01-11T16:59:15.810994+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgpu-renderer\",\"confidence\":85}"
+    },
+    {
+      "id": 576,
+      "change_id": "d648065b-86d9-4fd0-98d6-48646773b7da",
+      "node_type": "outcome",
+      "title": "Phase 5 complete - Image texture rendering with crop support, sampler, bind groups",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T17:02:53.730838+00:00",
+      "updated_at": "2026-01-11T17:02:53.730838+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgpu-renderer\",\"confidence\":90}"
+    },
+    {
+      "id": 577,
+      "change_id": "838bf90d-6ed0-4d3c-bf0d-8a9f49e9fcbd",
+      "node_type": "action",
+      "title": "Integrating WebGPU renderer with test-app for visual verification",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T17:03:02.441174+00:00",
+      "updated_at": "2026-01-11T17:03:02.441174+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgpu-renderer\",\"confidence\":85}"
+    },
+    {
+      "id": 578,
+      "change_id": "431c6579-c33b-4ddd-a391-aead363a5625",
+      "node_type": "outcome",
+      "title": "WebGPU renderer integration complete - visual parity verified with Canvas/SVG/WebGL across full-demo, transparency, transforms scenes",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T17:10:44.498093+00:00",
+      "updated_at": "2026-01-11T17:10:44.498093+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgpu-renderer\",\"confidence\":95}"
+    },
+    {
+      "id": 579,
+      "change_id": "ca008e6a-354d-4cd2-a0c1-f4c1b12fcd6b",
+      "node_type": "action",
+      "title": "Fix WebGPU optional clear - add persistent render target for frame accumulation",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T17:13:44.695338+00:00",
+      "updated_at": "2026-01-11T17:13:44.695338+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgpu-renderer\",\"confidence\":85}"
+    },
+    {
+      "id": 580,
+      "change_id": "c00f7de4-256b-44b5-9c30-e3e17d027e32",
+      "node_type": "outcome",
+      "title": "WebGPU optional clear fixed - persistent render target with blit shader pass enables frame accumulation without clearing. Swap chain textures lack COPY_DST, so blit approach required.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T17:18:48.265016+00:00",
+      "updated_at": "2026-01-11T17:18:48.265016+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgpu-renderer\",\"confidence\":95}"
+    },
+    {
+      "id": 581,
+      "change_id": "7972b1e6-c60a-4f12-a9cf-e34109dbe75d",
+      "node_type": "outcome",
+      "title": "WebGPU renderer implementation complete - all automated tests pass, visual parity verified via Playwright. Pending full manual testing by user.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T17:23:12.758564+00:00",
+      "updated_at": "2026-01-11T17:23:12.758564+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgpu-renderer\",\"confidence\":85}"
     }
   ],
   "edges": [
@@ -12475,6 +12607,116 @@
       "weight": 1.0,
       "rationale": "Investigation conclusion",
       "created_at": "2026-01-11T16:42:49.133158+00:00"
+    },
+    {
+      "id": 571,
+      "from_node_id": 570,
+      "to_node_id": 571,
+      "from_change_id": "0f94e3cf-7610-45f6-a799-9c21f1038c19",
+      "to_change_id": "329f44ac-92fe-4b16-a3cc-e6b0b7217a71",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation of goal",
+      "created_at": "2026-01-11T16:53:01.279667+00:00"
+    },
+    {
+      "id": 572,
+      "from_node_id": 571,
+      "to_node_id": 572,
+      "from_change_id": "329f44ac-92fe-4b16-a3cc-e6b0b7217a71",
+      "to_change_id": "18ca5f9e-6b59-488b-ba24-caabae5db57d",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Phase 1 complete",
+      "created_at": "2026-01-11T16:53:01.304065+00:00"
+    },
+    {
+      "id": 573,
+      "from_node_id": 572,
+      "to_node_id": 573,
+      "from_change_id": "18ca5f9e-6b59-488b-ba24-caabae5db57d",
+      "to_change_id": "1df6a076-ab5b-4c19-8167-b8212598ace1",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Next phase",
+      "created_at": "2026-01-11T16:58:32.091281+00:00"
+    },
+    {
+      "id": 574,
+      "from_node_id": 573,
+      "to_node_id": 574,
+      "from_change_id": "1df6a076-ab5b-4c19-8167-b8212598ace1",
+      "to_change_id": "416a98a8-cb8e-43e7-85be-feac64a1a9eb",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Phases 2-4 complete",
+      "created_at": "2026-01-11T16:58:32.116893+00:00"
+    },
+    {
+      "id": 575,
+      "from_node_id": 574,
+      "to_node_id": 575,
+      "from_change_id": "416a98a8-cb8e-43e7-85be-feac64a1a9eb",
+      "to_change_id": "44dc96d4-7789-4bb9-bfdb-5d530cff089d",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Next phase",
+      "created_at": "2026-01-11T17:02:53.755343+00:00"
+    },
+    {
+      "id": 576,
+      "from_node_id": 575,
+      "to_node_id": 576,
+      "from_change_id": "44dc96d4-7789-4bb9-bfdb-5d530cff089d",
+      "to_change_id": "d648065b-86d9-4fd0-98d6-48646773b7da",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Phase 5 complete",
+      "created_at": "2026-01-11T17:02:53.779221+00:00"
+    },
+    {
+      "id": 577,
+      "from_node_id": 576,
+      "to_node_id": 577,
+      "from_change_id": "d648065b-86d9-4fd0-98d6-48646773b7da",
+      "to_change_id": "838bf90d-6ed0-4d3c-bf0d-8a9f49e9fcbd",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Next phase",
+      "created_at": "2026-01-11T17:10:44.524486+00:00"
+    },
+    {
+      "id": 578,
+      "from_node_id": 577,
+      "to_node_id": 578,
+      "from_change_id": "838bf90d-6ed0-4d3c-bf0d-8a9f49e9fcbd",
+      "to_change_id": "431c6579-c33b-4ddd-a391-aead363a5625",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Integration complete",
+      "created_at": "2026-01-11T17:10:44.550480+00:00"
+    },
+    {
+      "id": 579,
+      "from_node_id": 579,
+      "to_node_id": 580,
+      "from_change_id": "ca008e6a-354d-4cd2-a0c1-f4c1b12fcd6b",
+      "to_change_id": "c00f7de4-256b-44b5-9c30-e3e17d027e32",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Fix implementation result",
+      "created_at": "2026-01-11T17:18:51.672720+00:00"
+    },
+    {
+      "id": 580,
+      "from_node_id": 570,
+      "to_node_id": 581,
+      "from_change_id": "0f94e3cf-7610-45f6-a799-9c21f1038c19",
+      "to_change_id": "7972b1e6-c60a-4f12-a9cf-e34109dbe75d",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation complete, pending manual verification",
+      "created_at": "2026-01-11T17:23:17.025529+00:00"
     }
   ]
 }

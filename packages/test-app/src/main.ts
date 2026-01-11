@@ -55,7 +55,8 @@ const validGenerators = generatorParams.filter(
   (g): g is GeneratorType => g === "procedural" || g === "object"
 );
 const validRenderers = rendererParams.filter(
-  (r): r is RendererType => r === "svg" || r === "canvas" || r === "webgl"
+  (r): r is RendererType =>
+    r === "svg" || r === "canvas" || r === "webgl" || r === "webgpu"
 );
 
 // Redirect to explicit URL if any params are missing or invalid
@@ -80,6 +81,7 @@ if (needsRedirect) {
     url.searchParams.append("renderer", "svg");
     url.searchParams.append("renderer", "canvas");
     url.searchParams.append("renderer", "webgl");
+    url.searchParams.append("renderer", "webgpu");
   }
 
   window.location.replace(url.toString());
@@ -159,7 +161,7 @@ for (const item of rendererItems) {
   }
 }
 rendererButton.textContent =
-  selectedRenderers.length === 3
+  selectedRenderers.length === 4
     ? "All"
     : selectedRenderers.map((r) => r.toUpperCase()).join(", ");
 
@@ -318,7 +320,9 @@ for (const generatorType of selectedGenerators) {
         ? "SVG"
         : rendererType === "webgl"
           ? "WebGL"
-          : "Canvas";
+          : rendererType === "webgpu"
+            ? "WebGPU"
+            : "Canvas";
     header.innerHTML = `<span>${generatorLabel} / ${rendererLabel}</span>`;
     card.appendChild(header);
 

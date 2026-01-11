@@ -9,7 +9,19 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
-    "noEmit": true
+    "noEmit": true,
+    "types": ["@webgpu/types", "node"],
+    "paths": {
+      "@medli/spec": ["../spec/src/index.ts"],
+      "@medli/generator-procedural": ["../generators/procedural/src/index.ts"],
+      "@medli/generator-object": ["../generators/object/src/index.ts"],
+      "@medli/generator-remote": ["../generators/remote/src/index.ts"],
+      "@medli/renderer-common": ["../renderers/common/src/index.ts"],
+      "@medli/renderer-svg": ["../renderers/svg/src/index.ts"],
+      "@medli/renderer-canvas": ["../renderers/canvas/src/index.ts"],
+      "@medli/renderer-webgl": ["../renderers/webgl/src/index.ts"],
+      "@medli/renderer-webgpu": ["../renderers/webgpu/src/index.ts"]
+    }
   },
   "include": ["src", "scripts"]
 }
