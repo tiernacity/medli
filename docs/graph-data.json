@@ -6104,6 +6104,39 @@
       "created_at": "2026-01-11T16:06:20.018031+00:00",
       "updated_at": "2026-01-11T16:06:20.018031+00:00",
       "metadata_json": "{\"branch\":\"feat/webgl-renderer\",\"confidence\":99}"
+    },
+    {
+      "id": 559,
+      "change_id": "631cdaaf-a4da-490d-b3a3-9cb3a3fd7a7d",
+      "node_type": "observation",
+      "title": "Confirmed: WebGL transparency broken after parseColor optimization. Colors washed out/wrong in full-demo scene compared to SVG/Canvas.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T16:12:52.315207+00:00",
+      "updated_at": "2026-01-11T16:12:52.315207+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgl-renderer\",\"confidence\":95}"
+    },
+    {
+      "id": 560,
+      "change_id": "5cbb7582-fe27-4105-bc57-02f0f10801a0",
+      "node_type": "action",
+      "title": "Fix parseColor clearRect: clear canvas before each color parse to prevent blending",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T16:14:42.711640+00:00",
+      "updated_at": "2026-01-11T16:14:42.711640+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgl-renderer\",\"confidence\":95}"
+    },
+    {
+      "id": 561,
+      "change_id": "998b8f4d-026b-42bb-bb3a-4a6bce75b171",
+      "node_type": "outcome",
+      "title": "WebGL transparency fixed - clearRect prevents color blending in reused canvas. Visual parity restored with SVG/Canvas.",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T16:14:42.790616+00:00",
+      "updated_at": "2026-01-11T16:14:42.790616+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgl-renderer\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -12266,6 +12299,28 @@
       "weight": 1.0,
       "rationale": "Profiling confirms fix",
       "created_at": "2026-01-11T16:06:25.027505+00:00"
+    },
+    {
+      "id": 563,
+      "from_node_id": 559,
+      "to_node_id": 560,
+      "from_change_id": "631cdaaf-a4da-490d-b3a3-9cb3a3fd7a7d",
+      "to_change_id": "5cbb7582-fe27-4105-bc57-02f0f10801a0",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Bug confirmed leads to fix",
+      "created_at": "2026-01-11T16:14:51.905428+00:00"
+    },
+    {
+      "id": 564,
+      "from_node_id": 560,
+      "to_node_id": 561,
+      "from_change_id": "5cbb7582-fe27-4105-bc57-02f0f10801a0",
+      "to_change_id": "998b8f4d-026b-42bb-bb3a-4a6bce75b171",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Fix verified",
+      "created_at": "2026-01-11T16:14:51.934602+00:00"
     }
   ]
 }
