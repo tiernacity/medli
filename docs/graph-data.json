@@ -6137,6 +6137,39 @@
       "created_at": "2026-01-11T16:14:42.790616+00:00",
       "updated_at": "2026-01-11T16:14:42.790616+00:00",
       "metadata_json": "{\"branch\":\"feat/webgl-renderer\",\"confidence\":95}"
+    },
+    {
+      "id": 562,
+      "change_id": "e408b94a-568a-4ad4-9dd0-9b35dfb5d04e",
+      "node_type": "goal",
+      "title": "Inject WebGL lessons learned into WebGPU design docs",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T16:25:25.350046+00:00",
+      "updated_at": "2026-01-11T16:25:25.350046+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgl-renderer\",\"confidence\":95,\"prompt\":\"Before we merge this branch, there is one task I'd like to complete. We implemented the webgl renderer. There was a plan and a design to do this - but as we progressed, we learned and ended up with a better design. Also some requirements were no initially fulfilled, but we have done that now.\\n\\nOne of the upcoming tasks is to implement the webgpu renderer. webgl and webgpu are not the same, but I feel sure that many of the lessons we learned in webgl, are relevant to webgpu.\\n\\nPlease use task agents heavily, but I would like you to:\\n- reach back into the decision graph, and identify the goals that happened AFTER we designed the webgl and webgpu renderers. These are potentially relate to our webgl implementation. There was some metrics and profiling work, which is not relevant\\n- inspect all of the decisions, options, etc, etc that relate to these goals\\n- collate a lessons learned list, from the webgl work\\n- filter the list for anything that may also be relevant to webgpu\\n- examine the webgpu design documentation, readme, etc\\n- inject each relevant lesson learned into an appropriate place in the design docs\\n- then commit, please\"}"
+    },
+    {
+      "id": 563,
+      "change_id": "0a950d76-9459-418f-a879-d9f4d69e2f79",
+      "node_type": "action",
+      "title": "Updated WebGPU DESIGN.md with 5 lessons from WebGL implementation",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T16:25:30.803143+00:00",
+      "updated_at": "2026-01-11T16:25:30.803143+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgl-renderer\",\"confidence\":95}"
+    },
+    {
+      "id": 564,
+      "change_id": "ebcf76ba-a1e4-4c99-a37f-ad86897b1f25",
+      "node_type": "outcome",
+      "title": "WebGPU DESIGN.md updated with 5 WebGL lessons: render order, alpha blending, SDF parity, color parsing, image coords",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T16:25:48.172927+00:00",
+      "updated_at": "2026-01-11T16:25:48.172927+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgl-renderer\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -12321,6 +12354,28 @@
       "weight": 1.0,
       "rationale": "Fix verified",
       "created_at": "2026-01-11T16:14:51.934602+00:00"
+    },
+    {
+      "id": 565,
+      "from_node_id": 562,
+      "to_node_id": 563,
+      "from_change_id": "e408b94a-568a-4ad4-9dd0-9b35dfb5d04e",
+      "to_change_id": "0a950d76-9459-418f-a879-d9f4d69e2f79",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementing goal",
+      "created_at": "2026-01-11T16:25:42.201784+00:00"
+    },
+    {
+      "id": 566,
+      "from_node_id": 563,
+      "to_node_id": 564,
+      "from_change_id": "0a950d76-9459-418f-a879-d9f4d69e2f79",
+      "to_change_id": "ebcf76ba-a1e4-4c99-a37f-ad86897b1f25",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Documentation updated successfully",
+      "created_at": "2026-01-11T16:25:48.241190+00:00"
     }
   ]
 }
