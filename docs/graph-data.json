@@ -5466,6 +5466,17 @@
       "created_at": "2026-01-11T12:44:34.940155+00:00",
       "updated_at": "2026-01-11T12:44:34.940155+00:00",
       "metadata_json": "{\"branch\":\"feat/webgl-renderer\",\"confidence\":80}"
+    },
+    {
+      "id": 501,
+      "change_id": "9d238bc3-b094-4674-a66b-b4e23500cb1f",
+      "node_type": "action",
+      "title": "Committed WebGL renderer implementation",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T12:46:18.798842+00:00",
+      "updated_at": "2026-01-11T12:46:18.798842+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgl-renderer\",\"commit\":\"d8181ef\",\"confidence\":100}"
     }
   ],
   "edges": [
@@ -10990,6 +11001,17 @@
       "weight": 1.0,
       "rationale": "Follow-on optimization work after feature completion",
       "created_at": "2026-01-11T12:44:39.274114+00:00"
+    },
+    {
+      "id": 505,
+      "from_node_id": 499,
+      "to_node_id": 501,
+      "from_change_id": "18cb933b-f261-4539-acb1-cb9c564b199b",
+      "to_change_id": "9d238bc3-b094-4674-a66b-b4e23500cb1f",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Deployment",
+      "created_at": "2026-01-11T12:46:18.853936+00:00"
     }
   ]
 }
