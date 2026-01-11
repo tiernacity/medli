@@ -22,6 +22,7 @@
     "@medli/renderer-canvas": "*",
     "@medli/renderer-common": "*",
     "@medli/renderer-svg": "*",
+    "@medli/renderer-webgl": "*",
     "@medli/spec": "*"
   },
   "devDependencies": {

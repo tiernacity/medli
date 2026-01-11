@@ -30,6 +30,10 @@ export default defineConfig({
         __dirname,
         "../renderers/canvas/src/index.ts"
       ),
+      "@medli/renderer-webgl": resolve(
+        __dirname,
+        "../renderers/webgl/src/index.ts"
+      ),
     },
   },
   optimizeDeps: {
@@ -42,6 +46,7 @@ export default defineConfig({
       "@medli/renderer-common",
       "@medli/renderer-svg",
       "@medli/renderer-canvas",
+      "@medli/renderer-webgl",
     ],
   },
   build: {

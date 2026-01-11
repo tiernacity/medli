@@ -47,7 +47,7 @@ const validGenerators = generatorParams.filter(
   (g): g is GeneratorType => g === "procedural" || g === "object"
 );
 const validRenderers = rendererParams.filter(
-  (r): r is RendererType => r === "svg" || r === "canvas"
+  (r): r is RendererType => r === "svg" || r === "canvas" || r === "webgl"
 );
 
 // Redirect to explicit URL if any params are missing or invalid
@@ -59,7 +59,10 @@ const needsRedirect =
 
 if (needsRedirect) {
   const url = new URL(window.location.href);
-  url.searchParams.set("scene", sceneParam && sceneParam in scenes ? sceneParam : defaultSceneId);
+  url.searchParams.set(
+    "scene",
+    sceneParam && sceneParam in scenes ? sceneParam : defaultSceneId
+  );
 
   if (validGenerators.length === 0) {
     url.searchParams.append("generator", "procedural");
@@ -68,6 +71,7 @@ if (needsRedirect) {
   if (validRenderers.length === 0) {
     url.searchParams.append("renderer", "svg");
     url.searchParams.append("renderer", "canvas");
+    url.searchParams.append("renderer", "webgl");
   }
 
   window.location.replace(url.toString());
@@ -89,14 +93,28 @@ const sceneCode = document.getElementById("scene-code") as HTMLPreElement;
 const rendererGrid = document.getElementById("renderer-grid") as HTMLDivElement;
 
 // Custom dropdown elements
-const sceneDropdown = document.getElementById("scene-dropdown") as HTMLDivElement;
-const sceneButton = document.getElementById("scene-button") as HTMLButtonElement;
+const sceneDropdown = document.getElementById(
+  "scene-dropdown"
+) as HTMLDivElement;
+const sceneButton = document.getElementById(
+  "scene-button"
+) as HTMLButtonElement;
 const sceneMenu = document.getElementById("scene-menu") as HTMLDivElement;
-const generatorDropdown = document.getElementById("generator-dropdown") as HTMLDivElement;
-const generatorButton = document.getElementById("generator-button") as HTMLButtonElement;
-const generatorMenu = document.getElementById("generator-menu") as HTMLDivElement;
-const rendererDropdown = document.getElementById("renderer-dropdown") as HTMLDivElement;
-const rendererButton = document.getElementById("renderer-button") as HTMLButtonElement;
+const generatorDropdown = document.getElementById(
+  "generator-dropdown"
+) as HTMLDivElement;
+const generatorButton = document.getElementById(
+  "generator-button"
+) as HTMLButtonElement;
+const generatorMenu = document.getElementById(
+  "generator-menu"
+) as HTMLDivElement;
+const rendererDropdown = document.getElementById(
+  "renderer-dropdown"
+) as HTMLDivElement;
+const rendererButton = document.getElementById(
+  "renderer-button"
+) as HTMLButtonElement;
 const rendererMenu = document.getElementById("renderer-menu") as HTMLDivElement;
 
 // Populate scene dropdown menu
@@ -110,24 +128,32 @@ for (const [id, sceneData] of Object.entries(scenes)) {
 sceneButton.textContent = scenes[sceneId].name;
 
 // Set selected state on generator items
-const generatorItems = generatorMenu.querySelectorAll<HTMLDivElement>(".dropdown-item");
+const generatorItems =
+  generatorMenu.querySelectorAll<HTMLDivElement>(".dropdown-item");
 for (const item of generatorItems) {
   if (selectedGenerators.includes(item.dataset.value as GeneratorType)) {
     item.classList.add("selected");
   }
 }
-generatorButton.textContent = selectedGenerators.length === 2 ? "All" :
-  selectedGenerators.map(g => g === "procedural" ? "Procedural" : "Object").join(", ");
+generatorButton.textContent =
+  selectedGenerators.length === 2
+    ? "All"
+    : selectedGenerators
+        .map((g) => (g === "procedural" ? "Procedural" : "Object"))
+        .join(", ");
 
 // Set selected state on renderer items
-const rendererItems = rendererMenu.querySelectorAll<HTMLDivElement>(".dropdown-item");
+const rendererItems =
+  rendererMenu.querySelectorAll<HTMLDivElement>(".dropdown-item");
 for (const item of rendererItems) {
   if (selectedRenderers.includes(item.dataset.value as RendererType)) {
     item.classList.add("selected");
   }
 }
-rendererButton.textContent = selectedRenderers.length === 2 ? "All" :
-  selectedRenderers.map(r => r.toUpperCase()).join(", ");
+rendererButton.textContent =
+  selectedRenderers.length === 3
+    ? "All"
+    : selectedRenderers.map((r) => r.toUpperCase()).join(", ");
 
 // Build URL with current selections (always explicit, no defaults)
 function buildUrl(
@@ -170,7 +196,9 @@ function setupDropdown(
   });
 
   menu.addEventListener("click", (e) => {
-    const item = (e.target as HTMLElement).closest(".dropdown-item") as HTMLDivElement | null;
+    const item = (e.target as HTMLElement).closest(
+      ".dropdown-item"
+    ) as HTMLDivElement | null;
     if (item) {
       onSelect(item.dataset.value!, item);
     }
@@ -179,7 +207,9 @@ function setupDropdown(
 
 // Close dropdowns when clicking outside
 document.addEventListener("click", () => {
-  document.querySelectorAll(".dropdown.open").forEach((d) => d.classList.remove("open"));
+  document
+    .querySelectorAll(".dropdown.open")
+    .forEach((d) => d.classList.remove("open"));
 });
 
 // Scene dropdown (single-select)
@@ -188,25 +218,30 @@ setupDropdown(sceneDropdown, sceneButton, sceneMenu, (value) => {
 });
 
 // Generator dropdown (multi-select with toggle)
-setupDropdown(generatorDropdown, generatorButton, generatorMenu, (value, item) => {
-  const isSelected = item.classList.contains("selected");
-  const currentSelected = Array.from(generatorItems)
-    .filter((i) => i.classList.contains("selected"))
-    .map((i) => i.dataset.value as GeneratorType);
+setupDropdown(
+  generatorDropdown,
+  generatorButton,
+  generatorMenu,
+  (value, item) => {
+    const isSelected = item.classList.contains("selected");
+    const currentSelected = Array.from(generatorItems)
+      .filter((i) => i.classList.contains("selected"))
+      .map((i) => i.dataset.value as GeneratorType);
 
-  let newSelected: GeneratorType[];
-  if (isSelected && currentSelected.length > 1) {
-    // Deselect (but keep at least one)
-    newSelected = currentSelected.filter((v) => v !== value);
-  } else if (!isSelected) {
-    // Select
-    newSelected = [...currentSelected, value as GeneratorType];
-  } else {
-    // Can't deselect the last one
-    return;
+    let newSelected: GeneratorType[];
+    if (isSelected && currentSelected.length > 1) {
+      // Deselect (but keep at least one)
+      newSelected = currentSelected.filter((v) => v !== value);
+    } else if (!isSelected) {
+      // Select
+      newSelected = [...currentSelected, value as GeneratorType];
+    } else {
+      // Can't deselect the last one
+      return;
+    }
+    window.location.href = buildUrl(sceneId, newSelected, selectedRenderers);
   }
-  window.location.href = buildUrl(sceneId, newSelected, selectedRenderers);
-});
+);
 
 // Renderer dropdown (multi-select with toggle)
 setupDropdown(rendererDropdown, rendererButton, rendererMenu, (value, item) => {
@@ -270,7 +305,12 @@ for (const generatorType of selectedGenerators) {
     header.className = "renderer-header";
     const generatorLabel =
       generatorType === "procedural" ? "Procedural" : "Object";
-    const rendererLabel = rendererType === "svg" ? "SVG" : "Canvas";
+    const rendererLabel =
+      rendererType === "svg"
+        ? "SVG"
+        : rendererType === "webgl"
+          ? "WebGL"
+          : "Canvas";
     header.innerHTML = `<span>${generatorLabel} / ${rendererLabel}</span>`;
     card.appendChild(header);
 
@@ -286,6 +326,7 @@ for (const generatorType of selectedGenerators) {
       element = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       element.setAttribute("data-testid", testId);
     } else {
+      // Both Canvas and WebGL use HTMLCanvasElement
       element = document.createElement("canvas");
       element.setAttribute("data-testid", testId);
     }

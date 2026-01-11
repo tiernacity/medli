@@ -185,6 +185,7 @@ Before considering any code edit complete, verify:
 
 ```bash
 npm install        # Ensure dependencies are installed
+npm run dev        # Start test-app dev server for visual verification
 npm run typecheck  # TypeScript compilation succeeds
 npm run lint       # No ESLint errors
 npm run format:check  # Code follows formatting standards

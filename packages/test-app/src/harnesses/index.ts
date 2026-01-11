@@ -5,8 +5,9 @@ import type { Generator } from "@medli/spec";
 import type { Point } from "@medli/renderer-common";
 import { SvgRenderer } from "@medli/renderer-svg";
 import { CanvasRenderer } from "@medli/renderer-canvas";
+import { WebGLRenderer } from "@medli/renderer-webgl";
 
-export type RendererType = "svg" | "canvas";
+export type RendererType = "svg" | "canvas" | "webgl";
 export type GeneratorType = "procedural" | "object";
 
 export interface HarnessInstance {
@@ -20,10 +21,14 @@ export function createHarness(
   generator: Generator,
   rendererType: RendererType
 ): HarnessInstance {
-  const renderer =
-    rendererType === "svg"
-      ? new SvgRenderer(element as SVGSVGElement, generator)
-      : new CanvasRenderer(element as HTMLCanvasElement, generator);
+  let renderer;
+  if (rendererType === "svg") {
+    renderer = new SvgRenderer(element as SVGSVGElement, generator);
+  } else if (rendererType === "webgl") {
+    renderer = new WebGLRenderer(element as HTMLCanvasElement, generator);
+  } else {
+    renderer = new CanvasRenderer(element as HTMLCanvasElement, generator);
+  }
 
   return {
     start: () => renderer.loop(),

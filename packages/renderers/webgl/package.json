@@ -13,7 +13,12 @@
   },
   "scripts": {
     "build": "tsc",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo 'Linted by root eslint'",
+    "format": "echo 'Formatted by root prettier'",
+    "format:check": "echo 'Checked by root prettier'",
+    "test": "echo 'No tests yet'"
   },
   "files": [
     "dist"
