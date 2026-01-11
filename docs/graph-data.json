@@ -5917,6 +5917,61 @@
       "created_at": "2026-01-11T14:11:55.924251+00:00",
       "updated_at": "2026-01-11T14:11:55.924251+00:00",
       "metadata_json": "{\"branch\":\"feat/webgl-renderer\",\"commit\":\"5aea83f\",\"confidence\":100}"
+    },
+    {
+      "id": 542,
+      "change_id": "401ba7ad-dfd3-4949-9055-2b7f43c41c9f",
+      "node_type": "goal",
+      "title": "Create dedicated performance stress-test scenes for controlled renderer comparison",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T14:58:05.890583+00:00",
+      "updated_at": "2026-01-11T14:58:05.890583+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgl-renderer\",\"confidence\":85,\"prompt\":\"3\"}"
+    },
+    {
+      "id": 543,
+      "change_id": "d190c414-0b66-476e-a9b4-d4cacbf42c42",
+      "node_type": "action",
+      "title": "Creating stress test scenes for controlled renderer comparison",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T14:58:46.327718+00:00",
+      "updated_at": "2026-01-11T14:58:46.327718+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgl-renderer\",\"confidence\":85}"
+    },
+    {
+      "id": 544,
+      "change_id": "6ecbd2e0-d9a1-4947-9d5c-87e3240aa474",
+      "node_type": "outcome",
+      "title": "Stress test scenes created - shapes, animation, batch, transforms - all checks pass",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T15:03:52.471789+00:00",
+      "updated_at": "2026-01-11T15:03:52.471789+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgl-renderer\",\"confidence\":95}"
+    },
+    {
+      "id": 545,
+      "change_id": "bc85fe85-49ff-48a0-b661-f4cb1e2c5f82",
+      "node_type": "observation",
+      "title": "Stress test scenes verified via Playwright - all render correctly, performance degrades as expected with larger parameters",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T15:10:01.104736+00:00",
+      "updated_at": "2026-01-11T15:10:01.104736+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgl-renderer\",\"confidence\":95}"
+    },
+    {
+      "id": 546,
+      "change_id": "6a804a58-7e00-4b4b-b8dc-55fab16224b2",
+      "node_type": "action",
+      "title": "Committed stress test scenes",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-11T15:11:01.223347+00:00",
+      "updated_at": "2026-01-11T15:11:01.223347+00:00",
+      "metadata_json": "{\"branch\":\"feat/webgl-renderer\",\"commit\":\"009f7dd\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -11903,6 +11958,61 @@
       "weight": 1.0,
       "rationale": "Commit after verification",
       "created_at": "2026-01-11T14:11:55.946370+00:00"
+    },
+    {
+      "id": 547,
+      "from_node_id": 515,
+      "to_node_id": 542,
+      "from_change_id": "d1ddcf5c-65c6-4668-afa8-51e4ce26ddb2",
+      "to_change_id": "401ba7ad-dfd3-4949-9055-2b7f43c41c9f",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Continuation of performance testing goal",
+      "created_at": "2026-01-11T14:58:10.371007+00:00"
+    },
+    {
+      "id": 548,
+      "from_node_id": 542,
+      "to_node_id": 543,
+      "from_change_id": "401ba7ad-dfd3-4949-9055-2b7f43c41c9f",
+      "to_change_id": "d190c414-0b66-476e-a9b4-d4cacbf42c42",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation action",
+      "created_at": "2026-01-11T14:58:51.424943+00:00"
+    },
+    {
+      "id": 549,
+      "from_node_id": 543,
+      "to_node_id": 544,
+      "from_change_id": "d190c414-0b66-476e-a9b4-d4cacbf42c42",
+      "to_change_id": "6ecbd2e0-d9a1-4947-9d5c-87e3240aa474",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation complete",
+      "created_at": "2026-01-11T15:03:56.962758+00:00"
+    },
+    {
+      "id": 550,
+      "from_node_id": 544,
+      "to_node_id": 545,
+      "from_change_id": "6ecbd2e0-d9a1-4947-9d5c-87e3240aa474",
+      "to_change_id": "bc85fe85-49ff-48a0-b661-f4cb1e2c5f82",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Verification complete",
+      "created_at": "2026-01-11T15:10:01.164850+00:00"
+    },
+    {
+      "id": 551,
+      "from_node_id": 545,
+      "to_node_id": 546,
+      "from_change_id": "bc85fe85-49ff-48a0-b661-f4cb1e2c5f82",
+      "to_change_id": "6a804a58-7e00-4b4b-b8dc-55fab16224b2",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Code committed",
+      "created_at": "2026-01-11T15:11:06.101345+00:00"
     }
   ]
 }

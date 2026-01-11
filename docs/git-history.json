@@ -1,5 +1,13 @@
 [
   {
+    "hash": "009f7dda501b4ab90a3f2e0f4b83bf66af517e6c",
+    "short_hash": "009f7dd",
+    "author": "Chris Tierney",
+    "date": "2026-01-11T15:10:55Z",
+    "message": "feat: add performance stress test scenes\n\nAdd 4 dedicated stress test scenes for controlled renderer comparison:\n- stress-shapes: configurable shape count (?shapes=N) in grid pattern\n- stress-animation: animated orbiting circles for per-frame stress\n- stress-batch: alternating circles/rectangles to test batching efficiency\n- stress-transforms: deeply nested Groups with accumulated transforms\n\nAll scenes support URL parameters for tuning intensity and produce\nidentical output across Canvas and WebGL renderers.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 6
+  },
+  {
     "hash": "5aea83fe46007dd9cfa538f84e7403c1e8fd6f52",
     "short_hash": "5aea83f",
     "author": "Chris Tierney",
