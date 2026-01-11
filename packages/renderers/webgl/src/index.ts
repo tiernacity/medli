@@ -505,6 +505,8 @@ function parseColorImpl(color: string): [number, number, number, number] {
     return [0, 0, 0, 1]; // Fallback to black
   }
 
+  // Clear canvas before parsing to prevent color blending from previous parses
+  ctx.clearRect(0, 0, 1, 1);
   ctx.fillStyle = color;
   ctx.fillRect(0, 0, 1, 1);
   const data = ctx.getImageData(0, 0, 1, 1).data;
