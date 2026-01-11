@@ -1,5 +1,13 @@
 [
   {
+    "hash": "b72400c7fa891141d883c8d9c562378e913ecfaa",
+    "short_hash": "b72400c",
+    "author": "Chris Tierney",
+    "date": "2026-01-11T00:20:13Z",
+    "message": "feat: flexible test-app with configurable generator/renderer grid\n\n- Unified harness module replacing 4 separate files\n- Custom dropdown controls for scene, generators, renderers\n- Multi-select with toggle for generators and renderers\n- Query params: ?scene=X&generator=Y&renderer=Z (multiple allowed)\n- Auto-redirect to explicit URL when params missing\n- Dynamic NxM grid (generators as rows, renderers as columns)\n- Consistent dropdown styling with blue highlights for selected items\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 7
+  },
+  {
     "hash": "a9a7cb7bb578832267ebc41972bc3434ce8c83ac",
     "short_hash": "a9a7cb7",
     "author": "Chris Tierney",
