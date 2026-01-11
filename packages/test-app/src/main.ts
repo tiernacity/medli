@@ -23,6 +23,10 @@ import imageCropSource from "./scenes/image-crop.ts?raw";
 import optionalClearSource from "./scenes/optional-clear.ts?raw";
 import transparencySource from "./scenes/transparency.ts?raw";
 import interactionSource from "./scenes/interaction.ts?raw";
+import stressShapesSource from "./scenes/stress-shapes.ts?raw";
+import stressAnimationSource from "./scenes/stress-animation.ts?raw";
+import stressBatchSource from "./scenes/stress-batch.ts?raw";
+import stressTransformsSource from "./scenes/stress-transforms.ts?raw";
 
 // Map scene IDs to their source code
 const sceneSources: Record<string, string> = {
@@ -34,6 +38,10 @@ const sceneSources: Record<string, string> = {
   "optional-clear": optionalClearSource,
   transparency: transparencySource,
   interaction: interactionSource,
+  "stress-shapes": stressShapesSource,
+  "stress-animation": stressAnimationSource,
+  "stress-batch": stressBatchSource,
+  "stress-transforms": stressTransformsSource,
 };
 
 // Parse query parameters
@@ -404,8 +412,10 @@ window.medli = {
     console.log("\n==============================\n");
   },
   getMetrics: () => {
-    const result: Record<string, ReturnType<HarnessInstance["getMetrics"]>> =
-      {};
+    const result: Record<
+      string,
+      ReturnType<HarnessInstance["getMetrics"]>
+    > = {};
     for (const cell of gridCells) {
       const label = `${cell.generator}/${cell.renderer}`;
       result[label] = cell.harness.getMetrics();
