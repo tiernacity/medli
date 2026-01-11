@@ -348,6 +348,72 @@ for (const generatorType of selectedGenerators) {
   }
 }
 
+/**
+ * Expose metrics API for performance analysis.
+ * - window.medli.reportMetrics() - logs formatted metrics to console
+ * - window.medli.getMetrics() - returns structured metrics object
+ */
+declare global {
+  interface Window {
+    medli?: {
+      reportMetrics: () => void;
+      getMetrics: () => Record<
+        string,
+        ReturnType<HarnessInstance["getMetrics"]>
+      >;
+    };
+  }
+}
+
+window.medli = {
+  reportMetrics: () => {
+    console.log("\n=== Medli Renderer Metrics ===");
+    for (const cell of gridCells) {
+      const label = `${cell.generator}/${cell.renderer}`;
+      const m = cell.harness.getMetrics();
+      console.log(`\n[${label}]`);
+      console.log(`  FPS: ${m.fps?.toFixed(1) ?? "calculating..."}`);
+      console.log(`  Frame time: ${m.frameTime.toFixed(2)}ms`);
+      console.log(`  Generator: ${m.generatorTime.toFixed(2)}ms`);
+      console.log(`  Traversal: ${m.traversalTime.toFixed(2)}ms`);
+      console.log(`  Resource: ${m.resourceTime.toFixed(2)}ms`);
+      console.log(`  Render: ${m.renderTime.toFixed(2)}ms`);
+      console.log(`  Shapes: ${m.shapeCount}`);
+      console.log(`  Frame count: ${m.frameCount}`);
+      // WebGL-specific metrics
+      if ("batchCount" in m) {
+        console.log(`  Batch count: ${m.batchCount}`);
+      }
+      if ("gpuTime" in m) {
+        const gpuTime = m.gpuTime as number | undefined;
+        console.log(
+          `  GPU time: ${gpuTime !== undefined ? gpuTime.toFixed(2) + "ms" : "N/A"}`
+        );
+      }
+      if ("gpuTimerAvailable" in m) {
+        console.log(`  GPU timer available: ${m.gpuTimerAvailable}`);
+      }
+      // SVG-specific metrics
+      if ("snapshotTime" in m) {
+        const snapshotTime = m.snapshotTime as number | undefined;
+        console.log(
+          `  Snapshot time: ${snapshotTime !== undefined ? snapshotTime.toFixed(2) + "ms" : "N/A"}`
+        );
+      }
+    }
+    console.log("\n==============================\n");
+  },
+  getMetrics: () => {
+    const result: Record<string, ReturnType<HarnessInstance["getMetrics"]>> =
+      {};
+    for (const cell of gridCells) {
+      const label = `${cell.generator}/${cell.renderer}`;
+      result[label] = cell.harness.getMetrics();
+    }
+    return result;
+  },
+};
+
 // Set up native pointer events for interaction scene
 if (sceneId === "interaction") {
   for (const cell of gridCells) {
