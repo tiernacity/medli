@@ -17,6 +17,9 @@
   },
   "references": [
     { "path": "packages/spec" },
+    { "path": "packages/generators/utils" },
+    { "path": "packages/generators/validator" },
+    { "path": "packages/generators/optimizer" },
     { "path": "packages/generators/procedural" },
     { "path": "packages/generators/object" },
     { "path": "packages/generators/remote" },

@@ -9,6 +9,12 @@ module.exports = {
     "^@medli/generator-procedural$":
       "<rootDir>/packages/generators/procedural/src",
     "^@medli/generator-object$": "<rootDir>/packages/generators/object/src",
+    "^@medli/generator-utils$": "<rootDir>/packages/generators/utils/src",
+    "^@medli/generator-validator$":
+      "<rootDir>/packages/generators/validator/src",
+    "^@medli/generator-optimizer$":
+      "<rootDir>/packages/generators/optimizer/src",
+    "^@medli/generator-remote$": "<rootDir>/packages/generators/remote/src",
     "^@medli/renderer-common$": "<rootDir>/packages/renderers/common/src",
     "^@medli/renderer-svg$": "<rootDir>/packages/renderers/svg/src",
     "^@medli/renderer-canvas$": "<rootDir>/packages/renderers/canvas/src",

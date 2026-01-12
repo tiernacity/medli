@@ -17,8 +17,10 @@
   },
   "dependencies": {
     "@medli/generator-object": "*",
+    "@medli/generator-optimizer": "*",
     "@medli/generator-procedural": "*",
     "@medli/generator-remote": "*",
+    "@medli/generator-validator": "*",
     "@medli/renderer-canvas": "*",
     "@medli/renderer-common": "*",
     "@medli/renderer-svg": "*",

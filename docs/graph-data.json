@@ -6390,6 +6390,160 @@
       "created_at": "2026-01-11T17:39:00.635262+00:00",
       "updated_at": "2026-01-11T17:39:00.635262+00:00",
       "metadata_json": "{\"branch\":\"feat/webgpu-renderer\",\"confidence\":95}"
+    },
+    {
+      "id": 585,
+      "change_id": "5894ae22-fa4b-4269-9b5d-796078749dba",
+      "node_type": "goal",
+      "title": "Implement composable generator pipeline with validator and optimizer",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T20:41:09.120773+00:00",
+      "updated_at": "2026-01-12T20:41:09.120773+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"confidence\":90,\"prompt\":\"I want generators to be composable. One of the ways to compose them will be to chain them into a pipeline. Each generator fetches a frame from its predecessor, then processes that and outputs a new frame.\\n\\nTwo good candidates for chainable generators are:\\n- a frame validator: this accepts the upstream frame, validates it accordingly to the rules, and passes it on unchanged if it's valid. If not -> exception\\n- a frame optimiser that applies, for now, some simple optmisations: multiple sequential transforms can be merged into a single transform; with some logic to detect which materials are used by downstream elements, sequential materials can be squashed and unused ones removed\\n\\nValidation will be a huge deal for frames received over the network. Later, we may add zod validation for arbitrary received JSON. But not for now - let's extract the validation we have\\n\\nOptimisation will be a big deal in particular for the procedural generator. In this model, multiple calls are needed to construct an abritrary transform, or to set material properties. The optimiser can reduce the number of nodes in the frame spec tree\"}"
+    },
+    {
+      "id": 586,
+      "change_id": "bf4ff638-40ce-4597-8ec6-bceff1e8eb8b",
+      "node_type": "decision",
+      "title": "Choose architecture for composable generator pipeline",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T20:42:57.794300+00:00",
+      "updated_at": "2026-01-12T20:42:57.794300+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"confidence\":85}"
+    },
+    {
+      "id": 587,
+      "change_id": "412b3a21-be08-4013-b73d-0d8208bf6716",
+      "node_type": "option",
+      "title": "Separate packages per concern",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T21:00:05.890168+00:00",
+      "updated_at": "2026-01-12T21:00:05.890168+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"confidence\":95}"
+    },
+    {
+      "id": 588,
+      "change_id": "8ffc14e9-4733-4af5-a332-c2a0f8085aac",
+      "node_type": "outcome",
+      "title": "Composable generator pipeline implemented - 3 new packages, procedural simplified",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T21:13:41.460397+00:00",
+      "updated_at": "2026-01-12T21:13:41.460397+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"confidence\":95}"
+    },
+    {
+      "id": 589,
+      "change_id": "8b9fab5e-9d5f-4f05-8870-2230191c1f35",
+      "node_type": "goal",
+      "title": "Verify optimizer integration and validator coverage",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T21:15:54.893642+00:00",
+      "updated_at": "2026-01-12T21:15:54.893642+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"confidence\":90,\"prompt\":\"Please perform visual verification with more scenes. We have a \\\"transforms\\\" scene, for instance, and a \\\"materials\\\" scene. Ensure the scenes exercise those things enough to verify our new optimisation.\\n\\nDo we have unit tests confirming that invalid scenes do not pass the validator.\\n\\nAre our demo scenes all using the optimiser? They should be. Include the fullscreen ones also\"}"
+    },
+    {
+      "id": 590,
+      "change_id": "4bf55b3c-a3d1-4126-bbf7-7c5150858e0e",
+      "node_type": "observation",
+      "title": "Found 3 gaps: 1) No validateFrame tests for invalid scenes, 2) Harness/demos don't use optimizer, 3) Fullscreen demos don't use optimizer",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T21:16:51.699967+00:00",
+      "updated_at": "2026-01-12T21:16:51.699967+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"confidence\":95}"
+    },
+    {
+      "id": 591,
+      "change_id": "ed2b263a-5cad-484b-91e1-db2e25dea6e2",
+      "node_type": "action",
+      "title": "Fixed build - added missing tsconfig references and package.json dependencies",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T21:20:39.335543+00:00",
+      "updated_at": "2026-01-12T21:20:39.335543+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"confidence\":90}"
+    },
+    {
+      "id": 592,
+      "change_id": "f3efbbd2-a0ed-436f-a602-e92442199c7e",
+      "node_type": "outcome",
+      "title": "All 3 gaps addressed: 55 validateFrame tests added, optimizer integrated into all demos (harness + fullscreen), visual verification passed for transforms/materials across all 8 renderer combinations",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T21:31:19.678151+00:00",
+      "updated_at": "2026-01-12T21:31:19.678151+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"confidence\":95}"
+    },
+    {
+      "id": 593,
+      "change_id": "20b83498-acc0-479e-ac2b-e6044102b14b",
+      "node_type": "goal",
+      "title": "Diagnose WebGPU performance issues with validator/optimizer pipeline",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T21:41:36.403720+00:00",
+      "updated_at": "2026-01-12T21:41:36.403720+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"confidence\":85,\"prompt\":\"I tested the particle plotter and tree demos with our webgpu renderer. Both are running low frame rates. Please use your stress test demos to evaluate performance:\\n- with no optimiser or validator\\n- with one or the other\\n- with both\\n\\nif the problem is the validator - we can leave that out of the demo pipelines\"}"
+    },
+    {
+      "id": 594,
+      "change_id": "9c6ceca5-faa0-4df0-bb38-d4033400ac06",
+      "node_type": "observation",
+      "title": "Optimizer is the performance bottleneck - 46ms/frame overhead with 500 shapes, validator only adds 2ms",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T21:44:42.994651+00:00",
+      "updated_at": "2026-01-12T21:44:42.994651+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"confidence\":95}"
+    },
+    {
+      "id": 595,
+      "change_id": "355b8087-7d4e-467d-b562-d20a2e7e5fd4",
+      "node_type": "decision",
+      "title": "Should demos use the optimizer in the pipeline?",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T21:45:02.457688+00:00",
+      "updated_at": "2026-01-12T21:45:02.457688+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"confidence\":95}"
+    },
+    {
+      "id": 596,
+      "change_id": "5a6b4d52-e000-4417-b724-600db7f0a6a8",
+      "node_type": "option",
+      "title": "Remove optimizer from demo pipelines, keep validator only",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T21:45:07.059755+00:00",
+      "updated_at": "2026-01-12T21:45:07.059755+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"confidence\":95}"
+    },
+    {
+      "id": 597,
+      "change_id": "31d1adae-faa4-4c81-ab95-5d1ade90a632",
+      "node_type": "option",
+      "title": "Keep both but optimize the optimizer for real-time use",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T21:45:07.123842+00:00",
+      "updated_at": "2026-01-12T21:45:07.123842+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"confidence\":60}"
+    },
+    {
+      "id": 598,
+      "change_id": "0b126e0b-bd3d-4334-bfaa-03c96e22f749",
+      "node_type": "outcome",
+      "title": "Committed benchmark harness - standalone tool for pipeline performance testing",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T21:47:26.080251+00:00",
+      "updated_at": "2026-01-12T21:47:26.080251+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"commit\":\"bbc085d\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -12783,6 +12937,138 @@
       "weight": 1.0,
       "rationale": "WebGPU renderer goal achieved",
       "created_at": "2026-01-11T17:39:08.423926+00:00"
+    },
+    {
+      "id": 584,
+      "from_node_id": 585,
+      "to_node_id": 586,
+      "from_change_id": "5894ae22-fa4b-4269-9b5d-796078749dba",
+      "to_change_id": "bf4ff638-40ce-4597-8ec6-bceff1e8eb8b",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Design decision for goal",
+      "created_at": "2026-01-12T20:42:57.840864+00:00"
+    },
+    {
+      "id": 585,
+      "from_node_id": 586,
+      "to_node_id": 587,
+      "from_change_id": "bf4ff638-40ce-4597-8ec6-bceff1e8eb8b",
+      "to_change_id": "412b3a21-be08-4013-b73d-0d8208bf6716",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Selected approach: utils, validator, optimizer as separate packages",
+      "created_at": "2026-01-12T21:00:05.934406+00:00"
+    },
+    {
+      "id": 586,
+      "from_node_id": 585,
+      "to_node_id": 588,
+      "from_change_id": "5894ae22-fa4b-4269-9b5d-796078749dba",
+      "to_change_id": "8ffc14e9-4733-4af5-a332-c2a0f8085aac",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Goal completed",
+      "created_at": "2026-01-12T21:13:41.509147+00:00"
+    },
+    {
+      "id": 587,
+      "from_node_id": 589,
+      "to_node_id": 590,
+      "from_change_id": "8b9fab5e-9d5f-4f05-8870-2230191c1f35",
+      "to_change_id": "4bf55b3c-a3d1-4126-bbf7-7c5150858e0e",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Investigation findings",
+      "created_at": "2026-01-12T21:16:56.521958+00:00"
+    },
+    {
+      "id": 588,
+      "from_node_id": 589,
+      "to_node_id": 591,
+      "from_change_id": "8b9fab5e-9d5f-4f05-8870-2230191c1f35",
+      "to_change_id": "ed2b263a-5cad-484b-91e1-db2e25dea6e2",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Build fix for new packages",
+      "created_at": "2026-01-12T21:31:26.382162+00:00"
+    },
+    {
+      "id": 589,
+      "from_node_id": 589,
+      "to_node_id": 592,
+      "from_change_id": "8b9fab5e-9d5f-4f05-8870-2230191c1f35",
+      "to_change_id": "f3efbbd2-a0ed-436f-a602-e92442199c7e",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Goal achieved",
+      "created_at": "2026-01-12T21:31:26.403786+00:00"
+    },
+    {
+      "id": 590,
+      "from_node_id": 593,
+      "to_node_id": 594,
+      "from_change_id": "20b83498-acc0-479e-ac2b-e6044102b14b",
+      "to_change_id": "9c6ceca5-faa0-4df0-bb38-d4033400ac06",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Benchmark finding",
+      "created_at": "2026-01-12T21:44:43.059275+00:00"
+    },
+    {
+      "id": 591,
+      "from_node_id": 593,
+      "to_node_id": 595,
+      "from_change_id": "20b83498-acc0-479e-ac2b-e6044102b14b",
+      "to_change_id": "355b8087-7d4e-467d-b562-d20a2e7e5fd4",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Performance diagnosis leads to decision",
+      "created_at": "2026-01-12T21:45:11.194155+00:00"
+    },
+    {
+      "id": 592,
+      "from_node_id": 594,
+      "to_node_id": 595,
+      "from_change_id": "9c6ceca5-faa0-4df0-bb38-d4033400ac06",
+      "to_change_id": "355b8087-7d4e-467d-b562-d20a2e7e5fd4",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Finding informs decision",
+      "created_at": "2026-01-12T21:45:11.222270+00:00"
+    },
+    {
+      "id": 593,
+      "from_node_id": 595,
+      "to_node_id": 596,
+      "from_change_id": "355b8087-7d4e-467d-b562-d20a2e7e5fd4",
+      "to_change_id": "5a6b4d52-e000-4417-b724-600db7f0a6a8",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Recommended option",
+      "created_at": "2026-01-12T21:45:11.246763+00:00"
+    },
+    {
+      "id": 594,
+      "from_node_id": 595,
+      "to_node_id": 597,
+      "from_change_id": "355b8087-7d4e-467d-b562-d20a2e7e5fd4",
+      "to_change_id": "31d1adae-faa4-4c81-ab95-5d1ade90a632",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Alternative option",
+      "created_at": "2026-01-12T21:45:11.272522+00:00"
+    },
+    {
+      "id": 595,
+      "from_node_id": 593,
+      "to_node_id": 598,
+      "from_change_id": "20b83498-acc0-479e-ac2b-e6044102b14b",
+      "to_change_id": "0b126e0b-bd3d-4334-bfaa-03c96e22f749",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Goal achieved with benchmark tool",
+      "created_at": "2026-01-12T21:47:26.130599+00:00"
     }
   ]
 }

@@ -9,17 +9,32 @@ reading_list = ["docs/ARCHITECTURE.md", "packages/spec/AGENT.md"]
 [agents.generator-procedural]
 patterns = ["packages/generators/procedural/**"]
 brief = "Opinionated, p5.js-inspired imperative sketch API. Transforms imperative function calls into Frame spec IR."
-reading_list = ["docs/ARCHITECTURE.md", "packages/generators/procedural/AGENT.md"]
+reading_list = ["docs/ARCHITECTURE.md", "packages/generators/AGENT.md", "packages/generators/procedural/AGENT.md"]
 
 [agents.generator-object]
 patterns = ["packages/generators/object/**"]
 brief = "Opinionated, three.js-inspired declarative scene graph API. Transforms object references into Frame spec IR."
-reading_list = ["docs/ARCHITECTURE.md", "packages/generators/object/AGENT.md"]
+reading_list = ["docs/ARCHITECTURE.md", "packages/generators/AGENT.md", "packages/generators/object/AGENT.md"]
 
 [agents.generator-remote]
 patterns = ["packages/generators/remote/**"]
 brief = "Remote Frame fetcher. Polls a URL for Frame JSON, implements Generator interface for use with renderers."
-reading_list = ["docs/ARCHITECTURE.md", "packages/generators/remote/AGENT.md"]
+reading_list = ["docs/ARCHITECTURE.md", "packages/generators/AGENT.md", "packages/generators/remote/AGENT.md"]
+
+[agents.generator-utils]
+patterns = ["packages/generators/utils/**"]
+brief = "Shared utilities for generators - matrix operations."
+reading_list = ["docs/ARCHITECTURE.md", "packages/generators/AGENT.md", "packages/generators/utils/AGENT.md"]
+
+[agents.generator-validator]
+patterns = ["packages/generators/validator/**"]
+brief = "Pipeline generator for frame validation. Wraps upstream generator, throws on invalid frames."
+reading_list = ["docs/ARCHITECTURE.md", "packages/generators/AGENT.md", "packages/generators/validator/AGENT.md"]
+
+[agents.generator-optimizer]
+patterns = ["packages/generators/optimizer/**"]
+brief = "Pipeline generator for frame optimization. Merges transforms, squashes materials, removes unused nodes."
+reading_list = ["docs/ARCHITECTURE.md", "packages/generators/AGENT.md", "packages/generators/optimizer/AGENT.md"]
 
 [agents.renderer-common]
 patterns = ["packages/renderers/common/**"]
