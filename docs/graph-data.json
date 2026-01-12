@@ -6610,6 +6610,138 @@
       "created_at": "2026-01-12T22:12:15.660834+00:00",
       "updated_at": "2026-01-12T22:12:15.660834+00:00",
       "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"confidence\":95}"
+    },
+    {
+      "id": 605,
+      "change_id": "464bef55-6e96-4bed-8d23-28daf68ebf04",
+      "node_type": "goal",
+      "title": "Implement optimizer redesign per DESIGN.md",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T22:14:34.503178+00:00",
+      "updated_at": "2026-01-12T22:14:34.503178+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"confidence\":85,\"prompt\":\"Go ahead! Use task agents liberally for implementation\"}"
+    },
+    {
+      "id": 606,
+      "change_id": "be1a4796-22bc-425a-be49-a9e11a18f6a4",
+      "node_type": "action",
+      "title": "Dispatching optimizer agent for Phase 1 core implementation",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T22:14:56.522214+00:00",
+      "updated_at": "2026-01-12T22:14:56.522214+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"confidence\":85}"
+    },
+    {
+      "id": 607,
+      "change_id": "7d3e2ea9-d879-461a-9e5b-b6c5200eea99",
+      "node_type": "outcome",
+      "title": "Phase 1 complete: Core optimizer redesigned with bottom-up traversal, structural sharing, lazy allocation",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T22:22:13.487058+00:00",
+      "updated_at": "2026-01-12T22:22:13.487058+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"confidence\":95}"
+    },
+    {
+      "id": 608,
+      "change_id": "6184849f-853a-48c7-8e40-2ae20f7e3b64",
+      "node_type": "action",
+      "title": "Dispatching optimizer agent for Phase 2 test suite",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T22:22:28.024642+00:00",
+      "updated_at": "2026-01-12T22:22:28.024642+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"confidence\":85}"
+    },
+    {
+      "id": 609,
+      "change_id": "caa09eaf-cd3f-49c8-83ec-1be6e2bada67",
+      "node_type": "outcome",
+      "title": "Phase 2 complete: 38 comprehensive tests added (281 total), all passing",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T22:26:39.649416+00:00",
+      "updated_at": "2026-01-12T22:26:39.649416+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"confidence\":95}"
+    },
+    {
+      "id": 610,
+      "change_id": "b769ac48-4004-4410-bd7a-405edb8e578c",
+      "node_type": "action",
+      "title": "Dispatching test-app agent for Phase 3 pipeline integration",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T22:28:10.987217+00:00",
+      "updated_at": "2026-01-12T22:28:10.987217+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"confidence\":85}"
+    },
+    {
+      "id": 611,
+      "change_id": "a8637cd3-1b68-4ca2-99b7-c0689672bb7f",
+      "node_type": "outcome",
+      "title": "Phase 3 complete: Pipeline order updated to validator-optimizer-validator in harness, full-screen, benchmark",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T22:29:30.952511+00:00",
+      "updated_at": "2026-01-12T22:29:30.952511+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"confidence\":95}"
+    },
+    {
+      "id": 612,
+      "change_id": "e33ce5eb-2922-416c-8fe1-ea516f7de713",
+      "node_type": "action",
+      "title": "Running performance benchmark to verify <1ms optimizer time with 500 shapes",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T22:30:38.051516+00:00",
+      "updated_at": "2026-01-12T22:30:38.051516+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"confidence\":85}"
+    },
+    {
+      "id": 613,
+      "change_id": "da2ba800-49e9-49c0-88ba-fbee3c185950",
+      "node_type": "outcome",
+      "title": "Phase 4 complete: Optimizer performance improved 13x (46ms -> 3.5ms with 500 shapes), 189 FPS achievable",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T22:33:02.357947+00:00",
+      "updated_at": "2026-01-12T22:33:02.357947+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"confidence\":90}"
+    },
+    {
+      "id": 614,
+      "change_id": "328bc0c5-4eae-4b2e-ae76-ee4d15e141cd",
+      "node_type": "action",
+      "title": "Updating AGENT.md with new optimizer architecture",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T22:33:26.560995+00:00",
+      "updated_at": "2026-01-12T22:33:26.560995+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"confidence\":85}"
+    },
+    {
+      "id": 615,
+      "change_id": "6077ffb6-0b87-4b38-a6fb-328c6322c4c4",
+      "node_type": "outcome",
+      "title": "Phase 5 complete: AGENT.md updated with new architecture, performance metrics, and review criteria",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T22:34:47.304352+00:00",
+      "updated_at": "2026-01-12T22:34:47.304352+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"confidence\":95}"
+    },
+    {
+      "id": 616,
+      "change_id": "bfeb759a-9af7-40ae-8719-063257e93140",
+      "node_type": "outcome",
+      "title": "Optimizer redesign complete: 13x performance improvement, 38 tests, pipeline integration updated",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T22:34:49.092699+00:00",
+      "updated_at": "2026-01-12T22:34:49.092699+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -13201,6 +13333,127 @@
       "weight": 1.0,
       "rationale": "Documentation complete",
       "created_at": "2026-01-12T22:12:23.713981+00:00"
+    },
+    {
+      "id": 602,
+      "from_node_id": 605,
+      "to_node_id": 606,
+      "from_change_id": "464bef55-6e96-4bed-8d23-28daf68ebf04",
+      "to_change_id": "be1a4796-22bc-425a-be49-a9e11a18f6a4",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation of goal",
+      "created_at": "2026-01-12T22:14:56.572307+00:00"
+    },
+    {
+      "id": 603,
+      "from_node_id": 606,
+      "to_node_id": 607,
+      "from_change_id": "be1a4796-22bc-425a-be49-a9e11a18f6a4",
+      "to_change_id": "7d3e2ea9-d879-461a-9e5b-b6c5200eea99",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation outcome",
+      "created_at": "2026-01-12T22:22:13.569418+00:00"
+    },
+    {
+      "id": 604,
+      "from_node_id": 605,
+      "to_node_id": 608,
+      "from_change_id": "464bef55-6e96-4bed-8d23-28daf68ebf04",
+      "to_change_id": "6184849f-853a-48c7-8e40-2ae20f7e3b64",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Test suite for goal",
+      "created_at": "2026-01-12T22:22:28.079051+00:00"
+    },
+    {
+      "id": 605,
+      "from_node_id": 608,
+      "to_node_id": 609,
+      "from_change_id": "6184849f-853a-48c7-8e40-2ae20f7e3b64",
+      "to_change_id": "caa09eaf-cd3f-49c8-83ec-1be6e2bada67",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Test suite outcome",
+      "created_at": "2026-01-12T22:26:39.701866+00:00"
+    },
+    {
+      "id": 606,
+      "from_node_id": 605,
+      "to_node_id": 610,
+      "from_change_id": "464bef55-6e96-4bed-8d23-28daf68ebf04",
+      "to_change_id": "b769ac48-4004-4410-bd7a-405edb8e578c",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Pipeline integration for goal",
+      "created_at": "2026-01-12T22:28:11.044299+00:00"
+    },
+    {
+      "id": 607,
+      "from_node_id": 610,
+      "to_node_id": 611,
+      "from_change_id": "b769ac48-4004-4410-bd7a-405edb8e578c",
+      "to_change_id": "a8637cd3-1b68-4ca2-99b7-c0689672bb7f",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Pipeline integration outcome",
+      "created_at": "2026-01-12T22:29:31.020723+00:00"
+    },
+    {
+      "id": 608,
+      "from_node_id": 605,
+      "to_node_id": 612,
+      "from_change_id": "464bef55-6e96-4bed-8d23-28daf68ebf04",
+      "to_change_id": "e33ce5eb-2922-416c-8fe1-ea516f7de713",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Performance validation for goal",
+      "created_at": "2026-01-12T22:30:38.101128+00:00"
+    },
+    {
+      "id": 609,
+      "from_node_id": 612,
+      "to_node_id": 613,
+      "from_change_id": "e33ce5eb-2922-416c-8fe1-ea516f7de713",
+      "to_change_id": "da2ba800-49e9-49c0-88ba-fbee3c185950",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Performance validation outcome",
+      "created_at": "2026-01-12T22:33:02.421574+00:00"
+    },
+    {
+      "id": 610,
+      "from_node_id": 605,
+      "to_node_id": 614,
+      "from_change_id": "464bef55-6e96-4bed-8d23-28daf68ebf04",
+      "to_change_id": "328bc0c5-4eae-4b2e-ae76-ee4d15e141cd",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Documentation for goal",
+      "created_at": "2026-01-12T22:33:26.620640+00:00"
+    },
+    {
+      "id": 611,
+      "from_node_id": 614,
+      "to_node_id": 615,
+      "from_change_id": "328bc0c5-4eae-4b2e-ae76-ee4d15e141cd",
+      "to_change_id": "6077ffb6-0b87-4b38-a6fb-328c6322c4c4",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Documentation outcome",
+      "created_at": "2026-01-12T22:34:47.361327+00:00"
+    },
+    {
+      "id": 612,
+      "from_node_id": 605,
+      "to_node_id": 616,
+      "from_change_id": "464bef55-6e96-4bed-8d23-28daf68ebf04",
+      "to_change_id": "bfeb759a-9af7-40ae-8719-063257e93140",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Goal achieved",
+      "created_at": "2026-01-12T22:34:49.138700+00:00"
     }
   ]
 }
