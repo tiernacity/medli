@@ -6555,6 +6555,61 @@
       "created_at": "2026-01-12T21:49:26.147831+00:00",
       "updated_at": "2026-01-12T21:49:26.147831+00:00",
       "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"commit\":\"8ce9221\",\"confidence\":95}"
+    },
+    {
+      "id": 600,
+      "change_id": "ac34e9c3-b4a0-49f7-aaef-853272c5b74d",
+      "node_type": "goal",
+      "title": "Optimize the optimizer for real-time performance",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T21:55:04.272814+00:00",
+      "updated_at": "2026-01-12T21:55:04.272814+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"confidence\":85,\"prompt\":\"Let's fix the optimiser. We should strive for comparable performance to the original procedural generator. Dispatch three task agents:\\n- give them identical instructions\\n- tell them they are competing for the best solution, so evaluate the problem, the requirements of the optimiser, and think carefully about an optimal design\\n- ask them to propose a better design for the optimiser\\n- ask them to take into account future requirements to optimise the frame in other ways\\n- ask them to predict the performance improvement over the existing implementation\\n\\nThen let's compare the proposals, choose one of the designs or synthesise a design from the suggestions\"}"
+    },
+    {
+      "id": 601,
+      "change_id": "7a06176f-5a53-4fff-b431-59400f945976",
+      "node_type": "action",
+      "title": "Dispatching 2 validation agents to evaluate synthesized optimizer design",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T22:02:54.262381+00:00",
+      "updated_at": "2026-01-12T22:02:54.262381+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"confidence\":85}"
+    },
+    {
+      "id": 602,
+      "change_id": "52151e3f-6cec-414f-bfeb-ff147ab50149",
+      "node_type": "observation",
+      "title": "Validator agents found critical bug: aggregateRefs includes direct child ref, causing trySquashMaterial to ALWAYS fail",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T22:06:43.256480+00:00",
+      "updated_at": "2026-01-12T22:06:43.256480+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"confidence\":95}"
+    },
+    {
+      "id": 603,
+      "change_id": "6de8b0c5-e1e3-4016-87a3-a9a1cf9193cd",
+      "node_type": "action",
+      "title": "Documenting optimizer redesign, test cases, and pipeline requirements",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T22:10:43.973560+00:00",
+      "updated_at": "2026-01-12T22:10:43.973560+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"confidence\":90}"
+    },
+    {
+      "id": 604,
+      "change_id": "cfe8878f-7c42-42fb-ae50-725e31335cbc",
+      "node_type": "outcome",
+      "title": "Documented optimizer redesign in DESIGN.md - includes synthesized architecture, comprehensive test suite (25+ test cases), pipeline requirements, and implementation checklist",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T22:12:15.660834+00:00",
+      "updated_at": "2026-01-12T22:12:15.660834+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -13091,6 +13146,61 @@
       "weight": 1.0,
       "rationale": "Goal implementation committed",
       "created_at": "2026-01-12T21:49:26.202937+00:00"
+    },
+    {
+      "id": 597,
+      "from_node_id": 597,
+      "to_node_id": 600,
+      "from_change_id": "31d1adae-faa4-4c81-ab95-5d1ade90a632",
+      "to_change_id": "ac34e9c3-b4a0-49f7-aaef-853272c5b74d",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Pursuing option to optimize the optimizer",
+      "created_at": "2026-01-12T21:55:10.786943+00:00"
+    },
+    {
+      "id": 598,
+      "from_node_id": 600,
+      "to_node_id": 601,
+      "from_change_id": "ac34e9c3-b4a0-49f7-aaef-853272c5b74d",
+      "to_change_id": "7a06176f-5a53-4fff-b431-59400f945976",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Validation step before implementation",
+      "created_at": "2026-01-12T22:03:48.754859+00:00"
+    },
+    {
+      "id": 599,
+      "from_node_id": 601,
+      "to_node_id": 602,
+      "from_change_id": "7a06176f-5a53-4fff-b431-59400f945976",
+      "to_change_id": "52151e3f-6cec-414f-bfeb-ff147ab50149",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Bug discovered during validation",
+      "created_at": "2026-01-12T22:06:47.951725+00:00"
+    },
+    {
+      "id": 600,
+      "from_node_id": 600,
+      "to_node_id": 603,
+      "from_change_id": "ac34e9c3-b4a0-49f7-aaef-853272c5b74d",
+      "to_change_id": "6de8b0c5-e1e3-4016-87a3-a9a1cf9193cd",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Documentation for implementation",
+      "created_at": "2026-01-12T22:10:49.375766+00:00"
+    },
+    {
+      "id": 601,
+      "from_node_id": 603,
+      "to_node_id": 604,
+      "from_change_id": "6de8b0c5-e1e3-4016-87a3-a9a1cf9193cd",
+      "to_change_id": "cfe8878f-7c42-42fb-ae50-725e31335cbc",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Documentation complete",
+      "created_at": "2026-01-12T22:12:23.713981+00:00"
     }
   ]
 }
