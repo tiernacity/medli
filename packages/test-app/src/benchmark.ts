@@ -92,9 +92,11 @@ function buildPipeline(
     case "validator":
       return withValidation(gen);
     case "optimizer":
+      // Pure optimizer without validation (for perf testing only)
       return withOptimization(gen);
     case "both":
-      return withOptimization(withValidation(gen));
+      // Standard pipeline: validator -> optimizer -> validator
+      return withValidation(withOptimization(withValidation(gen)));
   }
 }
 

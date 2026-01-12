@@ -87,8 +87,10 @@ const instance = sketchModule.create(
 // Create Optimized Generator
 // ============================================================================
 
-// Pipeline: raw generator -> validator -> optimizer -> renderer
-const optimizedGenerator = withOptimization(withValidation(instance.generator));
+// Pipeline: raw generator -> validator -> optimizer -> validator -> renderer
+const optimizedGenerator = withValidation(
+  withOptimization(withValidation(instance.generator))
+);
 
 // ============================================================================
 // Create Renderer

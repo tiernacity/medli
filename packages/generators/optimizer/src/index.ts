@@ -27,6 +27,19 @@ const defaultOptions: Required<OptimizationOptions> = {
   removeIdentityTransforms: true,
 };
 
+// Result type for structural sharing
+type OptimizeResult = {
+  node: FrameNode | RootMaterial;
+  meta: NodeMetadata;
+  changed: boolean;
+};
+
+interface NodeMetadata {
+  descendantRefs: Set<string>; // All material refs from this subtree
+}
+
+const EMPTY_SET: ReadonlySet<string> = Object.freeze(new Set<string>());
+
 /**
  * A pipeline generator that optimizes frames from an upstream generator.
  *
@@ -81,233 +94,233 @@ export function optimizeFrame(
 ): Frame {
   const opts = { ...defaultOptions, ...options };
 
-  // Clone the frame to avoid mutating the input
-  const optimizedRoot = optimizeNode(frame.root, opts) as RootMaterial;
+  // Use new bottom-up optimizer and extract just the node
+  const result = optimizeNode(frame.root, opts);
+
+  // Structural sharing: return same frame if unchanged
+  if (!result.changed) {
+    return frame;
+  }
 
   return {
     ...frame,
-    root: optimizedRoot,
+    root: result.node as RootMaterial,
   };
 }
 
 /**
- * Recursively optimize a node and its children.
+ * Recursively optimize a node and its children (bottom-up).
+ *
+ * Returns OptimizeResult with:
+ * - node: The optimized node (same reference if unchanged)
+ * - meta: Metadata including descendantRefs for O(1) ref lookups
+ * - changed: Whether any optimization was applied
  */
 function optimizeNode(
   node: FrameNode | RootMaterial,
   options: Required<OptimizationOptions>
-): FrameNode | RootMaterial {
-  // Handle nodes with children
-  if ("children" in node && node.children) {
-    let children = node.children.map((child) => optimizeNode(child, options));
-
-    // Apply optimizations to the children array
-    if (options.mergeTransforms) {
-      children = mergeTransforms(children);
-    }
-
-    if (options.squashMaterials) {
-      children = squashMaterials(children);
-    }
-
-    if (options.removeIdentityTransforms) {
-      children = removeIdentityTransforms(children);
-    }
-
-    return { ...node, children };
+): OptimizeResult {
+  // Leaf nodes: return immediately with empty refs
+  if (!("children" in node) || !node.children || node.children.length === 0) {
+    return {
+      node,
+      meta: { descendantRefs: EMPTY_SET as Set<string> },
+      changed: false,
+    };
   }
 
-  // Leaf nodes (shapes) pass through unchanged
-  return node;
+  // 1. Recurse children first (bottom-up)
+  const childResults = node.children.map((child) =>
+    optimizeNode(child, options)
+  );
+
+  // 2. Aggregate descendantRefs from children's subtrees
+  //    CRITICAL: Do NOT include direct children's refs here
+  const aggregateRefs = new Set<string>();
+  for (const result of childResults) {
+    for (const ref of result.meta.descendantRefs) {
+      aggregateRefs.add(ref);
+    }
+  }
+  // Add direct children's refs (for parent's aggregateRefs, NOT for our squash check)
+  for (const child of node.children) {
+    if (child.type === "material" && "ref" in child) {
+      aggregateRefs.add((child as ChildMaterial).ref);
+    }
+  }
+
+  // 3. Check if any child changed
+  const anyChildChanged = childResults.some((r) => r.changed);
+  let children = anyChildChanged
+    ? childResults.map((r) => r.node as FrameNode)
+    : node.children; // SAME REFERENCE if no changes
+
+  let modified = anyChildChanged;
+
+  // 4. Apply optimizations with O(1) ref lookups
+
+  // Transform merging (iterative chain merge)
+  if (options.mergeTransforms) {
+    const [merged, didMerge] = mergeTransformsLazy(children);
+    if (didMerge) {
+      children = merged;
+      modified = true;
+    }
+  }
+
+  // Material squashing (uses child's descendantRefs, NOT aggregateRefs)
+  if (options.squashMaterials && node.type === "material" && "ref" in node) {
+    const squashed = trySquashMaterial(
+      node as ChildMaterial,
+      children,
+      childResults // Pass child results for correct ref check
+    );
+    if (squashed) return squashed;
+  }
+
+  // Identity transform removal
+  if (options.removeIdentityTransforms) {
+    const [filtered, didRemove] = removeIdentitiesLazy(children);
+    if (didRemove) {
+      children = filtered;
+      modified = true;
+    }
+  }
+
+  // 5. Structural sharing: return same reference if unchanged
+  if (!modified) {
+    return { node, meta: { descendantRefs: aggregateRefs }, changed: false };
+  }
+
+  return {
+    node: { ...node, children },
+    meta: { descendantRefs: aggregateRefs },
+    changed: true,
+  };
 }
 
 /**
  * Merge sequential Transform nodes where no Material boundary exists.
+ * Uses iterative chain merging and lazy array allocation.
  *
  * Transform(A) -> Transform(B) -> children
  * becomes
  * Transform(A * B) -> children
+ *
+ * Returns [children, didMerge] tuple.
  */
-function mergeTransforms(children: FrameNode[]): FrameNode[] {
-  const result: FrameNode[] = [];
+function mergeTransformsLazy(children: FrameNode[]): [FrameNode[], boolean] {
+  let result: FrameNode[] | null = null;
 
-  for (const node of children) {
-    if (node.type === "transform") {
-      // Check if the transform has a single child that is also a transform
-      if (node.children.length === 1 && node.children[0].type === "transform") {
-        const childTransform = node.children[0] as Transform;
-        // Merge the matrices
-        const mergedMatrix = multiplyMatrices(
-          node.matrix,
-          childTransform.matrix
-        );
-        // Create merged transform with grandchildren
-        const merged: Transform = {
-          type: "transform",
-          matrix: mergedMatrix,
-          children: childTransform.children,
-        };
-        // Recursively try to merge more
-        result.push(...mergeTransforms([merged]));
-      } else {
-        // Can't merge, but recurse into children
-        result.push({
-          ...node,
-          children: mergeTransforms(node.children),
-        });
-      }
-    } else if (node.type === "material" && "children" in node) {
-      // Material boundary - recurse into children separately
-      result.push({
-        ...node,
-        children: mergeTransforms(node.children),
-      } as FrameNode);
-    } else {
-      // Shape or other node - pass through
-      result.push(node);
-    }
-  }
+  for (let i = 0; i < children.length; i++) {
+    const child = children[i];
 
-  return result;
-}
+    if (
+      child.type === "transform" &&
+      child.children.length === 1 &&
+      child.children[0].type === "transform"
+    ) {
+      // Lazy allocation: only clone when we find something to merge
+      if (!result) result = children.slice(0, i);
 
-/**
- * Squash sequential ChildMaterial nodes where safe.
- *
- * CRITICAL: A material can only be squashed if NO descendant references it by ID.
- *
- * ChildMaterial(id: "m1", ref: "root", fill: "red")
- *   ChildMaterial(id: "m2", ref: "m1", stroke: "blue")
- *     Circle
- *
- * becomes (if m1 is not referenced by any other descendant):
- *
- * ChildMaterial(id: "m2", ref: "root", fill: "red", stroke: "blue")
- *   Circle
- */
-function squashMaterials(children: FrameNode[]): FrameNode[] {
-  const result: FrameNode[] = [];
-
-  for (const node of children) {
-    if (node.type === "material" && "ref" in node) {
-      const material = node as ChildMaterial;
-
-      // Check if single child is also a ChildMaterial that refs this material
-      if (
-        material.children.length === 1 &&
-        material.children[0].type === "material" &&
-        "ref" in material.children[0]
+      // Iterative chain merge
+      let current = child as Transform;
+      let matrix = current.matrix;
+      while (
+        current.children.length === 1 &&
+        current.children[0].type === "transform"
       ) {
-        const childMaterial = material.children[0] as ChildMaterial;
-
-        // Child must reference this material
-        if (childMaterial.ref === material.id) {
-          // Check if any OTHER descendant references this material
-          const descendantRefs = collectDescendantRefs(childMaterial.children);
-
-          if (!descendantRefs.has(material.id)) {
-            // Safe to squash: merge parent's overrides into child
-            const squashed: ChildMaterial = {
-              type: "material",
-              id: childMaterial.id,
-              ref: material.ref, // Point to grandparent
-              // Parent's overrides first, then child's overrides on top
-              ...(material.fill !== undefined && { fill: material.fill }),
-              ...(material.stroke !== undefined && { stroke: material.stroke }),
-              ...(material.strokeWidth !== undefined && {
-                strokeWidth: material.strokeWidth,
-              }),
-              // Child's overrides take precedence
-              ...(childMaterial.fill !== undefined && {
-                fill: childMaterial.fill,
-              }),
-              ...(childMaterial.stroke !== undefined && {
-                stroke: childMaterial.stroke,
-              }),
-              ...(childMaterial.strokeWidth !== undefined && {
-                strokeWidth: childMaterial.strokeWidth,
-              }),
-              children: squashMaterials(childMaterial.children),
-            };
-            result.push(squashed);
-            continue;
-          }
-        }
+        const next = current.children[0] as Transform;
+        matrix = multiplyMatrices(matrix, next.matrix);
+        current = next;
       }
 
-      // Can't squash - recurse into children
       result.push({
-        ...material,
-        children: squashMaterials(material.children),
+        type: "transform",
+        matrix,
+        children: current.children,
       });
-    } else if ("children" in node && node.children) {
-      // Other node with children - recurse
-      result.push({
-        ...node,
-        children: squashMaterials(node.children),
-      } as FrameNode);
-    } else {
-      // Leaf node - pass through
-      result.push(node);
+    } else if (result) {
+      result.push(child);
     }
   }
 
-  return result;
+  return result ? [result, true] : [children, false];
 }
 
 /**
- * Collect all material IDs referenced by ref properties in descendants.
+ * Try to squash a ChildMaterial with its single ChildMaterial child.
+ *
+ * CRITICAL: Uses the CHILD's descendantRefs, not aggregateRefs.
+ * This fixes the bug where aggregateRefs includes the direct child's ref,
+ * causing squash to ALWAYS fail.
+ *
+ * Returns OptimizeResult if squashed, null otherwise.
  */
-function collectDescendantRefs(nodes: FrameNode[]): Set<string> {
-  const refs = new Set<string>();
+function trySquashMaterial(
+  material: ChildMaterial,
+  children: FrameNode[],
+  childResults: OptimizeResult[]
+): OptimizeResult | null {
+  if (children.length !== 1) return null;
 
-  function visit(node: FrameNode): void {
-    if (node.type === "material" && "ref" in node) {
-      refs.add((node as ChildMaterial).ref);
-    }
-    if ("children" in node && node.children) {
-      for (const child of node.children) {
-        visit(child);
-      }
-    }
-  }
+  const child = children[0];
+  if (child.type !== "material" || !("ref" in child)) return null;
 
-  for (const node of nodes) {
-    visit(node);
-  }
+  const childMaterial = child as ChildMaterial;
+  if (childMaterial.ref !== material.id) return null;
 
-  return refs;
+  // CRITICAL: Use the CHILD's descendantRefs, not aggregateRefs
+  // This contains refs from grandchildren and below, NOT the child's own ref
+  const childDescendantRefs = childResults[0].meta.descendantRefs;
+  if (childDescendantRefs.has(material.id)) return null;
+
+  // Safe to squash
+  const squashed: ChildMaterial = {
+    type: "material",
+    id: childMaterial.id,
+    ref: material.ref, // Point to grandparent
+    // Parent's overrides first, then child's overrides on top
+    ...(material.fill !== undefined && { fill: material.fill }),
+    ...(material.stroke !== undefined && { stroke: material.stroke }),
+    ...(material.strokeWidth !== undefined && {
+      strokeWidth: material.strokeWidth,
+    }),
+    ...(childMaterial.fill !== undefined && { fill: childMaterial.fill }),
+    ...(childMaterial.stroke !== undefined && { stroke: childMaterial.stroke }),
+    ...(childMaterial.strokeWidth !== undefined && {
+      strokeWidth: childMaterial.strokeWidth,
+    }),
+    children: childMaterial.children,
+  };
+
+  return {
+    node: squashed,
+    meta: { descendantRefs: childDescendantRefs },
+    changed: true,
+  };
 }
 
 /**
  * Remove Transform nodes with identity matrix, promoting their children.
+ * Uses lazy array allocation.
+ *
+ * Returns [children, didRemove] tuple.
  */
-function removeIdentityTransforms(children: FrameNode[]): FrameNode[] {
-  const result: FrameNode[] = [];
+function removeIdentitiesLazy(children: FrameNode[]): [FrameNode[], boolean] {
+  let result: FrameNode[] | null = null;
 
-  for (const node of children) {
-    if (node.type === "transform") {
-      if (isIdentityMatrix(node.matrix)) {
-        // Identity transform - promote children
-        result.push(...removeIdentityTransforms(node.children));
-      } else {
-        // Non-identity - keep but recurse
-        result.push({
-          ...node,
-          children: removeIdentityTransforms(node.children),
-        });
-      }
-    } else if ("children" in node && node.children) {
-      // Other node with children - recurse
-      result.push({
-        ...node,
-        children: removeIdentityTransforms(node.children),
-      } as FrameNode);
-    } else {
-      // Leaf node - pass through
-      result.push(node);
+  for (let i = 0; i < children.length; i++) {
+    const child = children[i];
+
+    if (child.type === "transform" && isIdentityMatrix(child.matrix)) {
+      // Identity - promote its children
+      if (!result) result = children.slice(0, i);
+      result.push(...child.children); // Splice in grandchildren
+    } else if (result) {
+      result.push(child);
     }
   }
 
-  return result;
+  return result ? [result, true] : [children, false];
 }

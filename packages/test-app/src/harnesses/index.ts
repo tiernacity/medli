@@ -25,8 +25,10 @@ export function createHarness(
   generator: Generator,
   rendererType: RendererType
 ): HarnessInstance {
-  // Pipeline: raw generator -> validator -> optimizer -> renderer
-  const optimizedGenerator = withOptimization(withValidation(generator));
+  // Pipeline: raw generator -> validator -> optimizer -> validator -> renderer
+  const optimizedGenerator = withValidation(
+    withOptimization(withValidation(generator))
+  );
 
   let renderer;
   if (rendererType === "svg") {
