@@ -44,8 +44,9 @@ Based on $ARGUMENTS:
 - `-b, --branch <name>` - Git branch (auto-detected by default)
 - `--no-branch` - Skip branch auto-detection
 - `--commit <hash|HEAD>` - Link to a git commit (use HEAD for current commit)
+- `--date "YYYY-MM-DD"` - Backdate node (for archaeology/retroactive logging)
 
-### ⚠️ CRITICAL: Link Commits to Actions/Outcomes
+### CRITICAL: Link Commits to Actions/Outcomes
 
 **After every git commit, link it to the decision graph!**
 
@@ -181,11 +182,11 @@ The graph viewer shows a branch dropdown in the stats bar:
 ### Connection Rules
 | Node Type | MUST connect to | Example |
 |-----------|----------------|---------|
-| `outcome` | The action/goal it resolves | "JWT working" → links FROM "Implementing JWT" |
-| `action` | The decision/goal that spawned it | "Implementing JWT" → links FROM "Add auth" |
-| `option` | Its parent decision | "Use JWT" → links FROM "Choose auth method" |
-| `observation` | Related goal/action/decision | "Found existing code" → links TO relevant node |
-| `decision` | Parent goal (if any) | "Choose auth" → links FROM "Add auth feature" |
+| `outcome` | The action/goal it resolves | "JWT working" -> links FROM "Implementing JWT" |
+| `action` | The decision/goal that spawned it | "Implementing JWT" -> links FROM "Add auth" |
+| `option` | Its parent decision | "Use JWT" -> links FROM "Choose auth method" |
+| `observation` | Related goal/action/decision | "Found existing code" -> links TO relevant node |
+| `decision` | Parent goal (if any) | "Choose auth" -> links FROM "Add auth feature" |
 | `goal` | Can be a root (no parent needed) | Root goals are valid orphans |
 
 ### Audit Checklist

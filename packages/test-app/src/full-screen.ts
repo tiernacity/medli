@@ -17,6 +17,8 @@ import { CanvasRenderer } from "@medli/renderer-canvas";
 import { SvgRenderer } from "@medli/renderer-svg";
 import { WebGLRenderer } from "@medli/renderer-webgl";
 import { WebGPURenderer } from "@medli/renderer-webgpu";
+import { withOptimization } from "@medli/generator-optimizer";
+import { withValidation } from "@medli/generator-validator";
 import { getSketch, getSketchIds } from "./sketches";
 
 // ============================================================================
@@ -82,19 +84,28 @@ const instance = sketchModule.create(
 );
 
 // ============================================================================
+// Create Optimized Generator
+// ============================================================================
+
+// Pipeline: raw generator -> validator -> optimizer -> validator -> renderer
+const optimizedGenerator = withValidation(
+  withOptimization(withValidation(instance.generator))
+);
+
+// ============================================================================
 // Create Renderer
 // ============================================================================
 
 let renderer: CanvasRenderer | SvgRenderer | WebGLRenderer | WebGPURenderer;
 
 if (rendererType === "svg" && svgElement) {
-  renderer = new SvgRenderer(svgElement, instance.generator);
+  renderer = new SvgRenderer(svgElement, optimizedGenerator);
 } else if (rendererType === "webgl" && canvas) {
-  renderer = new WebGLRenderer(canvas, instance.generator);
+  renderer = new WebGLRenderer(canvas, optimizedGenerator);
 } else if (rendererType === "webgpu" && canvas) {
-  renderer = new WebGPURenderer(canvas, instance.generator);
+  renderer = new WebGPURenderer(canvas, optimizedGenerator);
 } else if (canvas) {
-  renderer = new CanvasRenderer(canvas, instance.generator);
+  renderer = new CanvasRenderer(canvas, optimizedGenerator);
 } else {
   throw new Error("No valid element for renderer");
 }

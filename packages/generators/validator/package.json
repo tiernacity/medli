@@ -1,8 +1,8 @@
 {
-  "name": "@medli/generator-procedural",
+  "name": "@medli/generator-validator",
   "version": "0.0.1",
   "type": "module",
-  "description": "Procedural shape generator for medli",
+  "description": "Frame validation generator for medli - validates upstream frames",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -19,7 +19,6 @@
     "dist"
   ],
   "dependencies": {
-    "@medli/spec": "*",
-    "@medli/generator-utils": "*"
+    "@medli/spec": "*"
   }
 }

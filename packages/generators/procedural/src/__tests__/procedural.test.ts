@@ -1,5 +1,5 @@
 import { ProceduralGenerator, Sketch } from "../index";
-import type { ChildMaterial, RootMaterial, Transform } from "@medli/spec";
+import type { ChildMaterial, Transform } from "@medli/spec";
 
 describe("ProceduralGenerator", () => {
   it("should return undefined background when draw does nothing", () => {
@@ -81,21 +81,22 @@ describe("Sketch interface", () => {
   });
 });
 
-describe("Material output", () => {
+describe("Material output - Naive IR", () => {
   describe("Root material properties", () => {
-    it("should have default root material properties when no style methods called", () => {
+    it("should have default root material properties always", () => {
       const generator = new ProceduralGenerator((p) => {
         p.viewport(50, 50);
         p.circle(50, 50, 10);
       });
       const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
+      // Root ALWAYS has defaults in naive IR
       expect(frame.root.fill).toBe("#000000");
       expect(frame.root.stroke).toBe("#000000");
       expect(frame.root.strokeWidth).toBe(1);
     });
 
-    it("should set root fill from fill() call before shapes", () => {
+    it("should create ChildMaterial when fill() called (not set root)", () => {
       const generator = new ProceduralGenerator((p) => {
         p.viewport(50, 50);
         p.fill("#ff0000");
@@ -103,10 +104,19 @@ describe("Material output", () => {
       });
       const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
-      expect(frame.root.fill).toBe("#ff0000");
+      // Root still has defaults
+      expect(frame.root.fill).toBe("#000000");
+
+      // fill() creates a ChildMaterial containing the circle
+      expect(frame.root.children).toHaveLength(1);
+      const childMaterial = frame.root.children[0] as ChildMaterial;
+      expect(childMaterial.type).toBe("material");
+      expect(childMaterial.fill).toBe("#ff0000");
+      expect(childMaterial.children).toHaveLength(1);
+      expect(childMaterial.children[0].type).toBe("circle");
     });
 
-    it("should set root stroke from stroke() call before shapes", () => {
+    it("should create ChildMaterial when stroke() called (not set root)", () => {
       const generator = new ProceduralGenerator((p) => {
         p.viewport(50, 50);
         p.stroke("#00ff00");
@@ -114,10 +124,15 @@ describe("Material output", () => {
       });
       const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
-      expect(frame.root.stroke).toBe("#00ff00");
+      // Root still has defaults
+      expect(frame.root.stroke).toBe("#000000");
+
+      // stroke() creates a ChildMaterial
+      const childMaterial = frame.root.children[0] as ChildMaterial;
+      expect(childMaterial.stroke).toBe("#00ff00");
     });
 
-    it("should set root strokeWidth from strokeWidth() call before shapes", () => {
+    it("should create ChildMaterial when strokeWidth() called (not set root)", () => {
       const generator = new ProceduralGenerator((p) => {
         p.viewport(50, 50);
         p.strokeWidth(5);
@@ -125,10 +140,15 @@ describe("Material output", () => {
       });
       const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
-      expect(frame.root.strokeWidth).toBe(5);
+      // Root still has defaults
+      expect(frame.root.strokeWidth).toBe(1);
+
+      // strokeWidth() creates a ChildMaterial
+      const childMaterial = frame.root.children[0] as ChildMaterial;
+      expect(childMaterial.strokeWidth).toBe(5);
     });
 
-    it("should use last style call if called multiple times before shapes", () => {
+    it("should create NESTED ChildMaterials for multiple style calls", () => {
       const generator = new ProceduralGenerator((p) => {
         p.viewport(50, 50);
         p.fill("#ff0000");
@@ -138,10 +158,21 @@ describe("Material output", () => {
       });
       const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
-      expect(frame.root.fill).toBe("#0000ff");
+      // Each fill() creates a nested ChildMaterial
+      // root > red > green > blue > circle
+      const red = frame.root.children[0] as ChildMaterial;
+      expect(red.fill).toBe("#ff0000");
+
+      const green = red.children[0] as ChildMaterial;
+      expect(green.fill).toBe("#00ff00");
+
+      const blue = green.children[0] as ChildMaterial;
+      expect(blue.fill).toBe("#0000ff");
+
+      expect(blue.children[0].type).toBe("circle");
     });
 
-    it("should set all root material properties from multiple style calls", () => {
+    it("should create nested ChildMaterials for different style properties", () => {
       const generator = new ProceduralGenerator((p) => {
         p.viewport(50, 50);
         p.fill("#ff0000");
@@ -151,14 +182,75 @@ describe("Material output", () => {
       });
       const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
-      expect(frame.root.fill).toBe("#ff0000");
-      expect(frame.root.stroke).toBe("#00ff00");
-      expect(frame.root.strokeWidth).toBe(3);
+      // Root has defaults
+      expect(frame.root.fill).toBe("#000000");
+      expect(frame.root.stroke).toBe("#000000");
+      expect(frame.root.strokeWidth).toBe(1);
+
+      // Each style call creates nested ChildMaterial
+      // root > fill(red) > stroke(green) > strokeWidth(3) > circle
+      const fillMat = frame.root.children[0] as ChildMaterial;
+      expect(fillMat.fill).toBe("#ff0000");
+
+      const strokeMat = fillMat.children[0] as ChildMaterial;
+      expect(strokeMat.stroke).toBe("#00ff00");
+
+      const widthMat = strokeMat.children[0] as ChildMaterial;
+      expect(widthMat.strokeWidth).toBe(3);
+
+      expect(widthMat.children[0].type).toBe("circle");
     });
   });
 
-  describe("Different materials for different shapes", () => {
-    it("should wrap shapes in ChildMaterial when fill changes between shapes", () => {
+  describe("Shapes without style calls", () => {
+    it("should place shape directly under root when no style calls", () => {
+      const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
+        p.circle(10, 10, 5);
+      });
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
+
+      // Shape goes directly under root (inherits defaults)
+      expect(frame.root.children).toHaveLength(1);
+      expect(frame.root.children[0].type).toBe("circle");
+    });
+
+    it("should place multiple shapes directly under root when no style calls", () => {
+      const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
+        p.circle(10, 10, 5);
+        p.circle(20, 20, 5);
+        p.rectangle(30, 30, 10, 10);
+      });
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
+
+      expect(frame.root.children).toHaveLength(3);
+      expect(frame.root.children[0].type).toBe("circle");
+      expect(frame.root.children[1].type).toBe("circle");
+      expect(frame.root.children[2].type).toBe("rectangle");
+    });
+  });
+
+  describe("Consecutive shapes with style", () => {
+    it("should place consecutive shapes in same ChildMaterial", () => {
+      const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
+        p.fill("red");
+        p.circle(10, 10, 5);
+        p.circle(20, 20, 5);
+      });
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
+
+      // Single ChildMaterial contains both circles
+      expect(frame.root.children).toHaveLength(1);
+      const mat = frame.root.children[0] as ChildMaterial;
+      expect(mat.fill).toBe("red");
+      expect(mat.children).toHaveLength(2);
+      expect(mat.children[0].type).toBe("circle");
+      expect(mat.children[1].type).toBe("circle");
+    });
+
+    it("should create new nested ChildMaterial when style changes", () => {
       const generator = new ProceduralGenerator((p) => {
         p.viewport(50, 50);
         p.fill("red");
@@ -168,48 +260,22 @@ describe("Material output", () => {
       });
       const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
-      // Root should have two ChildMaterial children
-      expect(frame.root.children).toHaveLength(2);
+      // First fill creates ChildMaterial, second fill creates nested ChildMaterial
+      // root > red { circle, blue { circle } }
+      expect(frame.root.children).toHaveLength(1);
+      const redMat = frame.root.children[0] as ChildMaterial;
+      expect(redMat.fill).toBe("red");
+      expect(redMat.children).toHaveLength(2); // circle + blue material
 
-      const child1 = frame.root.children[0] as ChildMaterial;
-      expect(child1.type).toBe("material");
-      expect(child1.fill).toBe("red");
-      expect(child1.ref).toBe("root");
-      expect(child1.children).toHaveLength(1);
-      expect(child1.children[0].type).toBe("circle");
+      expect(redMat.children[0].type).toBe("circle");
 
-      const child2 = frame.root.children[1] as ChildMaterial;
-      expect(child2.type).toBe("material");
-      expect(child2.fill).toBe("blue");
-      expect(child2.ref).toBe("root");
-      expect(child2.children).toHaveLength(1);
-      expect(child2.children[0].type).toBe("circle");
+      const blueMat = redMat.children[1] as ChildMaterial;
+      expect(blueMat.fill).toBe("blue");
+      expect(blueMat.children).toHaveLength(1);
+      expect(blueMat.children[0].type).toBe("circle");
     });
 
-    it("should group consecutive shapes with same style in one ChildMaterial", () => {
-      const generator = new ProceduralGenerator((p) => {
-        p.viewport(50, 50);
-        p.fill("red");
-        p.circle(10, 10, 5);
-        p.circle(20, 20, 5);
-        p.fill("blue");
-        p.circle(30, 30, 5);
-      });
-      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
-
-      // Should have two ChildMaterial children (red group, blue group)
-      expect(frame.root.children).toHaveLength(2);
-
-      const redGroup = frame.root.children[0] as ChildMaterial;
-      expect(redGroup.fill).toBe("red");
-      expect(redGroup.children).toHaveLength(2);
-
-      const blueGroup = frame.root.children[1] as ChildMaterial;
-      expect(blueGroup.fill).toBe("blue");
-      expect(blueGroup.children).toHaveLength(1);
-    });
-
-    it("should create new ChildMaterial when stroke changes", () => {
+    it("should create new nested ChildMaterial when stroke changes", () => {
       const generator = new ProceduralGenerator((p) => {
         p.viewport(50, 50);
         p.stroke("red");
@@ -219,16 +285,14 @@ describe("Material output", () => {
       });
       const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
-      expect(frame.root.children).toHaveLength(2);
+      const redMat = frame.root.children[0] as ChildMaterial;
+      expect(redMat.stroke).toBe("red");
 
-      const child1 = frame.root.children[0] as ChildMaterial;
-      expect(child1.stroke).toBe("red");
-
-      const child2 = frame.root.children[1] as ChildMaterial;
-      expect(child2.stroke).toBe("blue");
+      const blueMat = redMat.children[1] as ChildMaterial;
+      expect(blueMat.stroke).toBe("blue");
     });
 
-    it("should create new ChildMaterial when strokeWidth changes", () => {
+    it("should create new nested ChildMaterial when strokeWidth changes", () => {
       const generator = new ProceduralGenerator((p) => {
         p.viewport(50, 50);
         p.strokeWidth(2);
@@ -238,13 +302,11 @@ describe("Material output", () => {
       });
       const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
-      expect(frame.root.children).toHaveLength(2);
+      const mat2 = frame.root.children[0] as ChildMaterial;
+      expect(mat2.strokeWidth).toBe(2);
 
-      const child1 = frame.root.children[0] as ChildMaterial;
-      expect(child1.strokeWidth).toBe(2);
-
-      const child2 = frame.root.children[1] as ChildMaterial;
-      expect(child2.strokeWidth).toBe(5);
+      const mat5 = mat2.children[1] as ChildMaterial;
+      expect(mat5.strokeWidth).toBe(5);
     });
 
     it("should have unique IDs for each ChildMaterial", () => {
@@ -259,14 +321,25 @@ describe("Material output", () => {
       });
       const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
-      const ids = frame.root.children.map((c) => (c as ChildMaterial).id);
+      // Collect all material IDs from nested structure
+      const ids: string[] = [];
+      const collectIds = (node: ChildMaterial) => {
+        ids.push(node.id);
+        for (const child of node.children) {
+          if (child.type === "material") {
+            collectIds(child as ChildMaterial);
+          }
+        }
+      };
+      collectIds(frame.root.children[0] as ChildMaterial);
+
       const uniqueIds = new Set(ids);
       expect(uniqueIds.size).toBe(ids.length);
     });
   });
 
   describe("Nesting with push/pop", () => {
-    it("should start a new nested material context with push()", () => {
+    it("should save and restore insertion point with push/pop", () => {
       const generator = new ProceduralGenerator((p) => {
         p.viewport(50, 50);
         p.fill("red");
@@ -274,136 +347,77 @@ describe("Material output", () => {
         p.fill("blue");
         p.circle(10, 10, 5);
         p.pop();
+        p.circle(20, 20, 5); // Goes back to red material
       });
       const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
-      // Root fill should be red (set before push)
-      expect(frame.root.fill).toBe("red");
+      // Structure: root > red { blue { circle }, circle }
+      const redMat = frame.root.children[0] as ChildMaterial;
+      expect(redMat.fill).toBe("red");
+      expect(redMat.children).toHaveLength(2);
 
-      // Should have one ChildMaterial child (the pushed context)
-      expect(frame.root.children).toHaveLength(1);
-      const pushed = frame.root.children[0] as ChildMaterial;
-      expect(pushed.type).toBe("material");
-      expect(pushed.fill).toBe("blue");
-      expect(pushed.ref).toBe("root");
-      expect(pushed.children).toHaveLength(1);
-      expect(pushed.children[0].type).toBe("circle");
+      const blueMat = redMat.children[0] as ChildMaterial;
+      expect(blueMat.fill).toBe("blue");
+      expect(blueMat.children[0].type).toBe("circle");
+
+      // Second circle goes back to red material after pop
+      expect(redMat.children[1].type).toBe("circle");
     });
 
-    it("should return to parent context after pop()", () => {
+    it("should allow nested push/pop", () => {
       const generator = new ProceduralGenerator((p) => {
         p.viewport(50, 50);
         p.fill("red");
         p.push();
         p.fill("blue");
+        p.push();
+        p.fill("green");
         p.circle(10, 10, 5);
         p.pop();
-        p.circle(20, 20, 5);
+        p.circle(15, 15, 5); // Back to blue
+        p.pop();
+        p.circle(20, 20, 5); // Back to red
       });
       const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
-      // Root should have red fill
-      expect(frame.root.fill).toBe("red");
+      // Structure: root > red { blue { green { circle }, circle }, circle }
+      const redMat = frame.root.children[0] as ChildMaterial;
+      expect(redMat.fill).toBe("red");
 
-      // Should have two children: pushed group and circle after pop
+      const blueMat = redMat.children[0] as ChildMaterial;
+      expect(blueMat.fill).toBe("blue");
+
+      const greenMat = blueMat.children[0] as ChildMaterial;
+      expect(greenMat.fill).toBe("green");
+      expect(greenMat.children[0].type).toBe("circle");
+
+      // After first pop - circle in blue
+      expect(blueMat.children[1].type).toBe("circle");
+
+      // After second pop - circle in red
+      expect(redMat.children[1].type).toBe("circle");
+    });
+
+    it("should handle push/pop at root level", () => {
+      const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
+        p.push();
+        p.fill("blue");
+        p.circle(10, 10, 5);
+        p.pop();
+        p.circle(20, 20, 5); // Back to root
+      });
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
+
+      // Structure: root { blue { circle }, circle }
       expect(frame.root.children).toHaveLength(2);
 
-      // First child is the pushed group with blue fill
-      const pushedGroup = frame.root.children[0] as ChildMaterial;
-      expect(pushedGroup.fill).toBe("blue");
+      const blueMat = frame.root.children[0] as ChildMaterial;
+      expect(blueMat.fill).toBe("blue");
+      expect(blueMat.children[0].type).toBe("circle");
 
-      // Second child is a circle (either directly or wrapped in ChildMaterial inheriting red)
-      const afterPop = frame.root.children[1];
-      if (afterPop.type === "circle") {
-        // Shape directly under root inherits root's red fill
-        expect(afterPop.type).toBe("circle");
-      } else {
-        // Or wrapped in ChildMaterial with red fill
-        const wrapped = afterPop as ChildMaterial;
-        expect(wrapped.fill).toBe("red");
-      }
-    });
-
-    it("should restore style state after pop()", () => {
-      const generator = new ProceduralGenerator((p) => {
-        p.viewport(50, 50);
-        p.fill("red");
-        p.stroke("green");
-        p.strokeWidth(2);
-        p.push();
-        p.fill("blue");
-        p.stroke("yellow");
-        p.strokeWidth(5);
-        p.circle(10, 10, 5);
-        p.pop();
-        // After pop, should be back to red/green/2
-        p.circle(20, 20, 5);
-      });
-      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
-
-      // Root should have the initial style (red/green/2)
-      expect(frame.root.fill).toBe("red");
-      expect(frame.root.stroke).toBe("green");
-      expect(frame.root.strokeWidth).toBe(2);
-
-      // First child is pushed context with blue/yellow/5
-      const pushed = frame.root.children[0] as ChildMaterial;
-      expect(pushed.fill).toBe("blue");
-      expect(pushed.stroke).toBe("yellow");
-      expect(pushed.strokeWidth).toBe(5);
-    });
-  });
-
-  describe("Deep nesting", () => {
-    it("should support multiple levels of push()", () => {
-      const generator = new ProceduralGenerator((p) => {
-        p.viewport(50, 50);
-        p.fill("red");
-        p.push();
-        p.fill("blue");
-        p.push();
-        p.fill("green");
-        p.circle(10, 10, 5);
-        p.pop();
-        p.pop();
-      });
-      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
-
-      // Root > ChildMaterial(blue) > ChildMaterial(green) > circle
-      expect(frame.root.fill).toBe("red");
-
-      const level1 = frame.root.children[0] as ChildMaterial;
-      expect(level1.fill).toBe("blue");
-      expect(level1.ref).toBe("root");
-
-      const level2 = level1.children[0] as ChildMaterial;
-      expect(level2.fill).toBe("green");
-      expect(level2.ref).toBe(level1.id);
-
-      expect(level2.children).toHaveLength(1);
-      expect(level2.children[0].type).toBe("circle");
-    });
-
-    it("should correctly unwind multiple pops", () => {
-      const generator = new ProceduralGenerator((p) => {
-        p.viewport(50, 50);
-        p.fill("red");
-        p.circle(5, 5, 2); // red circle at root level
-        p.push();
-        p.fill("blue");
-        p.push();
-        p.fill("green");
-        p.circle(10, 10, 5);
-        p.pop();
-        p.circle(15, 15, 5); // blue circle at level 1
-        p.pop();
-        p.circle(20, 20, 5); // red circle at root level
-      });
-      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
-
-      // Should have 3 top-level children: circle, pushed group, circle
-      // (or wrapped in ChildMaterials)
-      expect(frame.root.children.length).toBeGreaterThanOrEqual(2);
+      // Second circle directly under root
+      expect(frame.root.children[1].type).toBe("circle");
     });
   });
 
@@ -412,54 +426,39 @@ describe("Material output", () => {
       const generator = new ProceduralGenerator((p) => {
         p.viewport(50, 50);
         p.fill("red");
-        p.push();
-        p.fill("blue");
         p.circle(10, 10, 5);
-        p.pop();
       });
       const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
       const child = frame.root.children[0] as ChildMaterial;
-      expect(child.ref).toBe(frame.root.id);
+      expect(child.ref).toBe("root");
     });
 
     it("should have deeply nested refs pointing to immediate parent", () => {
       const generator = new ProceduralGenerator((p) => {
         p.viewport(50, 50);
-        p.push();
-        p.push();
-        p.push();
+        p.fill("red");
+        p.fill("blue");
+        p.fill("green");
         p.circle(10, 10, 5);
-        p.pop();
-        p.pop();
-        p.pop();
       });
       const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
-      // Navigate down the tree and verify each ref points to parent
-      let current = frame.root;
-      while (current.children.length > 0) {
-        const child = current.children[0];
-        if (child.type === "material") {
-          const childMat = child as ChildMaterial;
-          expect(childMat.ref).toBe(current.id);
-          current = childMat as unknown as RootMaterial;
-        } else {
-          break;
-        }
-      }
+      const redMat = frame.root.children[0] as ChildMaterial;
+      expect(redMat.ref).toBe("root");
+
+      const blueMat = redMat.children[0] as ChildMaterial;
+      expect(blueMat.ref).toBe(redMat.id);
+
+      const greenMat = blueMat.children[0] as ChildMaterial;
+      expect(greenMat.ref).toBe(blueMat.id);
     });
 
-    it("should only include changed properties in ChildMaterial", () => {
+    it("should only include the property that was set in ChildMaterial", () => {
       const generator = new ProceduralGenerator((p) => {
         p.viewport(50, 50);
-        p.fill("red");
-        p.stroke("green");
-        p.strokeWidth(2);
-        p.push();
-        p.fill("blue"); // Only change fill
+        p.fill("blue");
         p.circle(10, 10, 5);
-        p.pop();
       });
       const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
@@ -492,9 +491,9 @@ describe("Material output", () => {
   });
 });
 
-describe("Transform output", () => {
+describe("Transform output - Naive IR", () => {
   describe("translate()", () => {
-    it("should wrap shape in Transform node with translation matrix", () => {
+    it("should wrap subsequent shapes in Transform node", () => {
       const generator = new ProceduralGenerator((p) => {
         p.viewport(50, 50);
         p.translate(10, 20);
@@ -502,12 +501,9 @@ describe("Transform output", () => {
       });
       const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
-      // Find the circle wrapped in a transform
-      const childMaterial = frame.root.children[0] as ChildMaterial;
-      const transformNode = childMaterial.children[0] as Transform;
-
+      // Transform contains circle directly (no style applied)
+      const transformNode = frame.root.children[0] as Transform;
       expect(transformNode.type).toBe("transform");
-      // Translation matrix: [1, 0, 0, 1, x, y]
       expect(transformNode.matrix).toEqual([1, 0, 0, 1, 10, 20]);
       expect(transformNode.children[0].type).toBe("circle");
     });
@@ -519,12 +515,11 @@ describe("Transform output", () => {
       });
       const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
-      // Shape should be directly in the material, not wrapped in Transform
-      const childMaterial = frame.root.children[0] as ChildMaterial;
-      expect(childMaterial.children[0].type).toBe("circle");
+      // Shape directly under root, not wrapped in Transform
+      expect(frame.root.children[0].type).toBe("circle");
     });
 
-    it("should accumulate multiple translate() calls", () => {
+    it("should create NESTED Transform nodes for multiple translate() calls", () => {
       const generator = new ProceduralGenerator((p) => {
         p.viewport(50, 50);
         p.translate(10, 20);
@@ -533,11 +528,16 @@ describe("Transform output", () => {
       });
       const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
-      const childMaterial = frame.root.children[0] as ChildMaterial;
-      const transformNode = childMaterial.children[0] as Transform;
+      // Nested transforms: Transform(10,20) > Transform(5,10) > circle
+      const outer = frame.root.children[0] as Transform;
+      expect(outer.type).toBe("transform");
+      expect(outer.matrix).toEqual([1, 0, 0, 1, 10, 20]);
 
-      // Accumulated: translate(10,20) then translate(5,10) = translate(15,30)
-      expect(transformNode.matrix).toEqual([1, 0, 0, 1, 15, 30]);
+      const inner = outer.children[0] as Transform;
+      expect(inner.type).toBe("transform");
+      expect(inner.matrix).toEqual([1, 0, 0, 1, 5, 10]);
+
+      expect(inner.children[0].type).toBe("circle");
     });
   });
 
@@ -550,16 +550,13 @@ describe("Transform output", () => {
       });
       const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
-      const childMaterial = frame.root.children[0] as ChildMaterial;
-      const transformNode = childMaterial.children[0] as Transform;
-
+      const transformNode = frame.root.children[0] as Transform;
       expect(transformNode.type).toBe("transform");
-      // Rotation matrix for 90 degrees: [cos, sin, -sin, cos, 0, 0]
-      // cos(90°) ≈ 0, sin(90°) = 1
-      expect(transformNode.matrix[0]).toBeCloseTo(0); // cos
-      expect(transformNode.matrix[1]).toBeCloseTo(1); // sin
-      expect(transformNode.matrix[2]).toBeCloseTo(-1); // -sin
-      expect(transformNode.matrix[3]).toBeCloseTo(0); // cos
+      // cos(90) ≈ 0, sin(90) = 1
+      expect(transformNode.matrix[0]).toBeCloseTo(0);
+      expect(transformNode.matrix[1]).toBeCloseTo(1);
+      expect(transformNode.matrix[2]).toBeCloseTo(-1);
+      expect(transformNode.matrix[3]).toBeCloseTo(0);
       expect(transformNode.matrix[4]).toBe(0);
       expect(transformNode.matrix[5]).toBe(0);
     });
@@ -574,11 +571,8 @@ describe("Transform output", () => {
       });
       const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
-      const childMaterial = frame.root.children[0] as ChildMaterial;
-      const transformNode = childMaterial.children[0] as Transform;
-
+      const transformNode = frame.root.children[0] as Transform;
       expect(transformNode.type).toBe("transform");
-      // Uniform scale matrix: [sx, 0, 0, sy, 0, 0]
       expect(transformNode.matrix).toEqual([2, 0, 0, 2, 0, 0]);
     });
 
@@ -590,16 +584,14 @@ describe("Transform output", () => {
       });
       const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
-      const childMaterial = frame.root.children[0] as ChildMaterial;
-      const transformNode = childMaterial.children[0] as Transform;
-
+      const transformNode = frame.root.children[0] as Transform;
       expect(transformNode.type).toBe("transform");
       expect(transformNode.matrix).toEqual([2, 0, 0, 3, 0, 0]);
     });
   });
 
-  describe("Combined transforms", () => {
-    it("should compose translate then scale correctly", () => {
+  describe("Combined transforms - Naive IR creates NESTED nodes", () => {
+    it("should create nested Transform nodes for translate then scale", () => {
       const generator = new ProceduralGenerator((p) => {
         p.viewport(50, 50);
         p.translate(10, 20);
@@ -608,15 +600,17 @@ describe("Transform output", () => {
       });
       const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
-      const childMaterial = frame.root.children[0] as ChildMaterial;
-      const transformNode = childMaterial.children[0] as Transform;
+      // Nested: Transform(translate) > Transform(scale) > circle
+      const translateNode = frame.root.children[0] as Transform;
+      expect(translateNode.matrix).toEqual([1, 0, 0, 1, 10, 20]);
 
-      // translate(10,20) * scale(2,2) = [2, 0, 0, 2, 10, 20]
-      // Matrix multiplication: new = current * transform
-      expect(transformNode.matrix).toEqual([2, 0, 0, 2, 10, 20]);
+      const scaleNode = translateNode.children[0] as Transform;
+      expect(scaleNode.matrix).toEqual([2, 0, 0, 2, 0, 0]);
+
+      expect(scaleNode.children[0].type).toBe("circle");
     });
 
-    it("should compose scale then translate correctly", () => {
+    it("should create nested Transform nodes for scale then translate", () => {
       const generator = new ProceduralGenerator((p) => {
         p.viewport(50, 50);
         p.scale(2);
@@ -625,39 +619,64 @@ describe("Transform output", () => {
       });
       const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
-      const childMaterial = frame.root.children[0] as ChildMaterial;
-      const transformNode = childMaterial.children[0] as Transform;
+      // Nested: Transform(scale) > Transform(translate) > circle
+      const scaleNode = frame.root.children[0] as Transform;
+      expect(scaleNode.matrix).toEqual([2, 0, 0, 2, 0, 0]);
 
-      // scale(2,2) * translate(10,20)
-      // Translation is scaled: e' = 2*10 = 20, f' = 2*20 = 40
-      expect(transformNode.matrix).toEqual([2, 0, 0, 2, 20, 40]);
+      const translateNode = scaleNode.children[0] as Transform;
+      expect(translateNode.matrix).toEqual([1, 0, 0, 1, 10, 20]);
+
+      expect(translateNode.children[0].type).toBe("circle");
+    });
+
+    it("should create nested nodes for translate, rotate, scale", () => {
+      const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
+        p.translate(100, 0);
+        p.rotate(Math.PI / 4);
+        p.scale(0.5);
+        p.circle(0, 0, 5);
+      });
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
+
+      const t1 = frame.root.children[0] as Transform;
+      expect(t1.matrix).toEqual([1, 0, 0, 1, 100, 0]);
+
+      const t2 = t1.children[0] as Transform;
+      // 45 degree rotation
+      expect(t2.matrix[0]).toBeCloseTo(Math.cos(Math.PI / 4));
+
+      const t3 = t2.children[0] as Transform;
+      expect(t3.matrix).toEqual([0.5, 0, 0, 0.5, 0, 0]);
+
+      expect(t3.children[0].type).toBe("circle");
     });
   });
 
   describe("Transform with push/pop", () => {
-    it("should save and restore transform state with push/pop", () => {
+    it("should save and restore insertion point with push/pop", () => {
       const generator = new ProceduralGenerator((p) => {
         p.viewport(50, 50);
         p.translate(10, 0);
         p.push();
         p.translate(5, 0);
-        p.circle(0, 0, 5); // Should have translate(15, 0)
+        p.circle(0, 0, 5);
         p.pop();
-        p.circle(0, 0, 5); // Should have translate(10, 0)
+        p.circle(0, 0, 5); // Back to first translate level
       });
       const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
-      // First child is the pushed context material
-      const pushedMaterial = frame.root.children[0] as ChildMaterial;
-      const pushedTransform = pushedMaterial.children[0] as Transform;
-      expect(pushedTransform.type).toBe("transform");
-      expect(pushedTransform.matrix).toEqual([1, 0, 0, 1, 15, 0]);
+      // Structure: root > T(10,0) { T(5,0) { circle }, circle }
+      const outerT = frame.root.children[0] as Transform;
+      expect(outerT.matrix).toEqual([1, 0, 0, 1, 10, 0]);
+      expect(outerT.children).toHaveLength(2);
 
-      // Second child is the circle after pop (wrapped in material)
-      const afterPopMaterial = frame.root.children[1] as ChildMaterial;
-      const afterPopTransform = afterPopMaterial.children[0] as Transform;
-      expect(afterPopTransform.type).toBe("transform");
-      expect(afterPopTransform.matrix).toEqual([1, 0, 0, 1, 10, 0]);
+      const innerT = outerT.children[0] as Transform;
+      expect(innerT.matrix).toEqual([1, 0, 0, 1, 5, 0]);
+      expect(innerT.children[0].type).toBe("circle");
+
+      // Circle after pop goes back to outer transform
+      expect(outerT.children[1].type).toBe("circle");
     });
 
     it("should allow independent transforms in nested push/pop", () => {
@@ -667,18 +686,57 @@ describe("Transform output", () => {
         p.translate(100, 0);
         p.circle(0, 0, 5);
         p.pop();
-        p.circle(0, 0, 5); // No transform
+        p.circle(0, 0, 5); // No transform - directly under root
       });
       const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
-      // First child is pushed context with translated circle
-      const pushedMaterial = frame.root.children[0] as ChildMaterial;
-      const pushedTransform = pushedMaterial.children[0] as Transform;
-      expect(pushedTransform.matrix).toEqual([1, 0, 0, 1, 100, 0]);
+      // Structure: root { T(100,0) { circle }, circle }
+      expect(frame.root.children).toHaveLength(2);
 
-      // Second child has no transform (directly a circle, not wrapped in Transform)
-      const afterPopMaterial = frame.root.children[1] as ChildMaterial;
-      expect(afterPopMaterial.children[0].type).toBe("circle");
+      const transform = frame.root.children[0] as Transform;
+      expect(transform.matrix).toEqual([1, 0, 0, 1, 100, 0]);
+      expect(transform.children[0].type).toBe("circle");
+
+      // Second circle directly under root (no transform)
+      expect(frame.root.children[1].type).toBe("circle");
+    });
+  });
+
+  describe("Transform with style", () => {
+    it("should nest transform inside material when style then transform", () => {
+      const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
+        p.fill("red");
+        p.translate(10, 20);
+        p.circle(0, 0, 5);
+      });
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
+
+      // Structure: root > material(red) > transform > circle
+      const mat = frame.root.children[0] as ChildMaterial;
+      expect(mat.fill).toBe("red");
+
+      const transform = mat.children[0] as Transform;
+      expect(transform.matrix).toEqual([1, 0, 0, 1, 10, 20]);
+      expect(transform.children[0].type).toBe("circle");
+    });
+
+    it("should nest material inside transform when transform then style", () => {
+      const generator = new ProceduralGenerator((p) => {
+        p.viewport(50, 50);
+        p.translate(10, 20);
+        p.fill("red");
+        p.circle(0, 0, 5);
+      });
+      const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
+
+      // Structure: root > transform > material(red) > circle
+      const transform = frame.root.children[0] as Transform;
+      expect(transform.matrix).toEqual([1, 0, 0, 1, 10, 20]);
+
+      const mat = transform.children[0] as ChildMaterial;
+      expect(mat.fill).toBe("red");
+      expect(mat.children[0].type).toBe("circle");
     });
   });
 
@@ -718,8 +776,7 @@ describe("Image output", () => {
       });
       const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
-      const childMaterial = frame.root.children[0] as ChildMaterial;
-      const imageShape = childMaterial.children[0] as {
+      const imageShape = frame.root.children[0] as {
         type: string;
         url: string;
         position: { x: number; y: number };
@@ -755,8 +812,7 @@ describe("Image output", () => {
       });
       const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
-      const childMaterial = frame.root.children[0] as ChildMaterial;
-      const imageShape = childMaterial.children[0] as {
+      const imageShape = frame.root.children[0] as {
         type: string;
         url: string;
         position: { x: number; y: number };
@@ -781,8 +837,7 @@ describe("Image output", () => {
       });
       const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
-      const childMaterial = frame.root.children[0] as ChildMaterial;
-      const imageShape = childMaterial.children[0] as {
+      const imageShape = frame.root.children[0] as {
         type: string;
         crop?: { x: number; y: number; width: number; height: number };
       };
@@ -799,8 +854,7 @@ describe("Image output", () => {
       });
       const frame = generator.frame({ time: 0, targetDimensions: [100, 100] });
 
-      const childMaterial = frame.root.children[0] as ChildMaterial;
-      const imageShape = childMaterial.children[0] as {
+      const imageShape = frame.root.children[0] as {
         type: string;
         crop?: { x: number; y: number; width: number; height: number };
       };

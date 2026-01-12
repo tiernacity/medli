@@ -19,6 +19,7 @@
     "dist"
   ],
   "dependencies": {
-    "@medli/spec": "*"
+    "@medli/spec": "*",
+    "@medli/generator-utils": "*"
   }
 }

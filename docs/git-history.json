@@ -1,5 +1,21 @@
 [
   {
+    "hash": "8ce922142ea8a74b412b8ad5b6cfc07f3683edbe",
+    "short_hash": "8ce9221",
+    "author": "Chris Tierney",
+    "date": "2026-01-12T21:49:21Z",
+    "message": "feat: add composable generator pipeline with validator and optimizer\n\nIntroduces a composable pipeline architecture for Frame processing:\n\nNew packages:\n- @medli/generator-validator: Wraps generators with frame validation\n- @medli/generator-optimizer: Optimizes Frame IR (transform merging,\n  material squashing, identity removal)\n- @medli/generator-utils: Shared matrix utilities\n\nChanges:\n- Simplified procedural/object generators (removed inline validation)\n- Added 55 validateFrame tests covering all validation paths\n- Integrated pipeline into harnesses and full-screen demos\n- Added AGENT.md files for new packages\n\nPipeline usage:\n  const gen = withOptimization(withValidation(rawGenerator));\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 30
+  },
+  {
+    "hash": "bbc085d2a123ed27930b08ff17ecb4ee60a5e967",
+    "short_hash": "bbc085d",
+    "author": "Chris Tierney",
+    "date": "2026-01-12T21:47:21Z",
+    "message": "feat: add pipeline performance benchmark harness\n\nAdds a standalone benchmark page for testing WebGPU renderer performance\nwith different pipeline configurations (none, validator, optimizer, both).\n\nUsage: /benchmark.html?shapes=500&pipeline=none\n\nDisplays real-time FPS, generator time, traversal time, and render time.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 2
+  },
+  {
     "hash": "009f7dda501b4ab90a3f2e0f4b83bf66af517e6c",
     "short_hash": "009f7dd",
     "author": "Chris Tierney",

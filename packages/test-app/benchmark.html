@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medli Pipeline Benchmark</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #1a0633;
+      font-family: system-ui, sans-serif;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: calc(100% - 60px);
+    }
+    #metrics {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: rgba(0, 0, 0, 0.85);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      font-size: 14px;
+      z-index: 1000;
+    }
+    #metrics .config {
+      color: #00d9ff;
+    }
+    #metrics .fps {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    #metrics .fps.good { color: #4caf50; }
+    #metrics .fps.ok { color: #ffc107; }
+    #metrics .fps.bad { color: #e94560; }
+    #metrics .times {
+      display: flex;
+      gap: 20px;
+      font-size: 12px;
+      color: #aaa;
+    }
+    #metrics .times span {
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+  <div id="metrics">
+    <div class="config">Loading...</div>
+    <div class="fps">-- FPS</div>
+    <div class="times">
+      <span>Gen: --ms</span>
+      <span>Trav: --ms</span>
+      <span>Render: --ms</span>
+      <span>Total: --ms</span>
+    </div>
+  </div>
+  <canvas id="canvas"></canvas>
+  <script type="module" src="/src/benchmark.ts"></script>
+</body>
+</html>
