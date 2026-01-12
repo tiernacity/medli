@@ -6544,6 +6544,17 @@
       "created_at": "2026-01-12T21:47:26.080251+00:00",
       "updated_at": "2026-01-12T21:47:26.080251+00:00",
       "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"commit\":\"bbc085d\",\"confidence\":95}"
+    },
+    {
+      "id": 599,
+      "change_id": "8841392f-9b31-4457-bbd8-7034152445cf",
+      "node_type": "outcome",
+      "title": "Committed composable generator pipeline - validator, optimizer, utils packages",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-12T21:49:26.147831+00:00",
+      "updated_at": "2026-01-12T21:49:26.147831+00:00",
+      "metadata_json": "{\"branch\":\"feat/frame-validation-and-optimisation\",\"commit\":\"8ce9221\",\"confidence\":95}"
     }
   ],
   "edges": [
@@ -13069,6 +13080,17 @@
       "weight": 1.0,
       "rationale": "Goal achieved with benchmark tool",
       "created_at": "2026-01-12T21:47:26.130599+00:00"
+    },
+    {
+      "id": 596,
+      "from_node_id": 585,
+      "to_node_id": 599,
+      "from_change_id": "5894ae22-fa4b-4269-9b5d-796078749dba",
+      "to_change_id": "8841392f-9b31-4457-bbd8-7034152445cf",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Goal implementation committed",
+      "created_at": "2026-01-12T21:49:26.202937+00:00"
     }
   ]
 }
