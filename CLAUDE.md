@@ -200,6 +200,36 @@ npm run test       # All tests pass
 - [ ] `npm run test` passes
 - [ ] New code has appropriate test coverage
 - [ ] Decision graph updated with relevant nodes
+- [ ] Background processes killed (dev servers, watch processes)
+
+### ⚠️ CRITICAL: Clean Up Background Processes
+
+**Kill background processes when no longer needed.** Dev servers and watch processes accumulate if left running.
+
+**After visual verification or testing:**
+```bash
+# Check what's running
+/tasks
+
+# Kill background shells by ID
+KillShell <task_id>
+```
+
+**When to clean up:**
+- After `npm run dev` visual verification is complete
+- After any long-running process serves its purpose
+- Before starting a new dev server (check if one is already running)
+- At the end of a task or before committing
+
+**Common culprits:**
+- `npm run dev` - Vite dev server (test-app)
+- `npm run watch` - TypeScript watch mode
+- Any process started with `run_in_background: true`
+
+**Prevention:** Before starting a dev server, check if one is already running:
+```bash
+/tasks  # Lists all background tasks
+```
 
 ### Package Structure
 
