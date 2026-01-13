@@ -1,5 +1,29 @@
 [
   {
+    "hash": "d7b1d86a1217264226e12b0aff791f9fd7a3b253",
+    "short_hash": "d7b1d86",
+    "author": "Chris Tierney",
+    "date": "2026-01-13T08:59:27Z",
+    "message": "docs: add background process cleanup instructions to CLAUDE.md\n\nAdd guidance to kill dev servers and watch processes after tasks complete\nto prevent accumulation of orphaned background processes.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 1
+  },
+  {
+    "hash": "c9a0c9ea29cc2ab053342dbaf3646bffd3de3a49",
+    "short_hash": "c9a0c9e",
+    "author": "Chris Tierney",
+    "date": "2026-01-13T08:45:50Z",
+    "message": "feat: implement Fragment type for composable generators\n\nAdd Fragment feature enabling generator composition:\n\nCore types (@medli/spec):\n- RootMaterialRef: Material reference for style inheritance\n- Fragment: Composable scene graph (RootMaterialRef + children)\n- Embed: Embeds Fragment with namespace and material binding\n- FragmentGenerator: Interface for fragment producers\n\nFunctions (@medli/spec):\n- validateFragment(): Validates fragment structure\n- validateEmbed(): Validates embed nodes\n- resolveEmbed(): Resolves Embed to FrameNodes with namespacing\n- resolveFrame(): Resolves all Embeds in a Frame\n- fragmentToFrame(): Converts Fragment to standalone Frame\n\nProcedural generator:\n- Sketch.embed(): Embed fragment at current material context\n- Sketch.createFragment(): Create fragment from draw function\n\nObject generator:\n- FragmentScene: Scene that produces Fragment instead of Frame\n- Scene.embed(): Embed fragment at root level\n- Group.embedFragment(): Embed fragment in groups\n\nVisual demo (test-app):\n- fragment-demo scene showing all Fragment capabilities\n- Cross-generator composition demo\n- Nested fragments demo\n- Style inheritance demo\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 9
+  },
+  {
+    "hash": "4dd90194baf20993c87693931334b80096d72e7f",
+    "short_hash": "4dd9019",
+    "author": "Chris Tierney",
+    "date": "2026-01-13T08:27:28Z",
+    "message": "docs: add Fragment design and implementation plan\n\nFragment enables generator composition by allowing reusable scene graph\npieces to be embedded into Frames or other Fragments. Design went through\n3 iterations with multiple review cycles.\n\nKey insight: Fragment ≈ Frame, with only RootMaterialRef instead of\nRootMaterial (no styles) and no viewport.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 2
+  },
+  {
     "hash": "8ce922142ea8a74b412b8ad5b6cfc07f3683edbe",
     "short_hash": "8ce9221",
     "author": "Chris Tierney",
