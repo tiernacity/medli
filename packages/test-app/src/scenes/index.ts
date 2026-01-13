@@ -11,6 +11,7 @@ import { scene as stressShapes } from "./stress-shapes";
 import { scene as stressBatch } from "./stress-batch";
 import { scene as stressAnimation } from "./stress-animation";
 import { scene as stressTransforms } from "./stress-transforms";
+import { scene as fragmentDemo } from "./fragment-demo";
 
 export const scenes: Record<string, TestScene> = {
   "full-demo": fullDemo,
@@ -25,6 +26,7 @@ export const scenes: Record<string, TestScene> = {
   "stress-batch": stressBatch,
   "stress-animation": stressAnimation,
   "stress-transforms": stressTransforms,
+  "fragment-demo": fragmentDemo,
 };
 
 export type SceneId = keyof typeof scenes;

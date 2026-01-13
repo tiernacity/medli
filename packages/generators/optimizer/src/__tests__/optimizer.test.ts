@@ -51,12 +51,7 @@ function createCircle(x = 0, y = 0, radius = 5): Circle {
 }
 
 // Helper to create a rectangle shape
-function createRectangle(
-  x = 0,
-  y = 0,
-  width = 10,
-  height = 10
-): Rectangle {
+function createRectangle(x = 0, y = 0, width = 10, height = 10): Rectangle {
   return { type: "rectangle", center: { x, y }, width, height };
 }
 
@@ -168,7 +163,11 @@ describe("optimizer", () => {
           createChildMaterial(
             "m1",
             "root",
-            [createChildMaterial("m2", "m1", [createCircle()], { fill: "blue" })],
+            [
+              createChildMaterial("m2", "m1", [createCircle()], {
+                fill: "blue",
+              }),
+            ],
             { fill: "red" }
           ),
         ]);
@@ -428,7 +427,9 @@ describe("optimizer", () => {
           "m1",
           "root",
           [
-            createChildMaterial("m2", "m1", [createCircle()], { fill: "green" }),
+            createChildMaterial("m2", "m1", [createCircle()], {
+              fill: "green",
+            }),
           ],
           { fill: "red", stroke: "black", strokeWidth: 2 }
         ),
@@ -481,7 +482,11 @@ describe("optimizer", () => {
         createChildMaterial(
           "m1",
           "root",
-          [createChildMaterial("m2", "m1", [createRectangle()], { fill: "blue" })],
+          [
+            createChildMaterial("m2", "m1", [createRectangle()], {
+              fill: "blue",
+            }),
+          ],
           { stroke: "red" }
         ),
       ]);
@@ -561,9 +566,7 @@ describe("optimizer", () => {
               createChildMaterial(
                 "m2",
                 "m1",
-                [
-                  createChildMaterial("m3", "m1", [createCircle()]),
-                ],
+                [createChildMaterial("m3", "m1", [createCircle()])],
                 { fill: "blue" }
               ),
             ],
@@ -851,7 +854,9 @@ describe("optimizer", () => {
                   type: "material",
                   id: "m2",
                   ref: "m1",
-                  children: [{ type: "circle", center: { x: 0, y: 0 }, radius: 5 }],
+                  children: [
+                    { type: "circle", center: { x: 0, y: 0 }, radius: 5 },
+                  ],
                 },
               ],
             },
@@ -904,9 +909,7 @@ describe("optimizer", () => {
     });
 
     it("respects removeIdentityTransforms=false", () => {
-      const frame = createFrame([
-        createTransform(IDENTITY, [createCircle()]),
-      ]);
+      const frame = createFrame([createTransform(IDENTITY, [createCircle()])]);
 
       const optimized = optimizeFrame(frame, {
         removeIdentityTransforms: false,

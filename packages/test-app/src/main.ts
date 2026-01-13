@@ -27,6 +27,7 @@ import stressShapesSource from "./scenes/stress-shapes.ts?raw";
 import stressAnimationSource from "./scenes/stress-animation.ts?raw";
 import stressBatchSource from "./scenes/stress-batch.ts?raw";
 import stressTransformsSource from "./scenes/stress-transforms.ts?raw";
+import fragmentDemoSource from "./scenes/fragment-demo.ts?raw";
 
 // Map scene IDs to their source code
 const sceneSources: Record<string, string> = {
@@ -42,6 +43,7 @@ const sceneSources: Record<string, string> = {
   "stress-animation": stressAnimationSource,
   "stress-batch": stressBatchSource,
   "stress-transforms": stressTransformsSource,
+  "fragment-demo": fragmentDemoSource,
 };
 
 // Parse query parameters
