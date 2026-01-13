@@ -12,7 +12,13 @@ import type {
   Matrix2D,
   Transform,
   Viewport,
+  Fragment,
+  FragmentGenerator,
+  Embed,
+  RootMaterialRef,
 } from "@medli/spec";
+
+import { resolveFrame } from "@medli/spec";
 
 import {
   identityMatrix,
@@ -38,6 +44,15 @@ let materialIdCounter = 0;
 
 // Global counter for inline material IDs (used in Group.frame())
 let inlineMaterialCounter = 0;
+
+/**
+ * Internal type for storing embed information.
+ */
+type EmbedInfo = {
+  fragmentGen: FragmentGenerator | Fragment;
+  namespace: string;
+  rootMaterialId: string;
+};
 
 /**
  * Position in 2D space.
@@ -335,6 +350,7 @@ export class Image extends Shape {
  */
 export class Group extends SceneObject {
   private children: SceneObject[] = [];
+  private embeds: EmbedInfo[] = [];
 
   /**
    * Add a child object to this group.
@@ -362,9 +378,45 @@ export class Group extends SceneObject {
     return [...this.children];
   }
 
+  /**
+   * Embed a fragment into this group.
+   * The fragment inherits styles from the specified material (or root if not specified).
+   * @param fragmentGen - A FragmentGenerator or Fragment to embed
+   * @param namespace - Unique namespace for this embedding (prevents ID collisions)
+   * @param rootMaterialId - Material ID for style inheritance (defaults to "root")
+   */
+  embedFragment(
+    fragmentGen: FragmentGenerator | Fragment,
+    namespace: string,
+    rootMaterialId: string = "root"
+  ): this {
+    this.embeds.push({ fragmentGen, namespace, rootMaterialId });
+    return this;
+  }
+
+  /**
+   * Internal method to produce Embed nodes from stored embed info.
+   */
+  private produceEmbedNodes(time: number): Embed[] {
+    return this.embeds.map((info) => {
+      const fragment = isFragmentGenerator(info.fragmentGen)
+        ? info.fragmentGen.fragment({
+            time,
+            targetDimensions: [0, 0], // Fragments don't use targetDimensions
+          })
+        : info.fragmentGen;
+      return {
+        type: "embed" as const,
+        namespace: info.namespace,
+        rootMaterialId: info.rootMaterialId,
+        fragment,
+      };
+    });
+  }
+
   frame(time: number): FrameNode[] {
     // Collect children frame data, wrapping shapes with materials in inline ChildMaterial nodes
-    const childNodes: FrameNode[] = [];
+    const childNodes: (FrameNode | Embed)[] = [];
     for (const child of this.children) {
       const childFrameNodes = child.frame(time);
 
@@ -396,16 +448,20 @@ export class Group extends SceneObject {
       }
     }
 
-    // If no transform, just return children
+    // Add embed nodes
+    const embedNodes = this.produceEmbedNodes(time);
+    childNodes.push(...embedNodes);
+
+    // If no transform, just return children (cast since embeds need resolution)
     if (!this.hasTransform()) {
-      return childNodes;
+      return childNodes as FrameNode[];
     }
 
     // Wrap children in a Transform node
     const transform: Transform = {
       type: "transform",
       matrix: this.computeMatrix(),
-      children: childNodes,
+      children: childNodes as FrameNode[],
     };
 
     return [transform];
@@ -468,6 +524,15 @@ function isGroup(obj: SceneObject): obj is Group {
 }
 
 /**
+ * Helper to check if an object implements FragmentGenerator interface.
+ */
+function isFragmentGenerator(
+  obj: FragmentGenerator | Fragment
+): obj is FragmentGenerator {
+  return typeof (obj as FragmentGenerator).fragment === "function";
+}
+
+/**
  * Scene - the root container and generator for object-oriented scenes.
  * Builds a Material-based tree by grouping shapes by their material reference.
  *
@@ -479,6 +544,7 @@ function isGroup(obj: SceneObject): obj is Group {
 export class Scene implements Generator {
   private _background: Background | null = null;
   private children: SceneObject[] = [];
+  private embeds: EmbedInfo[] = [];
 
   /** Viewport configuration (required). */
   viewport: Viewport;
@@ -528,6 +594,22 @@ export class Scene implements Generator {
         this.children.splice(index, 1);
       }
     }
+    return this;
+  }
+
+  /**
+   * Embed a fragment into this scene at root level.
+   * The fragment inherits styles from the specified material (or root if not specified).
+   * @param fragmentGen - A FragmentGenerator or Fragment to embed
+   * @param namespace - Unique namespace for this embedding (prevents ID collisions)
+   * @param rootMaterialId - Material ID for style inheritance (defaults to "root")
+   */
+  embed(
+    fragmentGen: FragmentGenerator | Fragment,
+    namespace: string,
+    rootMaterialId: string = "root"
+  ): this {
+    this.embeds.push({ fragmentGen, namespace, rootMaterialId });
     return this;
   }
 
@@ -674,6 +756,21 @@ export class Scene implements Generator {
       }
     }
 
+    // Add embed nodes for fragments
+    for (const embedInfo of this.embeds) {
+      const fragment = isFragmentGenerator(embedInfo.fragmentGen)
+        ? embedInfo.fragmentGen.fragment(context)
+        : embedInfo.fragmentGen;
+
+      const embedNode: Embed = {
+        type: "embed",
+        namespace: embedInfo.namespace,
+        rootMaterialId: embedInfo.rootMaterialId,
+        fragment,
+      };
+      rootChildren.push(embedNode as unknown as FrameNode);
+    }
+
     // Build root material
     const root: RootMaterial = {
       type: "material",
@@ -687,10 +784,200 @@ export class Scene implements Generator {
     // Get background color
     const background = this._background?.color;
 
-    return {
+    // Create the unresolved frame and resolve all Embed nodes
+    const unresolvedFrame: Frame = {
       viewport: this.viewport,
       background,
       root,
     };
+
+    return resolveFrame(unresolvedFrame);
+  }
+}
+
+/**
+ * FragmentScene - produces Fragments instead of Frames.
+ * Use this when creating reusable visual components that can be embedded
+ * into Scenes or other Fragments.
+ *
+ * Similar to Scene but:
+ * - No viewport handling
+ * - Produces RootMaterialRef instead of RootMaterial
+ * - Uses "scene_root" as the RootMaterialRef.id
+ */
+export class FragmentScene implements FragmentGenerator {
+  private children: SceneObject[] = [];
+
+  /**
+   * Add a child object to this fragment scene.
+   */
+  add(child: SceneObject): this {
+    this.children.push(child);
+    return this;
+  }
+
+  /**
+   * Remove a child object from this fragment scene.
+   */
+  remove(child: SceneObject): this {
+    const index = this.children.indexOf(child);
+    if (index !== -1) {
+      this.children.splice(index, 1);
+    }
+    return this;
+  }
+
+  /**
+   * Get all children of this fragment scene.
+   */
+  getChildren(): SceneObject[] {
+    return [...this.children];
+  }
+
+  /**
+   * Generate a Fragment for the given render context.
+   */
+  fragment(context: RenderContext): Fragment {
+    const { time } = context;
+
+    // Collect all materials (from explicit adds and from shape references)
+    const allMaterials = new Set<Material>();
+
+    for (const child of this.children) {
+      if (child instanceof Material) {
+        allMaterials.add(child);
+        // Also add parent materials to the set
+        let parent = child.parent;
+        while (parent) {
+          allMaterials.add(parent);
+          parent = parent.parent;
+        }
+      } else if (isShape(child)) {
+        // Collect materials referenced by shapes
+        if (child.material) {
+          allMaterials.add(child.material);
+          // Also add parent materials
+          let parent = child.material.parent;
+          while (parent) {
+            allMaterials.add(parent);
+            parent = parent.parent;
+          }
+        }
+      }
+    }
+
+    // Group shapes by their material (undefined = root material ref)
+    const shapesByMaterial = new Map<Material | undefined, Shape[]>();
+    for (const child of this.children) {
+      if (isShape(child)) {
+        const mat = child.material;
+        if (!shapesByMaterial.has(mat)) {
+          shapesByMaterial.set(mat, []);
+        }
+        shapesByMaterial.get(mat)!.push(child);
+      }
+    }
+
+    // Build material tree structure
+    // Find root-level materials (no parent or parent not in scene)
+    const rootLevelMaterials = new Set<Material>();
+    const childMaterialsByParent = new Map<Material, Material[]>();
+
+    for (const mat of allMaterials) {
+      const parent = mat.parent;
+      if (!parent || !allMaterials.has(parent)) {
+        rootLevelMaterials.add(mat);
+      } else {
+        if (!childMaterialsByParent.has(parent)) {
+          childMaterialsByParent.set(parent, []);
+        }
+        childMaterialsByParent.get(parent)!.push(mat);
+      }
+    }
+
+    // Build ChildMaterial nodes recursively
+    const buildChildMaterial = (mat: Material): ChildMaterial => {
+      const children: FrameNode[] = [];
+
+      // Add shapes that reference this material
+      const matShapes = shapesByMaterial.get(mat) || [];
+      for (const shape of matShapes) {
+        children.push(...shape.frame(time));
+      }
+
+      // Add nested child materials
+      const nestedMaterials = childMaterialsByParent.get(mat) || [];
+      for (const nestedMat of nestedMaterials) {
+        children.push(buildChildMaterial(nestedMat));
+      }
+
+      // Build ChildMaterial with only defined properties
+      // For fragments, ref points to either parent material or scene_root
+      const childMaterial: ChildMaterial = {
+        type: "material",
+        id: mat.id,
+        ref: mat.parent ? mat.parent.id : "scene_root",
+        children,
+      };
+
+      if (mat.fill !== undefined) {
+        childMaterial.fill = mat.fill;
+      }
+      if (mat.stroke !== undefined) {
+        childMaterial.stroke = mat.stroke;
+      }
+      if (mat.strokeWidth !== undefined) {
+        childMaterial.strokeWidth = mat.strokeWidth;
+      }
+
+      return childMaterial;
+    };
+
+    // Build root children preserving insertion order
+    const rootChildren: FrameNode[] = [];
+    const processedMaterials = new Set<Material>();
+
+    for (const child of this.children) {
+      if (child instanceof Material) {
+        // Root-level material - add if not already processed
+        if (rootLevelMaterials.has(child) && !processedMaterials.has(child)) {
+          rootChildren.push(buildChildMaterial(child));
+          processedMaterials.add(child);
+        }
+      } else if (isGroup(child)) {
+        // Groups go directly to root (they don't have materials)
+        rootChildren.push(...child.frame(time));
+      } else if (isShape(child)) {
+        const mat = child.material;
+        if (!mat) {
+          // Shape without material goes directly to root
+          rootChildren.push(...child.frame(time));
+        } else if (
+          rootLevelMaterials.has(mat) &&
+          !processedMaterials.has(mat)
+        ) {
+          // First shape referencing this root-level material - add the material
+          rootChildren.push(buildChildMaterial(mat));
+          processedMaterials.add(mat);
+        }
+      }
+    }
+
+    // Add any remaining root-level materials
+    for (const mat of rootLevelMaterials) {
+      if (!processedMaterials.has(mat)) {
+        rootChildren.push(buildChildMaterial(mat));
+        processedMaterials.add(mat);
+      }
+    }
+
+    // Build RootMaterialRef (no styles, just an ID and children)
+    const root: RootMaterialRef = {
+      type: "root-material-ref",
+      id: "scene_root",
+      children: rootChildren,
+    };
+
+    return { root };
   }
 }
