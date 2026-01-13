@@ -34,11 +34,20 @@ export function createHarness(
   if (rendererType === "svg") {
     renderer = new SvgRenderer(element as SVGSVGElement, optimizedGenerator);
   } else if (rendererType === "webgl") {
-    renderer = new WebGLRenderer(element as HTMLCanvasElement, optimizedGenerator);
+    renderer = new WebGLRenderer(
+      element as HTMLCanvasElement,
+      optimizedGenerator
+    );
   } else if (rendererType === "webgpu") {
-    renderer = new WebGPURenderer(element as HTMLCanvasElement, optimizedGenerator);
+    renderer = new WebGPURenderer(
+      element as HTMLCanvasElement,
+      optimizedGenerator
+    );
   } else {
-    renderer = new CanvasRenderer(element as HTMLCanvasElement, optimizedGenerator);
+    renderer = new CanvasRenderer(
+      element as HTMLCanvasElement,
+      optimizedGenerator
+    );
   }
 
   return {
