@@ -7006,6 +7006,61 @@
       "created_at": "2026-01-13T09:06:33.362167+00:00",
       "updated_at": "2026-01-13T09:06:33.362167+00:00",
       "metadata_json": "{\"branch\":\"feat/composable-generators\",\"commit\":\"d7b1d86\",\"confidence\":95}"
+    },
+    {
+      "id": 641,
+      "change_id": "7f1edbfc-8e9b-494d-9795-a345b4d33980",
+      "node_type": "goal",
+      "title": "Implement TypeBox and JSON Schema for @medli/spec",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-14T15:40:06.094153+00:00",
+      "updated_at": "2026-01-14T15:40:06.094153+00:00",
+      "metadata_json": "{\"branch\":\"feat/typebox-and-json-schema\",\"confidence\":90,\"prompt\":\"Yes that's exactly it. Task an agent to design the solution. Later, we will look at openapi integration, but not now\"}"
+    },
+    {
+      "id": 642,
+      "change_id": "ed7292bf-49ad-4c24-b304-14b8a5e018b6",
+      "node_type": "action",
+      "title": "Design agent completed TypeBox/JSON Schema analysis",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-14T15:42:48.759342+00:00",
+      "updated_at": "2026-01-14T15:42:48.759342+00:00",
+      "metadata_json": "{\"branch\":\"feat/typebox-and-json-schema\",\"confidence\":95}"
+    },
+    {
+      "id": 643,
+      "change_id": "07a3070e-9853-4de6-9c21-538becab961c",
+      "node_type": "outcome",
+      "title": "Design document created at docs/TYPEBOX-DESIGN.md",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-14T15:44:02.642986+00:00",
+      "updated_at": "2026-01-14T15:44:02.642986+00:00",
+      "metadata_json": "{\"branch\":\"feat/typebox-and-json-schema\",\"confidence\":95,\"files\":[\"docs/TYPEBOX-DESIGN.md\"]}"
+    },
+    {
+      "id": 644,
+      "change_id": "55c75617-b1e3-4bcf-a979-a3f1cf316d13",
+      "node_type": "action",
+      "title": "Implementing TypeBox integration - Phase 1 through 4",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-14T16:19:24.484452+00:00",
+      "updated_at": "2026-01-14T16:19:24.484452+00:00",
+      "metadata_json": "{\"branch\":\"feat/typebox-and-json-schema\",\"confidence\":85}"
+    },
+    {
+      "id": 645,
+      "change_id": "c1d76cfe-f57f-4438-ba86-ca55ade85e91",
+      "node_type": "outcome",
+      "title": "TypeBox integration complete - all 5 phases implemented, 402 tests pass, visual verification successful",
+      "description": null,
+      "status": "pending",
+      "created_at": "2026-01-14T16:27:41.415541+00:00",
+      "updated_at": "2026-01-14T16:27:41.415541+00:00",
+      "metadata_json": "{\"branch\":\"feat/typebox-and-json-schema\",\"confidence\":95,\"files\":[\"packages/spec/src/index.ts\",\"packages/spec/package.json\"]}"
     }
   ],
   "edges": [
@@ -13949,6 +14004,50 @@
       "weight": 1.0,
       "rationale": "Goal achieved",
       "created_at": "2026-01-13T08:45:59.767548+00:00"
+    },
+    {
+      "id": 634,
+      "from_node_id": 641,
+      "to_node_id": 642,
+      "from_change_id": "7f1edbfc-8e9b-494d-9795-a345b4d33980",
+      "to_change_id": "ed7292bf-49ad-4c24-b304-14b8a5e018b6",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Design analysis for goal",
+      "created_at": "2026-01-14T15:44:06.823548+00:00"
+    },
+    {
+      "id": 635,
+      "from_node_id": 642,
+      "to_node_id": 643,
+      "from_change_id": "ed7292bf-49ad-4c24-b304-14b8a5e018b6",
+      "to_change_id": "07a3070e-9853-4de6-9c21-538becab961c",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Design document produced",
+      "created_at": "2026-01-14T15:44:06.848172+00:00"
+    },
+    {
+      "id": 636,
+      "from_node_id": 641,
+      "to_node_id": 644,
+      "from_change_id": "7f1edbfc-8e9b-494d-9795-a345b4d33980",
+      "to_change_id": "55c75617-b1e3-4bcf-a979-a3f1cf316d13",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation of TypeBox goal",
+      "created_at": "2026-01-14T16:19:41.001386+00:00"
+    },
+    {
+      "id": 637,
+      "from_node_id": 644,
+      "to_node_id": 645,
+      "from_change_id": "55c75617-b1e3-4bcf-a979-a3f1cf316d13",
+      "to_change_id": "c1d76cfe-f57f-4438-ba86-ca55ade85e91",
+      "edge_type": "leads_to",
+      "weight": 1.0,
+      "rationale": "Implementation complete",
+      "created_at": "2026-01-14T16:27:45.595091+00:00"
     }
   ]
 }

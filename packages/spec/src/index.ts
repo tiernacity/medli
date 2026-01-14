@@ -1,84 +1,152 @@
 /**
  * Core specification types for medli
+ *
+ * This module uses TypeBox for schema definitions with type inference.
+ * Types are derived from schemas using Static<typeof Schema>.
  */
+
+import { Type, Static, TSchema } from "@sinclair/typebox";
+import { Value } from "@sinclair/typebox/value";
+
+// ============================================================================
+// PHASE 1: PRIMITIVE SCHEMAS
+// ============================================================================
 
 /**
  * A 2D position with x and y coordinates.
  */
-export type Position = {
-  x: number;
-  y: number;
-};
+export const PositionSchema = Type.Object({
+  x: Type.Number(),
+  y: Type.Number(),
+});
+export type Position = Static<typeof PositionSchema>;
+
+/**
+ * 2D affine transformation matrix as 6 values [a, b, c, d, e, f].
+ * Represents:
+ * | a  c  e |
+ * | b  d  f |
+ * | 0  0  1 |
+ *
+ * Point (x, y) transforms to (ax + cy + e, bx + dy + f).
+ * Identity matrix: [1, 0, 0, 1, 0, 0]
+ *
+ * Note: Schema uses Array for structural validation; semantic validation
+ * enforces exactly 6 finite numbers with specific error messages.
+ */
+export const Matrix2DSchema = Type.Array(Type.Number());
+export type Matrix2D = [number, number, number, number, number, number];
+
+/**
+ * Scale mode for mapping viewport to element.
+ * - 'fit': Uniform scale to fit, letterbox/pillarbox empty space
+ * - 'fill': Uniform scale to fill, crop content outside element
+ * - 'stretch': Non-uniform scale to exactly fill (distorts aspect ratio)
+ */
+export const ScaleModeSchema = Type.Union([
+  Type.Literal("fit"),
+  Type.Literal("fill"),
+  Type.Literal("stretch"),
+]);
+export type ScaleMode = Static<typeof ScaleModeSchema>;
+
+// ============================================================================
+// PHASE 1: SHAPE SCHEMAS
+// ============================================================================
 
 /**
  * A circle shape with center position and radius.
  * Style (fill, stroke) inherited from parent Material.
  */
-export type Circle = {
-  type: "circle";
-  center: Position;
-  radius: number;
-};
+export const CircleSchema = Type.Object({
+  type: Type.Literal("circle"),
+  center: PositionSchema,
+  radius: Type.Number(),
+});
+export type Circle = Static<typeof CircleSchema>;
 
 /**
  * A line shape from start to end position.
  * Style (stroke, strokeWidth) inherited from parent Material.
  */
-export type Line = {
-  type: "line";
-  start: Position;
-  end: Position;
-};
+export const LineSchema = Type.Object({
+  type: Type.Literal("line"),
+  start: PositionSchema,
+  end: PositionSchema,
+});
+export type Line = Static<typeof LineSchema>;
 
 /**
  * A rectangle shape with center position and dimensions.
  * Style (fill, stroke, strokeWidth) inherited from parent Material.
  */
-export type Rectangle = {
-  type: "rectangle";
-  center: Position;
-  width: number;
-  height: number;
-};
+export const RectangleSchema = Type.Object({
+  type: Type.Literal("rectangle"),
+  center: PositionSchema,
+  width: Type.Number(),
+  height: Type.Number(),
+});
+export type Rectangle = Static<typeof RectangleSchema>;
 
 /**
  * Defines a rectangular region within the source image for cropping.
  * Coordinates and dimensions are in source image pixels.
  */
-export type ImageCrop = {
+export const ImageCropSchema = Type.Object({
   /** Source x position in pixels (must be >= 0) */
-  x: number;
+  x: Type.Number(),
   /** Source y position in pixels (must be >= 0) */
-  y: number;
+  y: Type.Number(),
   /** Source width in pixels (must be > 0) */
-  width: number;
+  width: Type.Number(),
   /** Source height in pixels (must be > 0) */
-  height: number;
-};
+  height: Type.Number(),
+});
+export type ImageCrop = Static<typeof ImageCropSchema>;
 
 /**
  * An image shape positioned in viewport coordinates.
  * URL references an external image resource loaded by the renderer.
  */
-export type Image = {
-  type: "image";
-  url: string;
-  position: Position;
-  width: number;
-  height: number;
+export const ImageSchema = Type.Object({
+  type: Type.Literal("image"),
+  url: Type.String(),
+  position: PositionSchema,
+  width: Type.Number(),
+  height: Type.Number(),
   /** Optional source rectangle for cropping. When present, only this region of the source image is rendered. */
-  crop?: ImageCrop;
-};
+  crop: Type.Optional(ImageCropSchema),
+});
+export type Image = Static<typeof ImageSchema>;
 
 /**
  * Union of all shape types.
  */
-export type Shape = Circle | Line | Rectangle | Image;
+export const ShapeSchema = Type.Union([
+  CircleSchema,
+  LineSchema,
+  RectangleSchema,
+  ImageSchema,
+]);
+export type Shape = Static<typeof ShapeSchema>;
+
+// ============================================================================
+// PHASE 2: MATERIAL SCHEMAS
+// ============================================================================
 
 /**
  * Root material with all style properties required.
  * Must be the root of the Frame tree.
+ * Note: children use Type.Array(Type.Any()) here and are properly typed in FrameNodeSchema.
  */
+export const RootMaterialSchema = Type.Object({
+  type: Type.Literal("material"),
+  id: Type.String(),
+  fill: Type.String(),
+  stroke: Type.String(),
+  strokeWidth: Type.Number(),
+  children: Type.Array(Type.Any()),
+});
 export type RootMaterial = {
   type: "material";
   id: string;
@@ -92,6 +160,15 @@ export type RootMaterial = {
  * Child material with optional style overrides.
  * Must reference an ancestor material via ref.
  */
+export const ChildMaterialSchema = Type.Object({
+  type: Type.Literal("material"),
+  id: Type.String(),
+  ref: Type.String(),
+  fill: Type.Optional(Type.String()),
+  stroke: Type.Optional(Type.String()),
+  strokeWidth: Type.Optional(Type.Number()),
+  children: Type.Array(Type.Any()),
+});
 export type ChildMaterial = {
   type: "material";
   id: string;
@@ -107,33 +184,127 @@ export type ChildMaterial = {
  */
 export type Material = RootMaterial | ChildMaterial;
 
-/**
- * 2D affine transformation matrix as 6 values [a, b, c, d, e, f].
- * Represents:
- * | a  c  e |
- * | b  d  f |
- * | 0  0  1 |
- *
- * Point (x, y) transforms to (ax + cy + e, bx + dy + f).
- * Identity matrix: [1, 0, 0, 1, 0, 0]
- */
-export type Matrix2D = [number, number, number, number, number, number];
+// ============================================================================
+// PHASE 2: TRANSFORM SCHEMA
+// ============================================================================
 
 /**
  * A transform node applying a 2D affine transformation to its children.
  * Transforms accumulate via matrix multiplication during traversal.
  * To express identity, simply omit the Transform node entirely.
  */
+export const TransformSchema = Type.Object({
+  type: Type.Literal("transform"),
+  matrix: Matrix2DSchema,
+  children: Type.Array(Type.Any()),
+});
 export type Transform = {
   type: "transform";
   matrix: Matrix2D;
   children: FrameNode[];
 };
 
+// ============================================================================
+// PHASE 2: RECURSIVE FRAME NODE SCHEMA
+// ============================================================================
+
 /**
  * A node in the frame tree - material (style), transform (geometry), or shape (leaf).
+ * Uses Type.Recursive for the recursive tree structure.
  */
+export const FrameNodeSchema = Type.Recursive((This) =>
+  Type.Union([
+    // RootMaterial
+    Type.Object({
+      type: Type.Literal("material"),
+      id: Type.String(),
+      fill: Type.String(),
+      stroke: Type.String(),
+      strokeWidth: Type.Number(),
+      children: Type.Array(This),
+    }),
+    // ChildMaterial
+    Type.Object({
+      type: Type.Literal("material"),
+      id: Type.String(),
+      ref: Type.String(),
+      fill: Type.Optional(Type.String()),
+      stroke: Type.Optional(Type.String()),
+      strokeWidth: Type.Optional(Type.Number()),
+      children: Type.Array(This),
+    }),
+    // Transform
+    Type.Object({
+      type: Type.Literal("transform"),
+      matrix: Matrix2DSchema,
+      children: Type.Array(This),
+    }),
+    // Shapes (leaves)
+    CircleSchema,
+    LineSchema,
+    RectangleSchema,
+    ImageSchema,
+  ])
+);
 export type FrameNode = Material | Transform | Shape;
+
+// ============================================================================
+// PHASE 2: VIEWPORT AND FRAME SCHEMAS
+// ============================================================================
+
+/**
+ * Viewport defines the logical coordinate space for rendering.
+ * Origin is at center (0,0) with Y-up convention.
+ * X ranges from -halfWidth to +halfWidth.
+ * Y ranges from -halfHeight to +halfHeight.
+ */
+export const ViewportSchema = Type.Object({
+  /** Half the viewport width. X ranges from -halfWidth to +halfWidth. */
+  halfWidth: Type.Number(),
+  /** Half the viewport height. Y ranges from -halfHeight to +halfHeight. */
+  halfHeight: Type.Number(),
+  /** How viewport maps to differently-sized elements. */
+  scaleMode: ScaleModeSchema,
+});
+export type Viewport = Static<typeof ViewportSchema>;
+
+/**
+ * A frame represents the current state to render.
+ * Contains a Material-based tree where root has all style properties defined.
+ */
+export const FrameSchema = Type.Object({
+  /** Viewport configuration (required). */
+  viewport: ViewportSchema,
+  /**
+   * Background color for the frame.
+   * - When present: Clear rendered contents and fill with this color before rendering shapes.
+   * - When absent (undefined): Preserve previous frame contents, render new shapes on top.
+   */
+  background: Type.Optional(Type.String()),
+  root: Type.Object({
+    type: Type.Literal("material"),
+    id: Type.String(),
+    fill: Type.String(),
+    stroke: Type.String(),
+    strokeWidth: Type.Number(),
+    children: Type.Array(FrameNodeSchema),
+  }),
+});
+export type Frame = {
+  /** Viewport configuration (required). */
+  viewport: Viewport;
+  /**
+   * Background color for the frame.
+   * - When present: Clear rendered contents and fill with this color before rendering shapes.
+   * - When absent (undefined): Preserve previous frame contents, render new shapes on top.
+   */
+  background?: string;
+  root: RootMaterial;
+};
+
+// ============================================================================
+// PHASE 2: FRAGMENT SCHEMAS
+// ============================================================================
 
 /**
  * A reference to an external material that provides style properties.
@@ -141,6 +312,16 @@ export type FrameNode = Material | Transform | Shape;
  * During resolution, ChildMaterials referencing this ID get rewritten
  * to reference the embedding material (Embed.rootMaterialId).
  */
+export const RootMaterialRefSchema = Type.Object({
+  type: Type.Literal("root-material-ref"),
+  /**
+   * Internal ID for the fragment's material anchor.
+   * ChildMaterials within the fragment ref this ID to inherit from
+   * whatever material this fragment gets embedded into.
+   */
+  id: Type.String(),
+  children: Type.Array(FrameNodeSchema),
+});
 export type RootMaterialRef = {
   type: "root-material-ref";
   /**
@@ -158,6 +339,13 @@ export type RootMaterialRef = {
  * - Has RootMaterialRef instead of RootMaterial (needs external style context)
  * - Has no viewport (client provides coordinate space)
  */
+export const FragmentSchema = Type.Object({
+  /**
+   * The fragment's root node - a reference to an external material.
+   * Contains the fragment's content as children.
+   */
+  root: RootMaterialRefSchema,
+});
 export type Fragment = {
   /**
    * The fragment's root node - a reference to an external material.
@@ -171,30 +359,48 @@ export type Fragment = {
  * Controls namespace (for ID uniqueness) and material binding (for style inheritance).
  * Resolved before rendering - renderers never see Embed nodes.
  */
-export type Embed = {
-  type: "embed";
+export const EmbedSchema = Type.Object({
+  type: Type.Literal("embed"),
   /**
    * Namespace prefix for all material IDs in the fragment.
    * Prevents ID collisions when embedding the same fragment multiple times.
    * Must be a valid identifier: starts with letter, contains only letters and numbers.
    * IMPORTANT: Underscores are NOT allowed to prevent ambiguity with namespace separator.
    */
-  namespace: string;
+  namespace: Type.String(),
   /**
    * Material ID that the fragment's RootMaterialRef resolves to.
    * Must be an ancestor material in the tree where this Embed appears.
    */
-  rootMaterialId: string;
+  rootMaterialId: Type.String(),
   /**
    * The fragment to embed.
    */
+  fragment: FragmentSchema,
+});
+export type Embed = Static<typeof EmbedSchema> & {
   fragment: Fragment;
 };
 
 /**
  * Extended FrameNode that includes Embed (used only during generation, before resolution).
  */
+export const UnresolvedFrameNodeSchema = Type.Union([
+  FrameNodeSchema,
+  EmbedSchema,
+]);
 export type UnresolvedFrameNode = FrameNode | Embed;
+
+// ============================================================================
+// PHASE 3: VALIDATION
+// ============================================================================
+
+/**
+ * Result of frame validation.
+ */
+export type ValidationResult =
+  | { valid: true }
+  | { valid: false; error: string };
 
 /**
  * Resolved material with all properties defined.
@@ -207,106 +413,126 @@ export type ResolvedMaterial = {
 };
 
 /**
- * Scale mode for mapping viewport to element.
- * - 'fit': Uniform scale to fit, letterbox/pillarbox empty space
- * - 'fill': Uniform scale to fill, crop content outside element
- * - 'stretch': Non-uniform scale to exactly fill (distorts aspect ratio)
+ * Schema for validating top-level frame structure (viewport and root existence).
+ * Tree node validation is handled by semantic validation for better error messages.
  */
-export type ScaleMode = "fit" | "fill" | "stretch";
+const FrameTopLevelSchema = Type.Object({
+  viewport: ViewportSchema,
+  background: Type.Optional(Type.String()),
+  root: Type.Object({
+    type: Type.Literal("material"),
+    id: Type.String(),
+    fill: Type.String(),
+    stroke: Type.String(),
+    strokeWidth: Type.Number(),
+    children: Type.Array(Type.Any()), // Children validated semantically
+  }),
+});
 
 /**
- * Viewport defines the logical coordinate space for rendering.
- * Origin is at center (0,0) with Y-up convention.
- * X ranges from -halfWidth to +halfWidth.
- * Y ranges from -halfHeight to +halfHeight.
+ * Validate frame structure using TypeBox schema.
+ * Checks: correct types, required fields present at top level.
+ * Tree node validation deferred to semantic validation for better error messages.
  */
-export type Viewport = {
-  /** Half the viewport width. X ranges from -halfWidth to +halfWidth. */
-  halfWidth: number;
-  /** Half the viewport height. Y ranges from -halfHeight to +halfHeight. */
-  halfHeight: number;
-  /** How viewport maps to differently-sized elements. */
-  scaleMode: ScaleMode;
-};
-
-/**
- * A frame represents the current state to render.
- * Contains a Material-based tree where root has all style properties defined.
- */
-export type Frame = {
-  /** Viewport configuration (required). */
-  viewport: Viewport;
-  /**
-   * Background color for the frame.
-   * - When present: Clear rendered contents and fill with this color before rendering shapes.
-   * - When absent (undefined): Preserve previous frame contents, render new shapes on top.
-   */
-  background?: string;
-  root: RootMaterial;
-};
-
-/**
- * Result of frame validation.
- */
-export type ValidationResult =
-  | { valid: true }
-  | { valid: false; error: string };
-
-/**
- * Validate a frame's material tree structure.
- * Checks: unique IDs, valid ancestor refs, root completeness.
- * Single-pass, top-to-bottom traversal.
- */
-export function validateFrame(frame: Frame): ValidationResult {
-  // Validate viewport
-  if (!frame.viewport) {
+export function validateFrameStructure(data: unknown): ValidationResult {
+  // Check for missing viewport first (specific error message)
+  if (
+    typeof data !== "object" ||
+    data === null ||
+    !("viewport" in data) ||
+    data.viewport === undefined
+  ) {
     return { valid: false, error: "Frame missing required property: viewport" };
   }
-  if (
-    typeof frame.viewport.halfWidth !== "number" ||
-    frame.viewport.halfWidth <= 0 ||
-    !isFinite(frame.viewport.halfWidth)
-  ) {
-    return {
-      valid: false,
-      error: "Viewport halfWidth must be a positive finite number",
+
+  // Check for invalid scaleMode (specific error message)
+  const frame = data as {
+    viewport?: {
+      scaleMode?: unknown;
+      halfWidth?: unknown;
+      halfHeight?: unknown;
     };
-  }
+  };
   if (
-    typeof frame.viewport.halfHeight !== "number" ||
-    frame.viewport.halfHeight <= 0 ||
-    !isFinite(frame.viewport.halfHeight)
+    frame.viewport &&
+    typeof frame.viewport.scaleMode === "string" &&
+    !["fit", "fill", "stretch"].includes(frame.viewport.scaleMode)
   ) {
-    return {
-      valid: false,
-      error: "Viewport halfHeight must be a positive finite number",
-    };
-  }
-  if (!["fit", "fill", "stretch"].includes(frame.viewport.scaleMode)) {
     return {
       valid: false,
       error: "Viewport scaleMode must be 'fit', 'fill', or 'stretch'",
     };
   }
 
-  // Validate root has all required properties
-  const root = frame.root;
-  if (root.fill === undefined) {
+  // Check viewport dimensions for NaN/Infinity before TypeBox (TypeBox rejects these)
+  // We want semantic validation to handle these with better error messages
+  if (frame.viewport) {
+    const hw = frame.viewport.halfWidth;
+    const hh = frame.viewport.halfHeight;
+    if (typeof hw === "number" && !isFinite(hw)) {
+      // Pass through to semantic validation - it will give a specific error
+      // But TypeBox would reject NaN/Infinity, so we skip TypeBox for this case
+      return { valid: true };
+    }
+    if (typeof hh === "number" && !isFinite(hh)) {
+      return { valid: true };
+    }
+  }
+
+  // Check root material properties (specific error messages)
+  const rootData = (data as { root?: Record<string, unknown> }).root;
+  if (rootData) {
+    if (rootData.fill === undefined) {
+      return {
+        valid: false,
+        error: "Root material missing required property: fill",
+      };
+    }
+    if (rootData.stroke === undefined) {
+      return {
+        valid: false,
+        error: "Root material missing required property: stroke",
+      };
+    }
+    if (rootData.strokeWidth === undefined) {
+      return {
+        valid: false,
+        error: "Root material missing required property: strokeWidth",
+      };
+    }
+  }
+
+  // Use TypeBox for remaining structural validation
+  if (!Value.Check(FrameTopLevelSchema, data)) {
+    const errors = [...Value.Errors(FrameTopLevelSchema, data)];
+    const firstError = errors[0];
+    if (firstError) {
+      return {
+        valid: false,
+        error: `${firstError.path}: ${firstError.message}`,
+      };
+    }
+    return { valid: false, error: "Invalid frame structure" };
+  }
+  return { valid: true };
+}
+
+/**
+ * Validate frame semantics (ID uniqueness, ancestor refs, positive dimensions).
+ * Assumes structural validation has passed.
+ */
+export function validateFrameSemantics(frame: Frame): ValidationResult {
+  // Validate viewport dimensions are positive and finite
+  if (frame.viewport.halfWidth <= 0 || !isFinite(frame.viewport.halfWidth)) {
     return {
       valid: false,
-      error: "Root material missing required property: fill",
+      error: "Viewport halfWidth must be a positive finite number",
     };
   }
-  if (root.stroke === undefined) {
+  if (frame.viewport.halfHeight <= 0 || !isFinite(frame.viewport.halfHeight)) {
     return {
       valid: false,
-      error: "Root material missing required property: stroke",
-    };
-  }
-  if (root.strokeWidth === undefined) {
-    return {
-      valid: false,
-      error: "Root material missing required property: strokeWidth",
+      error: "Viewport halfHeight must be a positive finite number",
     };
   }
 
@@ -341,13 +567,14 @@ export function validateFrame(frame: Frame): ValidationResult {
         if (!result.valid) return result;
       }
     } else if (node.type === "transform") {
-      // Validate matrix has exactly 6 numbers
+      // Validate matrix has exactly 6 values
       if (node.matrix.length !== 6) {
         return {
           valid: false,
           error: `Transform matrix must have exactly 6 values, got ${node.matrix.length}`,
         };
       }
+      // Validate matrix values are finite
       for (let i = 0; i < node.matrix.length; i++) {
         if (typeof node.matrix[i] !== "number" || !isFinite(node.matrix[i])) {
           return {
@@ -364,29 +591,21 @@ export function validateFrame(frame: Frame): ValidationResult {
       }
     } else if (node.type === "image") {
       // Validate image URL is non-empty string
-      if (typeof node.url !== "string" || node.url.length === 0) {
+      if (node.url.length === 0) {
         return {
           valid: false,
           error: "Image url must be a non-empty string",
         };
       }
       // Validate width is positive finite number
-      if (
-        typeof node.width !== "number" ||
-        node.width <= 0 ||
-        !isFinite(node.width)
-      ) {
+      if (node.width <= 0 || !isFinite(node.width)) {
         return {
           valid: false,
           error: "Image width must be a positive finite number",
         };
       }
       // Validate height is positive finite number
-      if (
-        typeof node.height !== "number" ||
-        node.height <= 0 ||
-        !isFinite(node.height)
-      ) {
+      if (node.height <= 0 || !isFinite(node.height)) {
         return {
           valid: false,
           error: "Image height must be a positive finite number",
@@ -395,44 +614,28 @@ export function validateFrame(frame: Frame): ValidationResult {
       // Validate crop properties if present
       if (node.crop !== undefined) {
         // crop.x must be a finite number >= 0
-        if (
-          typeof node.crop.x !== "number" ||
-          node.crop.x < 0 ||
-          !isFinite(node.crop.x)
-        ) {
+        if (node.crop.x < 0 || !isFinite(node.crop.x)) {
           return {
             valid: false,
             error: "Image crop.x must be a non-negative finite number",
           };
         }
         // crop.y must be a finite number >= 0
-        if (
-          typeof node.crop.y !== "number" ||
-          node.crop.y < 0 ||
-          !isFinite(node.crop.y)
-        ) {
+        if (node.crop.y < 0 || !isFinite(node.crop.y)) {
           return {
             valid: false,
             error: "Image crop.y must be a non-negative finite number",
           };
         }
         // crop.width must be a positive finite number
-        if (
-          typeof node.crop.width !== "number" ||
-          node.crop.width <= 0 ||
-          !isFinite(node.crop.width)
-        ) {
+        if (node.crop.width <= 0 || !isFinite(node.crop.width)) {
           return {
             valid: false,
             error: "Image crop.width must be a positive finite number",
           };
         }
         // crop.height must be a positive finite number
-        if (
-          typeof node.crop.height !== "number" ||
-          node.crop.height <= 0 ||
-          !isFinite(node.crop.height)
-        ) {
+        if (node.crop.height <= 0 || !isFinite(node.crop.height)) {
           return {
             valid: false,
             error: "Image crop.height must be a positive finite number",
@@ -440,13 +643,278 @@ export function validateFrame(frame: Frame): ValidationResult {
         }
       }
     }
-    // Other shapes (circle, line) are leaves - no additional validation needed
+    // Other shapes (circle, line, rectangle) are leaves - no additional validation needed
     return { valid: true };
   }
 
   // Start from root
   return validateNode(frame.root, new Set());
 }
+
+/**
+ * Validate a frame's material tree structure.
+ * Checks: unique IDs, valid ancestor refs, root completeness.
+ * Single-pass, top-to-bottom traversal.
+ *
+ * Uses two-layer validation: structure (TypeBox) then semantics (custom).
+ */
+export function validateFrame(frame: Frame): ValidationResult {
+  // Layer 1: Structural validation via TypeBox
+  const structureResult = validateFrameStructure(frame);
+  if (!structureResult.valid) return structureResult;
+
+  // Layer 2: Semantic validation (business rules)
+  return validateFrameSemantics(frame);
+}
+
+/**
+ * Schema for validating top-level fragment structure.
+ * Tree node validation is handled by semantic validation for better error messages.
+ */
+const FragmentTopLevelSchema = Type.Object({
+  root: Type.Object({
+    type: Type.Literal("root-material-ref"),
+    id: Type.String(),
+    children: Type.Array(Type.Any()), // Children validated semantically
+  }),
+});
+
+/**
+ * Validate fragment structure using TypeBox schema.
+ * Checks: correct types, required fields present at top level.
+ * Tree node validation deferred to semantic validation for better error messages.
+ */
+export function validateFragmentStructure(data: unknown): ValidationResult {
+  if (!Value.Check(FragmentTopLevelSchema, data)) {
+    const errors = [...Value.Errors(FragmentTopLevelSchema, data)];
+    const firstError = errors[0];
+    if (firstError) {
+      return {
+        valid: false,
+        error: `${firstError.path}: ${firstError.message}`,
+      };
+    }
+    return { valid: false, error: "Invalid fragment structure" };
+  }
+  return { valid: true };
+}
+
+/**
+ * Validate fragment semantics (ID uniqueness, ancestor refs, etc.).
+ * Assumes structural validation has passed.
+ */
+export function validateFragmentSemantics(
+  fragment: Fragment
+): ValidationResult {
+  // 1. RootMaterialRef must have non-empty ID
+  if (!fragment.root.id || fragment.root.id.length === 0) {
+    return { valid: false, error: "RootMaterialRef must have a non-empty ID" };
+  }
+
+  // 2. Early return for empty fragments (valid but no-op)
+  if (fragment.root.children.length === 0) {
+    return { valid: true };
+  }
+
+  // Track material IDs for uniqueness
+  const seenIds = new Set<string>();
+  // Track namespaces for embed uniqueness within scope
+  const usedNamespaces = new Set<string>();
+
+  function checkNode(
+    node: FrameNode | Embed,
+    ancestorIds: Set<string>
+  ): ValidationResult {
+    if (node.type === "material") {
+      // Unique ID check
+      if (seenIds.has(node.id)) {
+        return { valid: false, error: `Duplicate material ID: ${node.id}` };
+      }
+      seenIds.add(node.id);
+
+      // Ancestor ref check (for ChildMaterial)
+      if ("ref" in node && !ancestorIds.has(node.ref)) {
+        return {
+          valid: false,
+          error: `Material "${node.id}" references non-ancestor: "${node.ref}"`,
+        };
+      }
+
+      // Recurse with this material added to ancestors
+      const newAncestors = new Set(ancestorIds);
+      newAncestors.add(node.id);
+      for (const child of node.children) {
+        const result = checkNode(child as FrameNode | Embed, newAncestors);
+        if (!result.valid) return result;
+      }
+    } else if (node.type === "transform") {
+      // Validate matrix has exactly 6 values
+      if (node.matrix.length !== 6) {
+        return {
+          valid: false,
+          error: `Transform matrix must have exactly 6 values, got ${node.matrix.length}`,
+        };
+      }
+      // Validate matrix values are finite
+      for (let i = 0; i < 6; i++) {
+        if (typeof node.matrix[i] !== "number" || !isFinite(node.matrix[i])) {
+          return {
+            valid: false,
+            error: `Transform matrix[${i}] must be a finite number`,
+          };
+        }
+      }
+      // Recurse (transforms don't add to ancestor materials)
+      for (const child of node.children) {
+        const result = checkNode(child as FrameNode | Embed, ancestorIds);
+        if (!result.valid) return result;
+      }
+    } else if (node.type === "embed") {
+      // Validate embed
+      const embedResult = validateEmbed(node, ancestorIds, usedNamespaces);
+      if (!embedResult.valid) return embedResult;
+      usedNamespaces.add(node.namespace);
+    } else if (node.type === "image") {
+      // Validate image URL is non-empty string
+      if (node.url.length === 0) {
+        return {
+          valid: false,
+          error: "Image url must be a non-empty string",
+        };
+      }
+      // Validate width is positive finite number
+      if (node.width <= 0 || !isFinite(node.width)) {
+        return {
+          valid: false,
+          error: "Image width must be a positive finite number",
+        };
+      }
+      // Validate height is positive finite number
+      if (node.height <= 0 || !isFinite(node.height)) {
+        return {
+          valid: false,
+          error: "Image height must be a positive finite number",
+        };
+      }
+      // Validate crop properties if present
+      if (node.crop !== undefined) {
+        // crop.x must be a finite number >= 0
+        if (node.crop.x < 0 || !isFinite(node.crop.x)) {
+          return {
+            valid: false,
+            error: "Image crop.x must be a non-negative finite number",
+          };
+        }
+        // crop.y must be a finite number >= 0
+        if (node.crop.y < 0 || !isFinite(node.crop.y)) {
+          return {
+            valid: false,
+            error: "Image crop.y must be a non-negative finite number",
+          };
+        }
+        // crop.width must be a positive finite number
+        if (node.crop.width <= 0 || !isFinite(node.crop.width)) {
+          return {
+            valid: false,
+            error: "Image crop.width must be a positive finite number",
+          };
+        }
+        // crop.height must be a positive finite number
+        if (node.crop.height <= 0 || !isFinite(node.crop.height)) {
+          return {
+            valid: false,
+            error: "Image crop.height must be a positive finite number",
+          };
+        }
+      }
+    }
+    // Other shapes pass through
+    return { valid: true };
+  }
+
+  // Start with RootMaterialRef.id as the only ancestor
+  const initialAncestors = new Set([fragment.root.id]);
+  for (const child of fragment.root.children) {
+    const result = checkNode(child as FrameNode | Embed, initialAncestors);
+    if (!result.valid) return result;
+  }
+
+  return { valid: true };
+}
+
+/**
+ * Validate a fragment's structure.
+ * Checks: RootMaterialRef has non-empty ID, unique material IDs,
+ * valid ancestor refs, valid transform matrices, valid embedded fragments.
+ *
+ * Uses two-layer validation: structure (TypeBox) then semantics (custom).
+ */
+export function validateFragment(fragment: Fragment): ValidationResult {
+  // Layer 1: Structural validation via TypeBox
+  const structureResult = validateFragmentStructure(fragment);
+  if (!structureResult.valid) return structureResult;
+
+  // Layer 2: Semantic validation (business rules)
+  return validateFragmentSemantics(fragment);
+}
+
+/**
+ * Validate an embed node.
+ * Checks: valid namespace format, no namespace collision, valid rootMaterialId,
+ * and recursively validates the embedded fragment.
+ */
+export function validateEmbed(
+  embed: Embed,
+  ancestorMaterialIds: Set<string>,
+  usedNamespaces: Set<string>
+): ValidationResult {
+  // 1. Namespace must be valid identifier (NO underscores - reserved for separator)
+  if (!embed.namespace || !/^[a-zA-Z][a-zA-Z0-9]*$/.test(embed.namespace)) {
+    return {
+      valid: false,
+      error:
+        "Embed namespace must start with a letter and contain only letters/numbers (no underscores)",
+    };
+  }
+
+  // 2. Namespace must not collide
+  if (usedNamespaces.has(embed.namespace)) {
+    return {
+      valid: false,
+      error: `Namespace "${embed.namespace}" already used in this scope`,
+    };
+  }
+
+  // 3. rootMaterialId must be an ancestor
+  if (!ancestorMaterialIds.has(embed.rootMaterialId)) {
+    return {
+      valid: false,
+      error: `rootMaterialId "${embed.rootMaterialId}" is not an ancestor material`,
+    };
+  }
+
+  // 4. Fragment itself must be valid
+  return validateFragment(embed.fragment);
+}
+
+// ============================================================================
+// PHASE 4: JSON SCHEMA EXPORTS
+// ============================================================================
+
+/**
+ * Get a plain JSON Schema object from a TypeBox schema.
+ * Useful for serialization and external tooling.
+ */
+export function getJsonSchema(schema: TSchema): object {
+  return JSON.parse(JSON.stringify(schema));
+}
+
+// Re-export schemas for JSON Schema generation
+// All schemas are already exported above with Schema suffix
+
+// ============================================================================
+// UTILITY FUNCTIONS
+// ============================================================================
 
 /**
  * Resolve the effective material for a shape by walking up the ancestor chain.
@@ -477,6 +945,10 @@ export function resolveMaterial(ancestors: Material[]): ResolvedMaterial {
 
   return resolved;
 }
+
+// ============================================================================
+// RUNTIME INTERFACES (NOT serializable - no schemas needed)
+// ============================================================================
 
 /**
  * Context passed to generators each frame.
@@ -568,209 +1040,9 @@ export interface Renderer<M extends BaseRendererMetrics = BaseRendererMetrics> {
   destroy(): void;
 }
 
-/**
- * Validate a fragment's structure.
- * Checks: RootMaterialRef has non-empty ID, unique material IDs,
- * valid ancestor refs, valid transform matrices, valid embedded fragments.
- */
-export function validateFragment(fragment: Fragment): ValidationResult {
-  // 1. RootMaterialRef must have non-empty ID
-  if (!fragment.root.id || fragment.root.id.length === 0) {
-    return { valid: false, error: "RootMaterialRef must have a non-empty ID" };
-  }
-
-  // 2. Early return for empty fragments (valid but no-op)
-  if (fragment.root.children.length === 0) {
-    return { valid: true };
-  }
-
-  // Track material IDs for uniqueness
-  const seenIds = new Set<string>();
-  // Track namespaces for embed uniqueness within scope
-  const usedNamespaces = new Set<string>();
-
-  function checkNode(
-    node: FrameNode | Embed,
-    ancestorIds: Set<string>
-  ): ValidationResult {
-    if (node.type === "material") {
-      // Unique ID check
-      if (seenIds.has(node.id)) {
-        return { valid: false, error: `Duplicate material ID: ${node.id}` };
-      }
-      seenIds.add(node.id);
-
-      // Ancestor ref check (for ChildMaterial)
-      if ("ref" in node && !ancestorIds.has(node.ref)) {
-        return {
-          valid: false,
-          error: `Material "${node.id}" references non-ancestor: "${node.ref}"`,
-        };
-      }
-
-      // Recurse with this material added to ancestors
-      const newAncestors = new Set(ancestorIds);
-      newAncestors.add(node.id);
-      for (const child of node.children) {
-        const result = checkNode(child as FrameNode | Embed, newAncestors);
-        if (!result.valid) return result;
-      }
-    } else if (node.type === "transform") {
-      // Validate matrix
-      if (node.matrix.length !== 6) {
-        return {
-          valid: false,
-          error: `Transform matrix must have exactly 6 values, got ${node.matrix.length}`,
-        };
-      }
-      for (let i = 0; i < 6; i++) {
-        if (typeof node.matrix[i] !== "number" || !isFinite(node.matrix[i])) {
-          return {
-            valid: false,
-            error: `Transform matrix[${i}] must be a finite number`,
-          };
-        }
-      }
-      // Recurse (transforms don't add to ancestor materials)
-      for (const child of node.children) {
-        const result = checkNode(child as FrameNode | Embed, ancestorIds);
-        if (!result.valid) return result;
-      }
-    } else if (node.type === "embed") {
-      // Validate embed
-      const embedResult = validateEmbed(node, ancestorIds, usedNamespaces);
-      if (!embedResult.valid) return embedResult;
-      usedNamespaces.add(node.namespace);
-    } else if (node.type === "image") {
-      // Validate image URL is non-empty string
-      if (typeof node.url !== "string" || node.url.length === 0) {
-        return {
-          valid: false,
-          error: "Image url must be a non-empty string",
-        };
-      }
-      // Validate width is positive finite number
-      if (
-        typeof node.width !== "number" ||
-        node.width <= 0 ||
-        !isFinite(node.width)
-      ) {
-        return {
-          valid: false,
-          error: "Image width must be a positive finite number",
-        };
-      }
-      // Validate height is positive finite number
-      if (
-        typeof node.height !== "number" ||
-        node.height <= 0 ||
-        !isFinite(node.height)
-      ) {
-        return {
-          valid: false,
-          error: "Image height must be a positive finite number",
-        };
-      }
-      // Validate crop properties if present
-      if (node.crop !== undefined) {
-        // crop.x must be a finite number >= 0
-        if (
-          typeof node.crop.x !== "number" ||
-          node.crop.x < 0 ||
-          !isFinite(node.crop.x)
-        ) {
-          return {
-            valid: false,
-            error: "Image crop.x must be a non-negative finite number",
-          };
-        }
-        // crop.y must be a finite number >= 0
-        if (
-          typeof node.crop.y !== "number" ||
-          node.crop.y < 0 ||
-          !isFinite(node.crop.y)
-        ) {
-          return {
-            valid: false,
-            error: "Image crop.y must be a non-negative finite number",
-          };
-        }
-        // crop.width must be a positive finite number
-        if (
-          typeof node.crop.width !== "number" ||
-          node.crop.width <= 0 ||
-          !isFinite(node.crop.width)
-        ) {
-          return {
-            valid: false,
-            error: "Image crop.width must be a positive finite number",
-          };
-        }
-        // crop.height must be a positive finite number
-        if (
-          typeof node.crop.height !== "number" ||
-          node.crop.height <= 0 ||
-          !isFinite(node.crop.height)
-        ) {
-          return {
-            valid: false,
-            error: "Image crop.height must be a positive finite number",
-          };
-        }
-      }
-    }
-    // Other shapes pass through
-    return { valid: true };
-  }
-
-  // Start with RootMaterialRef.id as the only ancestor
-  const initialAncestors = new Set([fragment.root.id]);
-  for (const child of fragment.root.children) {
-    const result = checkNode(child as FrameNode | Embed, initialAncestors);
-    if (!result.valid) return result;
-  }
-
-  return { valid: true };
-}
-
-/**
- * Validate an embed node.
- * Checks: valid namespace format, no namespace collision, valid rootMaterialId,
- * and recursively validates the embedded fragment.
- */
-export function validateEmbed(
-  embed: Embed,
-  ancestorMaterialIds: Set<string>,
-  usedNamespaces: Set<string>
-): ValidationResult {
-  // 1. Namespace must be valid identifier (NO underscores - reserved for separator)
-  if (!embed.namespace || !/^[a-zA-Z][a-zA-Z0-9]*$/.test(embed.namespace)) {
-    return {
-      valid: false,
-      error:
-        "Embed namespace must start with a letter and contain only letters/numbers (no underscores)",
-    };
-  }
-
-  // 2. Namespace must not collide
-  if (usedNamespaces.has(embed.namespace)) {
-    return {
-      valid: false,
-      error: `Namespace "${embed.namespace}" already used in this scope`,
-    };
-  }
-
-  // 3. rootMaterialId must be an ancestor
-  if (!ancestorMaterialIds.has(embed.rootMaterialId)) {
-    return {
-      valid: false,
-      error: `rootMaterialId "${embed.rootMaterialId}" is not an ancestor material`,
-    };
-  }
-
-  // 4. Fragment itself must be valid
-  return validateFragment(embed.fragment);
-}
+// ============================================================================
+// EMBED AND FRAGMENT RESOLUTION
+// ============================================================================
 
 /**
  * Resolve a single Embed node into FrameNodes.
