@@ -1,0 +1,354 @@
+[
+  {
+    "hash": "d7b1d86a1217264226e12b0aff791f9fd7a3b253",
+    "short_hash": "d7b1d86",
+    "author": "Chris Tierney",
+    "date": "2026-01-13T08:59:27Z",
+    "message": "docs: add background process cleanup instructions to CLAUDE.md\n\nAdd guidance to kill dev servers and watch processes after tasks complete\nto prevent accumulation of orphaned background processes.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 1
+  },
+  {
+    "hash": "c9a0c9ea29cc2ab053342dbaf3646bffd3de3a49",
+    "short_hash": "c9a0c9e",
+    "author": "Chris Tierney",
+    "date": "2026-01-13T08:45:50Z",
+    "message": "feat: implement Fragment type for composable generators\n\nAdd Fragment feature enabling generator composition:\n\nCore types (@medli/spec):\n- RootMaterialRef: Material reference for style inheritance\n- Fragment: Composable scene graph (RootMaterialRef + children)\n- Embed: Embeds Fragment with namespace and material binding\n- FragmentGenerator: Interface for fragment producers\n\nFunctions (@medli/spec):\n- validateFragment(): Validates fragment structure\n- validateEmbed(): Validates embed nodes\n- resolveEmbed(): Resolves Embed to FrameNodes with namespacing\n- resolveFrame(): Resolves all Embeds in a Frame\n- fragmentToFrame(): Converts Fragment to standalone Frame\n\nProcedural generator:\n- Sketch.embed(): Embed fragment at current material context\n- Sketch.createFragment(): Create fragment from draw function\n\nObject generator:\n- FragmentScene: Scene that produces Fragment instead of Frame\n- Scene.embed(): Embed fragment at root level\n- Group.embedFragment(): Embed fragment in groups\n\nVisual demo (test-app):\n- fragment-demo scene showing all Fragment capabilities\n- Cross-generator composition demo\n- Nested fragments demo\n- Style inheritance demo\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 9
+  },
+  {
+    "hash": "4dd90194baf20993c87693931334b80096d72e7f",
+    "short_hash": "4dd9019",
+    "author": "Chris Tierney",
+    "date": "2026-01-13T08:27:28Z",
+    "message": "docs: add Fragment design and implementation plan\n\nFragment enables generator composition by allowing reusable scene graph\npieces to be embedded into Frames or other Fragments. Design went through\n3 iterations with multiple review cycles.\n\nKey insight: Fragment ≈ Frame, with only RootMaterialRef instead of\nRootMaterial (no styles) and no viewport.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 2
+  },
+  {
+    "hash": "8ce922142ea8a74b412b8ad5b6cfc07f3683edbe",
+    "short_hash": "8ce9221",
+    "author": "Chris Tierney",
+    "date": "2026-01-12T21:49:21Z",
+    "message": "feat: add composable generator pipeline with validator and optimizer\n\nIntroduces a composable pipeline architecture for Frame processing:\n\nNew packages:\n- @medli/generator-validator: Wraps generators with frame validation\n- @medli/generator-optimizer: Optimizes Frame IR (transform merging,\n  material squashing, identity removal)\n- @medli/generator-utils: Shared matrix utilities\n\nChanges:\n- Simplified procedural/object generators (removed inline validation)\n- Added 55 validateFrame tests covering all validation paths\n- Integrated pipeline into harnesses and full-screen demos\n- Added AGENT.md files for new packages\n\nPipeline usage:\n  const gen = withOptimization(withValidation(rawGenerator));\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 30
+  },
+  {
+    "hash": "bbc085d2a123ed27930b08ff17ecb4ee60a5e967",
+    "short_hash": "bbc085d",
+    "author": "Chris Tierney",
+    "date": "2026-01-12T21:47:21Z",
+    "message": "feat: add pipeline performance benchmark harness\n\nAdds a standalone benchmark page for testing WebGPU renderer performance\nwith different pipeline configurations (none, validator, optimizer, both).\n\nUsage: /benchmark.html?shapes=500&pipeline=none\n\nDisplays real-time FPS, generator time, traversal time, and render time.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 2
+  },
+  {
+    "hash": "009f7dda501b4ab90a3f2e0f4b83bf66af517e6c",
+    "short_hash": "009f7dd",
+    "author": "Chris Tierney",
+    "date": "2026-01-11T15:10:55Z",
+    "message": "feat: add performance stress test scenes\n\nAdd 4 dedicated stress test scenes for controlled renderer comparison:\n- stress-shapes: configurable shape count (?shapes=N) in grid pattern\n- stress-animation: animated orbiting circles for per-frame stress\n- stress-batch: alternating circles/rectangles to test batching efficiency\n- stress-transforms: deeply nested Groups with accumulated transforms\n\nAll scenes support URL parameters for tuning intensity and produce\nidentical output across Canvas and WebGL renderers.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 6
+  },
+  {
+    "hash": "5aea83fe46007dd9cfa538f84e7403c1e8fd6f52",
+    "short_hash": "5aea83f",
+    "author": "Chris Tierney",
+    "date": "2026-01-11T14:11:49Z",
+    "message": "feat: make Renderer generic on metrics type\n\nEach renderer now defines its own metrics type extending BaseRendererMetrics:\n- CanvasRendererMetrics: base metrics only (no GPU, no batching)\n- SvgRendererMetrics: adds snapshotTime (previously hidden 10-100ms cost)\n- WebGLRendererMetrics: adds gpuTime, batchCount, gpuTimerAvailable\n\nThis provides type-safe access to renderer-specific metrics and removes\nmeaningless fields (e.g., batchCount was always 1 for Canvas/SVG).\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 8
+  },
+  {
+    "hash": "d8181efc6ba631113f1146da47318a0fb53c13ef",
+    "short_hash": "d8181ef",
+    "author": "Chris Tierney",
+    "date": "2026-01-11T12:45:04Z",
+    "message": "feat: implement WebGL renderer with full Frame spec support\n\n- Complete WebGL 2 renderer using TWGL.js and SDF shaders\n- All shapes: circles, rectangles, lines with visual parity\n- Image support with correct positioning and transforms\n- Tree-order rendering with smart consecutive batching\n- Proper transparency with premultiplied alpha blending\n- Sharp corners/line endings matching Canvas/SVG defaults\n- Optional clear (preserveDrawingBuffer) for accumulation mode\n- Test-app integration with WebGL renderer option\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 13
+  },
+  {
+    "hash": "b72400c7fa891141d883c8d9c562378e913ecfaa",
+    "short_hash": "b72400c",
+    "author": "Chris Tierney",
+    "date": "2026-01-11T00:20:13Z",
+    "message": "feat: flexible test-app with configurable generator/renderer grid\n\n- Unified harness module replacing 4 separate files\n- Custom dropdown controls for scene, generators, renderers\n- Multi-select with toggle for generators and renderers\n- Query params: ?scene=X&generator=Y&renderer=Z (multiple allowed)\n- Auto-redirect to explicit URL when params missing\n- Dynamic NxM grid (generators as rows, renderers as columns)\n- Consistent dropdown styling with blue highlights for selected items\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 7
+  },
+  {
+    "hash": "a9a7cb7bb578832267ebc41972bc3434ce8c83ac",
+    "short_hash": "a9a7cb7",
+    "author": "Chris Tierney",
+    "date": "2026-01-10T15:23:30Z",
+    "message": "feat: bootstrap WebGL and WebGPU renderer packages with design docs\n\nAdd two new renderer packages with comprehensive design documentation:\n\nWebGL (renderer-webgl):\n- Dependencies: twgl.js, gl-matrix\n- SDF-based rendering approach\n- Context loss handling documented\n- Buffer management strategy (256 initial, 2x growth)\n\nWebGPU (renderer-webgpu):\n- Dependencies: typegpu, gl-matrix\n- SDF-based rendering (mirrors WebGL approach)\n- Device loss handling documented\n- Buffer management strategy (same as WebGL)\n\nBoth packages include:\n- DESIGN.md with full implementation plan\n- AGENT.md with sub-agent instructions\n- Known limitations (transparency, future features)\n- Placeholder src/index.ts\n\nUpdated:\n- agents.toml with new package patterns\n- ARCHITECTURE.md with GPU Renderers section\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 14
+  },
+  {
+    "hash": "2e50997d1a417ae70043ce3bb1d0b51bfa3964c5",
+    "short_hash": "2e50997",
+    "author": "Chris Tierney",
+    "date": "2026-01-10T13:14:13Z",
+    "message": "feat: add overlay circles to pendulum joints for cleaner visuals\n\nEach joint now renders a smaller overlay circle last in its group,\ncovering the line endpoints that previously overlapped the joint circles.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 1
+  },
+  {
+    "hash": "6ed9fdac54cc4c1a69b0d4c4d10d5d9d029c7208",
+    "short_hash": "6ed9fda",
+    "author": "Chris Tierney",
+    "date": "2026-01-09T23:44:54Z",
+    "message": "refactor: simplify sketch module API\n\n- Move SketchModule and SketchInstance types to types.ts\n- Extract remote-pendulum sketch to its own file\n- Each sketch's create() now accepts HTML element and sets up interactions\n- SketchInstance simplified to { generator, destroy }\n- Remove interaction handlers from index.ts registry\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 6
+  },
+  {
+    "hash": "639e943f74247d0bc4f4d08aa97bedc7488bf477",
+    "short_hash": "639e943",
+    "author": "Chris Tierney",
+    "date": "2026-01-09T19:18:50Z",
+    "message": "fix: internalize DPR handling in canvas renderer\n\nCanvas renderer's toViewportCoords() now handles DPR scaling internally.\nCallers pass CSS pixel coordinates; the renderer scales to buffer coords.\n\nThis also fixes a bug where shapes appeared too small on high-DPI displays:\n- getCanvasSize() was returning buffer dimensions (CSS × DPR)\n- Viewport was being set to inflated dimensions\n- Shapes now render at correct size, matching original Processing sketches\n\nChanges:\n- CanvasRenderer.toViewportCoords() scales input by DPR internally\n- getCanvasSize() returns CSS dimensions, not buffer dimensions\n- Removed manual DPR scaling from interaction handlers\n- Updated comments to reflect CSS pixel coordinate space\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 6
+  },
+  {
+    "hash": "879968fc3efd8457978a5e60b24497ae8067c0c9",
+    "short_hash": "879968f",
+    "author": "Chris Tierney",
+    "date": "2026-01-09T17:37:15Z",
+    "message": "fix: add resolve.alias to Vite config for workspace package HMR\n\nDuring development, changes to workspace packages (renderers, generators,\nspec) were not being reflected in the browser. The optimizeDeps.exclude\nconfig wasn't sufficient - Vite needed explicit resolve.alias entries\npointing to source files for proper HMR.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 3
+  },
+  {
+    "hash": "b05ae640a9acd790617929578e0cc94c7aa85dd6",
+    "short_hash": "b05ae64",
+    "author": "Chris Tierney",
+    "date": "2026-01-09T15:25:21Z",
+    "message": "feat: add flexible full-screen demo page with sketch registry\n\n- Add full-screen.html and full-screen.ts for URL-driven sketch/renderer selection\n- Create sketches/index.ts registry for centralized sketch management\n- Update main page dropdown with links to 4 demo combinations\n- Refactor Trees sketch to handle canvas clearing internally\n- Remove standalone particle.html, trees.html and their entry files\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 10
+  },
+  {
+    "hash": "a0c50c347ebe2d401528bb3d938a9663047fa8ba",
+    "short_hash": "a0c50c3",
+    "author": "Chris Tierney",
+    "date": "2026-01-09T13:17:25Z",
+    "message": "fix: interaction works on all four renderer panels\n\n- Fix object generator: use circle.x/y instead of non-existent circle.center setter\n- Fix canvas DPI scaling: multiply tap coordinates by devicePixelRatio for canvas elements\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 2
+  },
+  {
+    "hash": "f2e09873e714389a16f88586104afc3866e68e07",
+    "short_hash": "f2e0987",
+    "author": "Chris Tierney",
+    "date": "2026-01-09T13:08:02Z",
+    "message": "feat: add interaction support with toViewportCoords and hammer.js\n\n- Add flexible toViewportCoords() function to renderer-common that transforms\n  element coordinates to viewport coordinates. Supports multiple input types:\n  single point tuple, array of tuples, Record, and Map.\n- Install es-toolkit in renderer-common for mapValues utility\n- Implement toViewportCoords on CanvasRenderer and SvgRenderer classes\n- Install hammer.js in test-app for gesture recognition\n- Add interaction demo scene with tap-to-move circle\n- Wire up hammer.js tap events to update circle position via coordinate transform\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 15
+  },
+  {
+    "hash": "1511527cb760c3312fa1b0e8309b5fc863e8891a",
+    "short_hash": "1511527",
+    "author": "Chris Tierney",
+    "date": "2026-01-09T12:28:05Z",
+    "message": "feat: add transparency demo scene\n\nDemonstrates rgba() CSS strings for transparent fill and stroke colors.\nTests all shapes (circle, rectangle, line) with overlapping transparent\nelements to verify alpha blending works correctly across all renderers.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 3
+  },
+  {
+    "hash": "db9c40916273b7cbb286536b78b22296e807614e",
+    "short_hash": "db9c409",
+    "author": "Chris Tierney",
+    "date": "2026-01-09T12:06:01Z",
+    "message": "feat: add rectangle primitive\n\nAdd Rectangle shape type to spec with center-based positioning.\nImplement rectangle() in procedural generator and Rectangle class\nin object generator. Both renderers handle center-to-corner\nconversion for their respective APIs.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 8
+  },
+  {
+    "hash": "4ba3bec6e2c97066dd427297cc0ff0acbcb3c3c3",
+    "short_hash": "4ba3bec",
+    "author": "Chris Tierney",
+    "date": "2026-01-09T11:29:25Z",
+    "message": "Merge branch 'feat/optional-clear'",
+    "files_changed": 0
+  },
+  {
+    "hash": "3a4d3ddb4b119dc8072408e859bbef57987a76c9",
+    "short_hash": "3a4d3dd",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T22:38:09Z",
+    "message": "refactor: simplify ResourceManager to single resolveResources() API\n\n- Replace markNeeded(), getResource(), pruneUnused() with single resolveResources()\n- Renderers now make one call per frame, receive Map of all processed resources\n- Pruning happens internally before returning\n- All 187 tests pass, visual verification confirms identical output\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 5
+  },
+  {
+    "hash": "2d18e3c6597b1de6319325999d5c5757552f42e3",
+    "short_hash": "2d18e3c",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T22:11:25Z",
+    "message": "feat: add image cropping support\n\nAdd optional crop property to Image shape for rendering partial images.\nUseful for sprite sheets and image atlases.\n\n- Add ImageCrop type and optional crop property to spec\n- Extend image() in ProceduralGenerator with crop parameters\n- Extend Image class in ObjectGenerator with crop parameters\n- Canvas renderer uses 9-param drawImage() for cropping\n- SVG renderer uses clipPath with scaled image positioning\n- Add image-crop test scene for visual verification\n- 187 tests pass, all 4 renderers produce identical output\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 10
+  },
+  {
+    "hash": "1de3de8209f3f059b028bf1f8b0cb42be9ca59f3",
+    "short_hash": "1de3de8",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T21:34:18Z",
+    "message": "feat(test-app): add scene infrastructure with URL-based selection\n\nAdds switchable scene support to test-app:\n- Scene registry with TestScene interface (procedural + object generators)\n- URL param `?scene=<id>` for scene selection\n- Harnesses now accept generator as parameter\n- Two scenes: full-demo (all features) and image-transforms (transform tests)\n\nThis enables testing specific features in isolation via different scenes.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 11
+  },
+  {
+    "hash": "6a64deed91f39d68a95512aa445bdd866f0b6771",
+    "short_hash": "6a64dee",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T21:07:13Z",
+    "message": "feat: implement V1 resource management system with image support\n\nAdd blocking resource management for external resources (images).\nEach renderer owns a ResourceManager<T> that fetches blobs and\napplies renderer-specific post-processing.\n\nKey changes:\n- Add Image shape type to spec (url, position, width, height)\n- Add ResourceManager<T> with getResource/markNeeded/pruneUnused/destroy\n- Add ResourcePostProcessor<T> interface for renderer injection\n- Add extractResourceUrls() utility for Frame traversal\n- Make Renderer.render() async (returns Promise<void>)\n- Add Renderer.destroy() for lifecycle cleanup\n- Update BaseRenderer for async render loop\n- Canvas: ResourceManager<ImageBitmap> with createImageBitmap/.close()\n- SVG: ResourceManager<string> with createObjectURL/revokeObjectURL\n- Add image() to both generators (parity)\n- Add test image and visual verification in test-app\n\nV1 constraints:\n- Blocking: render() waits for all resources\n- All-or-nothing: any resource failure fails the frame\n- Each renderer owns its ResourceManager (no sharing)\n- Diff-based disposal: resources removed from frame are disposed\n\nBreaking changes:\n- Renderer.render() now returns Promise<void>\n- Renderer interface requires destroy() method\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 13
+  },
+  {
+    "hash": "91efbf00e591d96fe7d5c6338e9e77b79ca50951",
+    "short_hash": "91efbf0",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T19:44:29Z",
+    "message": "fix: wrap shapes inside Groups with inline ChildMaterial nodes\n\nShapes inside Groups now correctly receive their material properties.\nPreviously, only direct Scene children were grouped by material - shapes\ninside Groups were emitted as raw geometry, falling back to root defaults.\n\nAdded inline material wrapping in Group.frame() that creates unique\nChildMaterial nodes for shapes with material references, preserving\nthe material's fill, stroke, and strokeWidth properties.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 3
+  },
+  {
+    "hash": "62cee0ef748614be3684601ba706817b9e1660f5",
+    "short_hash": "62cee0e",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T19:30:27Z",
+    "message": "feat: implement viewport coordinate system across all packages\n\nAdd center-origin, Y-up coordinate system with configurable scaling:\n\nSpec:\n- Add Viewport type (halfWidth, halfHeight, scaleMode)\n- Update Frame to require viewport property\n- Add viewport validation to validateFrame()\n\nRenderer-common:\n- Add computeViewportTransform() for Canvas transform calculation\n- Supports fit/fill/stretch scale modes\n\nSVG Renderer:\n- Use native viewBox and preserveAspectRatio for scaling\n- Y-flip via root group transform scale(1, -1)\n\nCanvas Renderer:\n- Manual viewport transform via computeViewportTransform()\n- Y-flip via scale(sx, -sy)\n- Query element size on each render (don't set it)\n\nGenerators:\n- Procedural: Add viewport() and scaleMode() methods to Sketch\n- Object: Scene constructor requires Viewport parameter\n\nTest-app:\n- Convert all coordinates to center-origin, Y-up system\n- Add ResizeObserver for dynamic canvas buffer sizing\n- CSS ensures SVG and Canvas scale together\n\n170 tests pass, visual parity verified across all 4 renderers.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 16
+  },
+  {
+    "hash": "1489a945ac708f0877044953c05956daac26004e",
+    "short_hash": "1489a94",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T17:05:02Z",
+    "message": "refactor: SceneObject base class with transforms for all scene objects\n\nDesign changes (three.js-inspired):\n- SceneObject abstract base class provides position, rotation, scale\n- Shapes (Circle, Line) extend SceneObject - have transforms directly\n- Group extends SceneObject - has transforms, NO material property\n- Shapes without material use Scene's default styles\n\nThis matches three.js patterns where:\n- Object3D provides transforms for all objects\n- Mesh has both transforms and material\n- Group is purely organizational (no material)\n\nAPI improvement - shapes can now be transformed directly:\n```typescript\nconst circle = new Circle(0, 0, 10);\ncircle.position = { x: 50, y: 50 };\ncircle.material = redMaterial;\nscene.add(circle);\n```\n\nInstead of requiring a Group wrapper for every transform.\n\n- Updated AGENT.md with design decisions and class hierarchy\n- Updated ARCHITECTURE.md with object generator patterns\n- 163 tests passing, visual parity verified\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 5
+  },
+  {
+    "hash": "e2456eb1fe72ee8a7fbce15b2c593a801ce9a6e1",
+    "short_hash": "e2456eb",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T16:16:09Z",
+    "message": "feat: implement transform support across all packages\n\n- Add Transform type with 6-value 2D affine matrix [a,b,c,d,e,f] to spec\n- Add Matrix2D type and matrix validation in validateFrame()\n- Add translate(), rotate(), scale() APIs to procedural generator\n  - Matrix helpers: identityMatrix, translateMatrix, rotateMatrix, scaleMatrix, multiplyMatrices\n  - Transform state saved/restored with push()/pop()\n  - Shapes wrapped in Transform nodes when matrix is non-identity\n- Add Group class to object generator (three.js-style)\n  - position, rotation, scale properties\n  - computeMatrix() composes TRS in standard order\n  - Groups can be nested and contain shapes\n- Update SVG renderer: <g transform=\"matrix(...)\"> for Transform nodes\n- Update Canvas renderer: ctx.save()/transform()/restore() for Transform nodes\n- Update test-app with transform examples: translate, rotate, scale compositions\n- All 4 renderers produce identical visual output\n- 155 tests passing\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 11
+  },
+  {
+    "hash": "7d5bab672c35b27cd7087a9c049f2203bce84fed",
+    "short_hash": "7d5bab6",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T15:52:16Z",
+    "message": "docs: design transform representation for Frame spec\n\nResearch validated user opinions on transform design:\n- Transform nodes distinct from Materials (validated with nuance)\n- Transforms accumulate via matrix multiplication, no inheritance (strongly validated)\n- Matrix as canonical form for render-focused IR (validated)\n\nSelected: 6-value 2D affine matrix [a,b,c,d,e,f]\n- No id attribute (transforms don't need references)\n- Flexible nesting with Materials\n- Compact forms deferred as future optimization\n- Post-processor can merge sequential transforms\n\nUpdated documentation:\n- ARCHITECTURE.md: pipeline, transforms, future optimizer\n- spec/AGENT.md: transform guidance\n- renderer-common/AGENT.md: future candidates\n\nDecision graph: 28 nodes on feat/transforms branch\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 4
+  },
+  {
+    "hash": "6c3daecc10c1d68b0c0df0de5637e0b239a139cf",
+    "short_hash": "6c3daec",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T14:49:05Z",
+    "message": "docs: restructure agent instructions for minimal context usage\n\n- Reduce agents.toml from 264 to 38 lines (dispatch table only)\n- Add docs/ARCHITECTURE.md for cross-cutting concerns (83 lines)\n- Add AGENT.md to each package with strong directive instructions\n- Update CLAUDE.md Sub-Agents section for new workflow\n\nStructure:\n- agents.toml: patterns, brief, reading_list per package\n- ARCHITECTURE.md: Frame IR, API vs IR distinction, parity requirements\n- AGENT.md: \"Your job is to be opinionated...\", constraints, review checklist\n\nTask agents now read their reading_list files instead of receiving\nverbose inline instructions, reducing main conversation context.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 12
+  },
+  {
+    "hash": "1c769929434697ac59b6dbffa723a09e53f4e649",
+    "short_hash": "1c76992",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T14:15:14Z",
+    "message": "feat: complete material system with TDD tests and three.js-style API\n\n- Add comprehensive unit tests for both generators (92 tests total)\n- ProceduralGenerator: fill()/stroke()/strokeWidth() create ChildMaterial nodes\n- ProceduralGenerator: push()/pop() for nested material contexts\n- ObjectGenerator: Fix API to use three.js-style material references\n  - Materials are independent objects, not containers\n  - Shapes reference materials via .material property\n  - Generator transforms flat API to nested Frame IR tree\n- Update test-app with visual pattern exercising all material features\n- Update agents.toml to clarify API vs IR distinction\n- All 4 renderer outputs visually identical (verified with Playwright)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 10
+  },
+  {
+    "hash": "027481e1bd619e1d7b0c45b7c679db4870e8e065",
+    "short_hash": "027481e",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T13:04:06Z",
+    "message": "feat: implement Material-based Frame spec with validation\n\nTransform Frame from flat structure to Material-based tree for style inheritance.\n\nSpec changes:\n- Add RootMaterial (complete) and ChildMaterial (partial with ref) types\n- Add validateFrame() for single-pass tree validation\n- Add resolveMaterial() for style inheritance resolution\n- Frame now uses root: RootMaterial instead of shapes: Shape[]\n\nGenerator changes:\n- ProceduralGenerator emits Material tree, adds fill/stroke/strokeWidth methods\n- ObjectGenerator (Scene) emits Material tree, adds fill/stroke/strokeWidth props\n\nRenderer changes:\n- Both renderers call validateFrame() before rendering\n- Traverse Material tree with renderNode(), resolve styles per shape\n- Shapes now rendered with material fill/stroke/strokeWidth\n\nSafety:\n- resolveMaterial() guards against empty ancestors array\n- validateFrame() checks root has all required properties\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 11
+  },
+  {
+    "hash": "8ff4c94ab2a171e09ea1f97057b848c6dee43e3d",
+    "short_hash": "8ff4c94",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T12:39:46Z",
+    "message": "docs: add Material-based Frame spec design documentation\n\n- Create comprehensive spec/README.md documenting:\n  - Material-based tree structure (RootMaterial, ChildMaterial, Shapes)\n  - Validation rules (single-pass, ancestor-only refs, unique IDs)\n  - Style resolution algorithm\n  - Design decisions and rationale\n  - Future extensions (transforms, additional properties)\n\n- Update generator READMEs with Material output sections:\n  - Procedural: fill()/stroke() create Material nodes, push/pop mapping\n  - Object: Material class provides style context for children\n\n- Update agents.toml to be lightweight pointers to READMEs\n\n- Sync decision graph with design decisions and implementation plan\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 5
+  },
+  {
+    "hash": "3816817b83cb419f87936bb0cd8e4dd149674901",
+    "short_hash": "3816817",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T10:32:18Z",
+    "message": "feat: add line primitive with two API variants\n\nLine rendering support:\n- Spec: Line type with start/end positions\n- Procedural: line(x1,y1,x2,y2) and lineOffset(x,y,dx,dy)\n- Object: Line class with fromOffset() factory\n- SVG/Canvas: 5px black stroke rendering\n- Test app: examples using both API variants\n\nAlso strengthened CLAUDE.md sub-agent requirements:\n- ALL file edits must use Task agents\n- One agent per package for multi-package features\n- Parallel execution for independent packages\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 10
+  },
+  {
+    "hash": "bd6abfcd694d6edb69212758cea2a476bf11ee04",
+    "short_hash": "bd6abfc",
+    "author": "Chris Tierney",
+    "date": "2026-01-08T09:45:10Z",
+    "message": "feat: add circle primitive with Position type\n\n- Add Position type (x, y) and Circle shape to spec\n- Add circle(x, y, radius) to procedural generator Sketch\n- Add Circle class to object generator with scene integration\n- Update SVG renderer to create <circle> elements\n- Update Canvas renderer to use arc() API\n- All circles rendered as black (color support coming later)\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 8
+  },
+  {
+    "hash": "ba486834897673646902c434a62eb4865d8ee012",
+    "short_hash": "ba48683",
+    "author": "Chris Tierney",
+    "date": "2026-01-07T17:02:15Z",
+    "message": "feat: add sub-agent configuration for domain-specific context\n\n- Create .claude/agents.toml with 7 agent definitions\n- Each agent captures design philosophy, constraints, and instructions\n- Update CLAUDE.md with sub-agent usage rules and feature parity requirements\n- Generators: procedural (p5.js-inspired) and object (three.js-inspired)\n- Renderers: common, svg, canvas with specific rendering guidance\n- test-app: visual verification workflow with Playwright\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 3
+  },
+  {
+    "hash": "7d24fb50b2cb03ac582ca03f1dba91ff75596507",
+    "short_hash": "7d24fb5",
+    "author": "Chris Tierney",
+    "date": "2026-01-07T16:16:38Z",
+    "message": "feat: consistent background(color) function API for both generators\n\n- Object generator now exports background() function matching procedural API\n- Fixed SVGSVGElement cast errors using querySelector with type parameter\n- Added typecheck and stub scripts to test-app package.json\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 3
+  },
+  {
+    "hash": "dd27045bbb3e7523239e32f0f71c20d34d77bbbf",
+    "short_hash": "dd27045",
+    "author": "Chris Tierney",
+    "date": "2026-01-07T15:54:40Z",
+    "message": "feat: reorganize test app layout to group renderers by generator type\n\nRenderers now displayed in two columns (Procedural | Object) instead of\nby renderer type (SVG | Canvas), with color-coded column headers.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 2
+  },
+  {
+    "hash": "d9b79db59e672e5356b7ddb4d3b583d6700b0167",
+    "short_hash": "d9b79db",
+    "author": "Chris Tierney",
+    "date": "2026-01-07T15:21:38Z",
+    "message": "feat: major architecture improvements across generators and renderers\n\nTest App:\n- Refactor to 2 generators + 4 harnesses with code display\n- Remove old apps/ directory, add generators/ and harnesses/\n- Show generator code and harness code separately\n\nRenderers:\n- Add @medli/renderer-common with BaseRenderer abstract class\n- SVG and Canvas renderers extend BaseRenderer (shared loop/stop)\n- Default to white background when backgroundColor undefined\n\nObject Generator:\n- Remove ObjectGenerator class - Scene IS the generator\n- Scene implements Generator, pass directly to renderers\n- Add SceneObject interface for extensible scene tree\n- Background is optional via setBackground()/add()/remove()\n\nProcedural Generator:\n- Redesign with p5.js-style sketch pattern\n- Pass draw function: new ProceduralGenerator((p) => p.background(color))\n- Sketch context provides background() and time\n\nSpec:\n- Frame.backgroundColor is now optional\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 30
+  },
+  {
+    "hash": "fd888fb91e7790f7c68716a87f8a5e3e96f2fac3",
+    "short_hash": "fd888fb",
+    "author": "Chris Tierney",
+    "date": "2026-01-07T14:37:32Z",
+    "message": "feat: refactor test app with separate app files and code display\n\n- Create 4 separate app files demonstrating API styles:\n  - proc-svg.ts, proc-canvas.ts (p5.js-style procedural)\n  - obj-svg.ts, obj-canvas.ts (three.js-style object-oriented)\n- Each app uses animation loop instead of recreating on change\n- Add \"Show Code\" buttons with live source via Vite ?raw imports\n- Add npm run dev script at root level\n- Update Claude Code permissions for deciduous commands\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 10
+  },
+  {
+    "hash": "d6f8dcd281eb8d47f6eaff1dc2b9f7d10e738fda",
+    "short_hash": "d6f8dcd",
+    "author": "Chris Tierney",
+    "date": "2026-01-07T13:08:55Z",
+    "message": "chore: add Claude Code permissions settings\n\nAuto-approve common dev actions:\n- npm/pnpm commands\n- git operations (except force push/hard reset)\n- deciduous graph commands\n- file edits within repo\n- Playwright and Context7 MCP tools\n- localhost curl/fetch\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 1
+  },
+  {
+    "hash": "fb0155b3fa354c04c9e991523e7e4c6f0f4b12c8",
+    "short_hash": "fb0155b",
+    "author": "Chris Tierney",
+    "date": "2026-01-07T13:01:08Z",
+    "message": "feat: add visual test app for renderer verification\n\n- Add @medli/test-app package with Vite dev server\n- 2x2 matrix testing all generator/renderer combinations\n- Interactive color picker for live verification\n- Configured for Playwright MCP visual testing workflow\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 10
+  },
+  {
+    "hash": "08cded78e34592bcc0f293c372099cd5b36ba005",
+    "short_hash": "08cded7",
+    "author": "Chris Tierney",
+    "date": "2026-01-07T12:14:35Z",
+    "message": "feat: simplify spec to Frame type with background color\n\nReplace the generic Shape-based spec with a simpler Frame-based approach:\n- Frame type contains only backgroundColor\n- Generator.frame(time) returns a Frame\n- Renderer has render(time), loop(), and stop() methods\n- Renderers accept HTML elements and render 100x100 squares\n- Added DOM lib support for renderer packages\n- Added jest-environment-jsdom for renderer tests\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 14
+  },
+  {
+    "hash": "bfecf05fe3ba212eb31216faaf87e0d2941d62f9",
+    "short_hash": "bfecf05",
+    "author": "Chris Tierney",
+    "date": "2026-01-06T13:21:30Z",
+    "message": "feat: bootstrap TypeScript monorepo with npm workspaces\n\nSet up a monorepo structure with five packages:\n- @medli/spec: Core types and interfaces\n- @medli/generator-procedural: Procedural shape generation\n- @medli/generator-object: Object-based shape generation\n- @medli/renderer-svg: SVG rendering\n- @medli/renderer-canvas: Canvas rendering\n\nConfigured tooling:\n- TypeScript with project references\n- Jest with ts-jest for testing\n- ESLint with flat config\n- Prettier for formatting\n\nUpdated CLAUDE.md with success criteria for edits and\nacceptance criteria before committing.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "files_changed": 30
+  }
+]
